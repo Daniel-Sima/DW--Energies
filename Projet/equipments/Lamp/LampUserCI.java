@@ -1,4 +1,4 @@
-package equipments.CookingPlate;
+package equipments.Lamp;
 
 import fr.sorbonne_u.components.interfaces.OfferedCI;
 import fr.sorbonne_u.components.interfaces.RequiredCI;
@@ -7,7 +7,7 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The component interface <code>CookingPlateUserCI</code> defines the services a
+ * The component interface <code>LampUserCI</code> defines the services a
  * cooking plate component offers and that can be required from it.
  *
  * <p><strong>Description</strong></p>
@@ -23,15 +23,15 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-public interface CookingPlateUserCI 
-extends OfferedCI, RequiredCI, CookingPlateImplementationI{
+public interface LampUserCI 
+extends OfferedCI, RequiredCI, LampImplementationI{
 	
 	// TODO voir pour les @see
 	@Override
-	public CookingPlateState getState() throws Exception;
+	public LampState getState() throws Exception;
 	
 	@Override
-	public int	getMode() throws Exception;
+	public LampMode	getMode() throws Exception;
 	
 	@Override
 	public void turnOn() throws Exception;

@@ -1,11 +1,23 @@
-package equipments.CookingPlate;
+package equipments.Lamp;
+
+/*
+Lampe à 3 modes de luminosité
+Matériel: plastique et silicone
+Couleur de la lumière: blanc chaud
+Tension de l'adaptateur: 12 V 0,5 A
+Lumen: 500LM
+Température de couleur: 3000K
+Indice de rendu des couleurs:> 80 Ra
+Pmax = 5.5W
+mode 1 = 10% | mode 2 = 50% | mode 3 = 100% 
+ */
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The interface <code>CookingPlateImplementationI</code> defines the signatures
- * of services service implemented by the cooking plate component.
+ * The interface <code>LampImplementationI</code> defines the signatures
+ * of services service implemented by the lamp component.
  *
  * <p>
  * <strong>Description</strong>
@@ -28,13 +40,13 @@ package equipments.CookingPlate;
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-public interface CookingPlateImplementationI {
+public interface LampImplementationI {
 	// -------------------------------------------------------------------------
 	// Inner interfaces and types
 	// -------------------------------------------------------------------------
 	/**
-	 * The enumeration <code>CookingPlateState</code> describes the operation states
-	 * of the cooking plate.
+	 * The enumeration <code>LampState</code> describes the operation states
+	 * of the lamp.
 	 *
 	 * <p>
 	 * <strong>Description</strong>
@@ -47,24 +59,24 @@ public interface CookingPlateImplementationI {
 	 * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
 	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
-	public static enum CookingPlateState {
-		/** cooking plate is on. */
+	public static enum LampState {
+		/** lamp is on. */
 		ON,
-		/** cooking plate is off. */
+		/** lamp is off. */
 		OFF
 	}
 
 	/***********************************************************************************/
 	/**
-	 * Array of <code>CookingPlateMode</code> describes the operation modes
-	 * of the cooking plate.
+	 * The enumeration <code>LampMode</code> describes the operation modes
+	 * of the lamp.
 	 *
 	 * <p>
 	 * <strong>Description</strong>
 	 * </p>
 	 * 
 	 * <p>
-	 * The cooking plate has 7 modes, from 0 to 6, from the coldest to the hottest temperature.
+	 * The lamp has 7 modes, from 1 to 7, from the coldest to the hottest temperature.
 	 * </p>
 	 * 
 	 * <p>
@@ -74,14 +86,18 @@ public interface CookingPlateImplementationI {
 	 * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
 	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
-	public static int[] CookingPlateMode =	new int[] {50, 80, 120, 160, 200, 250, 300};
+	public static enum LampMode {
+		MODE_1, // 10%
+		MODE_2, // 50%
+		MODE_3	// 100%
+	}
 	/***********************************************************************************/
 	// -------------------------------------------------------------------------
 	// Component services signatures
 	// -------------------------------------------------------------------------
 
 	/**
-	 * return the current state of the cooking plate.
+	 * return the current state of the lamp.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -90,14 +106,14 @@ public interface CookingPlateImplementationI {
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @return				the current state of the cooking plate.
+	 * @return				the current state of the lamp.
 	 * @throws Exception 	<i>TODO</i>.
 	 */
-	public CookingPlateState getState() throws Exception;
+	public LampState getState() throws Exception;
 	
 	/***********************************************************************************/
 	/**
-	 * return the current operation mode of the cooking plate.
+	 * return the current operation mode of the lamp.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -106,21 +122,21 @@ public interface CookingPlateImplementationI {
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @return				the current state of the cooking plate.
+	 * @return				the current state of the lamp.
 	 * @throws Exception 	<i>TODO</i>.
 	 */
-	public int getMode() throws Exception;
+	public LampMode	getMode() throws Exception;
 	
 	/***********************************************************************************/
 	/**
-	 * turn on the cooking plate, put in the mode 0 (50°).
+	 * turn on the lamp, put in the mode 0 (50°).
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code getState() == CookingPlate.OFF}
-	 * post	{@code getMode() == CookingPlateMode.MODE_1}
-	 * post	{@code getState() == CookingPlateMode.ON}
+	 * pre	{@code getState() == Lamp.OFF}
+	 * post	{@code getMode() == LampMode.MODE_1}
+	 * post	{@code getState() == LampMode.ON}
 	 * </pre>
 	 *
 	 * @throws Exception <i>TODO</i>.
@@ -129,13 +145,13 @@ public interface CookingPlateImplementationI {
 	
 	/***********************************************************************************/
 	/**
-	 * turn off the cooking plate.
+	 * turn off the lamp.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
 	 * pre	{@code true}	// no precondition.
-	 * post	{@code getState() == CookingPlateState.OFF}
+	 * post	{@code getState() == LampState.OFF}
 	 * </pre>
 	 *
 	 * @throws Exception	<i>to do</i>.
@@ -144,12 +160,12 @@ public interface CookingPlateImplementationI {
 	
 	/***********************************************************************************/
 	/**
-	 * increase the cooking plate MODE.
+	 * increase the lamp MODE.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code getState() == CookingPlateState.ON}
+	 * pre	{@code getState() == LampState.ON}
 	 * </pre>
 	 *
 	 * @throws Exception	<i>to do</i>.
@@ -158,12 +174,12 @@ public interface CookingPlateImplementationI {
 	
 	/***********************************************************************************/
 	/**
-	 * decrease the cooking plate MODE
+	 * decrease the lamp MODE
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code getState() == CookingPlateState.ON}
+	 * pre	{@code getState() == LampState.ON}
 	 * </pre>
 	 *
 	 * @throws Exception	<i>to do</i>.
