@@ -110,7 +110,7 @@ implements	HeaterUserImplI,
 	/** URI of the heater port for internal control.						*/
 	public static final String		INTERNAL_CONTROL_INBOUND_PORT_URI =
 									"HEATER-INTERNAL-CONTROL-INBOUND-PORT-URI";
-	/** URI of the heater port for internal control.						*/
+	/** URI of the heater port for external control.						*/
 	public static final String		EXTERNAL_CONTROL_INBOUND_PORT_URI =
 									"HEATER-EXTERNAL-CONTROL-INBOUND-PORT-URI";
 
