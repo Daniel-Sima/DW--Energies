@@ -51,11 +51,11 @@ implements CookingPlateImplementationI{
 	/** when true, methods trace their actions.								*/
 	public static final boolean VERBOSE = true;
 	public static final CookingPlateState INITIAL_STATE = CookingPlateState.OFF;
-	public static final int INITIAL_MODE = CookingPlateMode[0];
+	public static final int INITIAL_TEMPERATURE = CookingPlateTemperature[0];
 
 	/** current state (on, off) of the cooking plate.							*/
 	protected CookingPlateState currentState;
-	/** current mode of operation (1 to 7) of the cooking plate.			*/
+	/** current mode of operation (1 (50°) to 7 (300°)) of the cooking plate.			*/
 	protected int currentMode;
 
 	/** inbound port offering the <code>CookingPlateUserCI</code> interface.		*/
@@ -155,7 +155,7 @@ implements CookingPlateImplementationI{
 		assert	!cookingPlateInboundPortURI.isEmpty() : new PreconditionException("!cookingPlateInboundPortURI.isEmpty()");
 
 		this.currentState = INITIAL_STATE;
-		this.currentMode = INITIAL_MODE;
+		this.currentMode = 0; // 50°
 		this.cookingPlateInboudPort  = new CookingPlateInboundPort(cookingPlateInboundPortURI, this);
 		this.cookingPlateInboudPort.publishPort();
 
@@ -203,12 +203,12 @@ implements CookingPlateImplementationI{
 	 * @see
 	 */
 	@Override
-	public int getMode() throws Exception {
+	public int getTemperature() throws Exception {
 		if (CookingPlate.VERBOSE) { 
-			this.traceMessage("Cooking plate returns its mode : " + this.currentMode + ".\n");
+			this.traceMessage("Cooking plate returns its temperature : " + CookingPlateTemperature[this.currentMode] + " corresponding mode "+this.currentMode+".\n");
 		}
 
-		return this.currentMode;
+		return CookingPlateTemperature[this.currentMode];
 	}
 
 	/***********************************************************************************/
@@ -224,7 +224,7 @@ implements CookingPlateImplementationI{
 		assert this.getState() == CookingPlateState.OFF : new PreconditionException("getState() == CookingPlateState.OFF");
 
 		this.currentState = CookingPlateState.ON;
-		this.currentMode = CookingPlateMode[0];
+		this.currentMode = 0;
 	}
 
 	/***********************************************************************************/
@@ -250,13 +250,15 @@ implements CookingPlateImplementationI{
 	public void increaseMode() throws Exception {
 		assert	this.getState() == CookingPlateState.ON :
 			new PreconditionException("getState() == CookingPlateState.ON");
+		
+		assert this.currentMode < 6: new PreconditionException("this.currentMode < 6");
 
-		int nextMode = this.currentMode == 6 ? 6 : this.currentMode+1; 
+		int nextMode = this.currentMode+1; 
 		if (CookingPlate.VERBOSE) {
-			this.traceMessage("Cooking plate is increasing its mode from "+this.currentMode+" to "+nextMode+".\n");
+			this.traceMessage("Cooking plate is increasing its mode from "+this.currentMode+" ("+CookingPlateTemperature[this.currentMode]+"°) to "+nextMode+" ("+CookingPlateTemperature[nextMode]+"°)"+"\n");
 		}
 
-		this.currentMode = CookingPlateMode[nextMode]; 
+		this.currentMode = nextMode; 
 	}
 
 	/***********************************************************************************/
@@ -267,12 +269,15 @@ implements CookingPlateImplementationI{
 	public void decreaseMode() throws Exception {
 		assert	this.getState() == CookingPlateState.ON : new PreconditionException("getState() == CookingPlateState.ON");
 
-		int nextMode = this.currentMode == 0 ? 0 : this.currentMode-1; 
+		assert this.currentMode > 0: new PreconditionException("this.currentMode > 0");
+		
+		int nextMode = this.currentMode-1; 
 		if (CookingPlate.VERBOSE) {
-			this.traceMessage("Cooking plate is decreasing its mode from "+this.currentMode+" to "+nextMode+".\n");
+			this.traceMessage("Cooking plate is decrasing its mode from "+this.currentMode+" ("+CookingPlateTemperature[this.currentMode]+"°) to "+nextMode+" ("+CookingPlateTemperature[nextMode]+"°)"+"\n");
+
 		}
 
-		this.currentMode = CookingPlateMode[nextMode];
+		this.currentMode = nextMode;
 	}
 }
 /***********************************************************************************/

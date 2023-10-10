@@ -31,7 +31,7 @@ extends OfferedCI, RequiredCI, CookingPlateImplementationI{
 	public CookingPlateState getState() throws Exception;
 	
 	@Override
-	public int	getMode() throws Exception;
+	public int	getTemperature() throws Exception;
 	
 	@Override
 	public void turnOn() throws Exception;

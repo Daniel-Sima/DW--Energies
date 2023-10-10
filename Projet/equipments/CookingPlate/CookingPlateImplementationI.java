@@ -74,7 +74,7 @@ public interface CookingPlateImplementationI {
 	 * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
 	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
-	public static int[] CookingPlateMode =	new int[] {50, 80, 120, 160, 200, 250, 300};
+	public static int[] CookingPlateTemperature =	new int[] {50, 80, 120, 160, 200, 250, 300};
 	/***********************************************************************************/
 	// -------------------------------------------------------------------------
 	// Component services signatures
@@ -97,7 +97,7 @@ public interface CookingPlateImplementationI {
 	
 	/***********************************************************************************/
 	/**
-	 * return the current operation mode of the cooking plate.
+	 * return the current operation temperature of the cooking plate.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -109,7 +109,7 @@ public interface CookingPlateImplementationI {
 	 * @return				the current state of the cooking plate.
 	 * @throws Exception 	<i>TODO</i>.
 	 */
-	public int getMode() throws Exception;
+	public int getTemperature() throws Exception;
 	
 	/***********************************************************************************/
 	/**

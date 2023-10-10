@@ -86,8 +86,8 @@ implements	CookingPlateUserCI{
 	 * @see 
 	 */
 	@Override
-	public int getMode() throws Exception {
-		return ((CookingPlateUserCI)this.getConnector()).getMode();
+	public int getTemperature() throws Exception {
+		return ((CookingPlateUserCI)this.getConnector()).getTemperature();
 	}
 
 	/***********************************************************************************/

@@ -107,7 +107,7 @@ extends AbstractComponent {
 	{
 		this.logMessage("testGetMode()... ");
 		try {
-			assertEquals(0, this.cookingPlateOutboundPort.getMode());
+			assertEquals(50, this.cookingPlateOutboundPort.getTemperature());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -122,7 +122,7 @@ extends AbstractComponent {
 			assertEquals(CookingPlateState.OFF, this.cookingPlateOutboundPort.getState());
 			this.cookingPlateOutboundPort.turnOn();
 			assertEquals(CookingPlateState.ON, this.cookingPlateOutboundPort.getState());
-			assertEquals(0, this.cookingPlateOutboundPort.getMode());
+			assertEquals(50, this.cookingPlateOutboundPort.getTemperature());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -148,11 +148,69 @@ extends AbstractComponent {
 	}
 
 	/***********************************************************************************/
+	public void	testIncreaseDecrease() {
+		this.logMessage("testSetLowHigh()... ");
+		try {
+			this.cookingPlateOutboundPort.turnOn();
+			this.cookingPlateOutboundPort.increaseMode();
+			assertEquals(CookingPlateState.ON, this.cookingPlateOutboundPort.getState());
+			assertEquals(CookingPlate.CookingPlateTemperature[1], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.increaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[2], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.increaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[3], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.increaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[4], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.increaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[5], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.increaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[6], this.cookingPlateOutboundPort.getTemperature());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			assertThrows(ExecutionException.class,
+					() -> this.cookingPlateOutboundPort.increaseMode());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			this.cookingPlateOutboundPort.decreaseMode();
+			assertEquals(CookingPlateState.ON, this.cookingPlateOutboundPort.getState());
+			assertEquals(CookingPlate.CookingPlateTemperature[5], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.decreaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[4], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.decreaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[3], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.decreaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[2], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.decreaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[1], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.decreaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[0], this.cookingPlateOutboundPort.getTemperature());	
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			assertThrows(ExecutionException.class,
+					() -> this.cookingPlateOutboundPort.decreaseMode());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			this.cookingPlateOutboundPort.turnOff();
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		this.logMessage("...done.");
+	}
+
+	/***********************************************************************************/
 	protected void runAllTests() {
-//		this.testGetState();
+		this.testGetState();
 		this.testGetMode();
-//		this.testTurnOnOff();
-		//		this.testSetLowHigh();
+		this.testTurnOnOff();
+		this.testIncreaseDecrease();
 	}
 
 	// -------------------------------------------------------------------------

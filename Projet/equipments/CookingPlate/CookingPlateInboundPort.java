@@ -90,9 +90,9 @@ implements CookingPlateUserCI{
 	 * @see
 	 */
 	@Override
-	public int getMode() throws Exception {
+	public int getTemperature() throws Exception {
 		return this.getOwner().handleRequest(
-				o -> ((CookingPlateImplementationI)o).getMode());
+				o -> ((CookingPlateImplementationI)o).getTemperature());
 	}
 
 	/***********************************************************************************/
