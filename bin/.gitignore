@@ -1,4 +1,6 @@
 /.DS_Store
-/fr/
+/._.DS_Store
+/.gitignore
 /equipments/
-/equipements/
+/fr/
+/production/
