@@ -251,9 +251,9 @@ extends		AbstractComponent
 
 	protected void runAllTests()
 	{
-//		this.testGetState();
-//		this.testGetMode(); 
-//		this.testTurnOnOff();
+		this.testGetState();
+		this.testGetMode(); 
+		this.testTurnOnOff();
 		this.testIncreaseDecreaseMode();
 	}
 
