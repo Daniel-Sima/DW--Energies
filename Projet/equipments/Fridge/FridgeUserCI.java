@@ -37,8 +37,8 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
 
 // -----------------------------------------------------------------------------
 /**
- * The component interface <code>AirConditioningUserCI</code> declares the signature
- * of the services offered and that can be required by the user from the air conditioning.
+ * The component interface <code>FridgeUserCI</code> declares the signature
+ * of the services offered and that can be required by the user from the fridge.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -59,56 +59,74 @@ extends		OfferedCI,
 			FridgeUserImplI
 {
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserImplI#on()
+	 * @see equipments.Fridge.FridgeUserImplI#on()
 	 */
 	@Override
 	public boolean		on() throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserImplI#switchOn()
+	 * @see equipments.Fridge.FridgeUserImplI#switchOn()
 	 */
 	@Override
 	public void			switchOn() throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserImplI#switchOff()
+	 * @see equipments.Fridge.FridgeUserImplI#switchOff()
 	 */
 	@Override
 	public void			switchOff() throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserImplI#setTargetTemperature(double)
+	 * @see equipments.Fridge.FridgeUserAndControlI#setTargetFreezerTemperature()
 	 */
 	@Override
-	public void			setTargetTemperature(double target) throws Exception;
-
+	public void		setTargetFreezerTemperature(double targetFreezer) throws Exception;
+	
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndControlI#getTargetTemperature()
+	 * @see equipments.Fridge.FridgeUserAndControlI#getTargetFreezerTemperature(double targetFreezer)
 	 */
 	@Override
-	public double		getTargetTemperature() throws Exception ;
+	public double		getTargetFreezerTemperature() throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndControlI#getCurrentTemperature()
+	 * @see equipments.Fridge.FridgeUserAndControlI#getCurrentFreezerTemperature()
 	 */
 	@Override
-	public double		getCurrentTemperature() throws Exception;
+	public double		getCurrentFreezerTemperature() throws Exception;
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#setTargetCoolerTemperature(double targetCooler)
+	 */
+	@Override
+	public void		setTargetCoolerTemperature(double targetCooler) throws Exception;
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#getTargetCoolerTemperature()
+	 */
+	@Override
+	public double		getTargetCoolerTemperature() throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndExternalControlI#getMaxPowerLevel()
+	 * @see equipments.Fridge.FridgeUserAndControlI#getCurrentCoolerTemperature()
+	 */
+	@Override
+	public double		getCurrentCoolerTemperature() throws Exception;
+
+	/**
+	 * @see equipments.Fridge.FridgeUserAndExternalControlI#getMaxPowerLevel()
 	 */
 	@Override
 	public double		getMaxPowerLevel() throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndExternalControlI#setCurrentPowerLevel(double)
+	 * @see equipments.Fridge.FridgeUserAndExternalControlI#setCurrentPowerLevel(double)
 	 */
 	@Override
 	public void			setCurrentPowerLevel(double powerLevel)
 	throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndExternalControlI#getCurrentPowerLevel()
+	 * @see equipments.Fridge.FridgeUserAndExternalControlI#getCurrentPowerLevel()
 	 */
 	@Override
 	public double		getCurrentPowerLevel() throws Exception;

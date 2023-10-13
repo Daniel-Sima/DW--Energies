@@ -1,6 +1,6 @@
 package equipments.Fridge.connections;
 
-import equipments.AirConditioning.AirConditioningUserCI;
+import equipments.Fridge.FridgeUserCI;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -57,7 +57,7 @@ import fr.sorbonne_u.components.ports.AbstractOutboundPort;
  */
 public class			FridgeUserOutboundPort
 extends		AbstractOutboundPort
-implements	AirConditioningUserCI
+implements	FridgeUserCI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -84,7 +84,7 @@ implements	AirConditioningUserCI
 	 */
 	public FridgeUserOutboundPort(ComponentI owner) throws Exception
 	{
-		super(AirConditioningUserCI.class, owner);
+		super(FridgeUserCI.class, owner);
 	}
 
 	/**
@@ -104,7 +104,7 @@ implements	AirConditioningUserCI
 	public				FridgeUserOutboundPort(String uri, ComponentI owner)
 	throws Exception
 	{
-		super(uri, AirConditioningUserCI.class, owner);
+		super(uri, FridgeUserCI.class, owner);
 	}
 
 	// -------------------------------------------------------------------------
@@ -112,84 +112,111 @@ implements	AirConditioningUserCI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#on()
+	 * @see equipments.Fridge.FridgeUserCI#on()
 	 */
 	@Override
 	public boolean		on() throws Exception
 	{
-		return ((AirConditioningUserCI)this.getConnector()).on();
+		return ((FridgeUserCI)this.getConnector()).on();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#switchOn()
+	 * @see equipments.Fridge.FridgeUserCI#switchOn()
 	 */
 	@Override
 	public void			switchOn() throws Exception
 	{
-		((AirConditioningUserCI)this.getConnector()).switchOn();
+		((FridgeUserCI)this.getConnector()).switchOn();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#switchOff()
+	 * @see equipments.Fridge.FridgeUserCI#switchOff()
 	 */
 	@Override
 	public void			switchOff() throws Exception
 	{
-		((AirConditioningUserCI)this.getConnector()).switchOff();
+		((FridgeUserCI)this.getConnector()).switchOff();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#setTargetTemperature(double)
+	 * @see equipments.Fridge.FridgeUserCI#setTargetCoolerTemperature(double)
 	 */
 	@Override
-	public void			setTargetTemperature(double target) throws Exception
+	public void			setTargetCoolerTemperature(double targetCooler) throws Exception
 	{
-		((AirConditioningUserCI)this.getConnector()).setTargetTemperature(target);
+		((FridgeUserCI)this.getConnector()).setTargetCoolerTemperature(targetCooler);
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#getTargetTemperature()
+	 * @see equipments.Fridge.FridgeUserCI#getTargetCoolerTemperature()
 	 */
 	@Override
-	public double		getTargetTemperature() throws Exception
+	public double		getTargetCoolerTemperature() throws Exception
 	{
-		return ((AirConditioningUserCI)this.getConnector()).getTargetTemperature();
+		return ((FridgeUserCI)this.getConnector()).getTargetCoolerTemperature();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#getCurrentTemperature()
+	 * @see equipments.Fridge.FridgeUserCI#getCurrentCoolerTemperature()
 	 */
 	@Override
-	public double		getCurrentTemperature() throws Exception
+	public double		getCurrentCoolerTemperature() throws Exception
 	{
-		return ((AirConditioningUserCI)this.getConnector()).getCurrentTemperature();
+		return ((FridgeUserCI)this.getConnector()).getCurrentCoolerTemperature();
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserCI#setTargetFreezerTemperature(double)
+	 */
+	@Override
+	public void			setTargetFreezerTemperature(double targetFreezer) throws Exception
+	{
+		((FridgeUserCI)this.getConnector()).setTargetFreezerTemperature(targetFreezer);
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#getMaxPowerLevel()
+	 * @see equipments.Fridge.FridgeUserCI#getTargetFreezerTemperature()
+	 */
+	@Override
+	public double		getTargetFreezerTemperature() throws Exception
+	{
+		return ((FridgeUserCI)this.getConnector()).getTargetFreezerTemperature();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeUserCI#getCurrentFreezerTemperature()
+	 */
+	@Override
+	public double		getCurrentFreezerTemperature() throws Exception
+	{
+		return ((FridgeUserCI)this.getConnector()).getCurrentFreezerTemperature();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeUserCI#getMaxPowerLevel()
 	 */
 	@Override
 	public double		getMaxPowerLevel() throws Exception
 	{
-		return ((AirConditioningUserCI)this.getConnector()).getMaxPowerLevel();
+		return ((FridgeUserCI)this.getConnector()).getMaxPowerLevel();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#setCurrentPowerLevel(double)
+	 * @see equipments.Fridge.FridgeUserCI#setCurrentPowerLevel(double)
 	 */
 	@Override
 	public void			setCurrentPowerLevel(double powerLevel) throws Exception
 	{
-		((AirConditioningUserCI)this.getConnector()).setCurrentPowerLevel(powerLevel);
+		((FridgeUserCI)this.getConnector()).setCurrentPowerLevel(powerLevel);
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#getCurrentPowerLevel()
+	 * @see equipments.Fridge.FridgeUserCI#getCurrentPowerLevel()
 	 */
 	@Override
 	public double		getCurrentPowerLevel() throws Exception
 	{
-		return ((AirConditioningUserCI)this.getConnector()).getCurrentPowerLevel();
+		return ((FridgeUserCI)this.getConnector()).getCurrentPowerLevel();
 	}
 }
 // -----------------------------------------------------------------------------

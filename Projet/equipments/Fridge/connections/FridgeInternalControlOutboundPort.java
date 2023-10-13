@@ -1,6 +1,6 @@
 package equipments.Fridge.connections;
 
-import equipments.AirConditioning.AirConditioningInternalControlCI;
+import equipments.Fridge.FridgeInternalControlCI;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -39,8 +39,8 @@ import fr.sorbonne_u.components.ports.AbstractOutboundPort;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>AirConditioningInternalControlOutboundPort</code> implements an
- * outbound port for the {@code AirConditioningInternalControlCI} component interface.
+ * The class <code>FridgeInternalControlOutboundPort</code> implements an
+ * outbound port for the {@code FridgeInternalControlCI} component interface.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -63,7 +63,7 @@ import fr.sorbonne_u.components.ports.AbstractOutboundPort;
  */
 public class FridgeInternalControlOutboundPort
 extends		AbstractOutboundPort
-implements	AirConditioningInternalControlCI
+implements	FridgeInternalControlCI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -91,7 +91,7 @@ implements	AirConditioningInternalControlCI
 	public				FridgeInternalControlOutboundPort(ComponentI owner)
 	throws Exception
 	{
-		super(AirConditioningInternalControlCI.class, owner);
+		super(FridgeInternalControlCI.class, owner);
 	}
 
 	/**
@@ -113,16 +113,16 @@ implements	AirConditioningInternalControlCI
 		ComponentI owner
 		) throws Exception
 	{
-		super(uri, AirConditioningInternalControlCI.class, owner);
+		super(uri, FridgeInternalControlCI.class, owner);
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlI#cooling()
+	 * @see equipments.Fridge.FridgeInternalControlI#cooling()
 	 */
 	@Override
 	public boolean	cooling() throws Exception
 	{
-		return ((AirConditioningInternalControlCI)this.getConnector()).cooling();
+		return ((FridgeInternalControlCI)this.getConnector()).cooling();
 	}
 
 	// -------------------------------------------------------------------------
@@ -130,41 +130,79 @@ implements	AirConditioningInternalControlCI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#getTargetTemperature()
+	 * @see equipments.Fridge.FridgeInternalControlCI#setTargetCoolerTemperature(double)
 	 */
 	@Override
-	public double		getTargetTemperature() throws Exception
+	public void		setTargetCoolerTemperature(double targetCooler) throws Exception
 	{
-		return ((AirConditioningInternalControlCI)this.getConnector()).
-													getTargetTemperature();
+		((FridgeInternalControlCI)this.getConnector()).setTargetCoolerTemperature(targetCooler);
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#getTargetCoolerTemperature()
+	 */
+	@Override
+	public double		getTargetCoolerTemperature() throws Exception
+	{
+		return ((FridgeInternalControlCI)this.getConnector()).getTargetCoolerTemperature();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#getCurrentTemperature()
+	 * @see equipments.Fridge.FridgeInternalControlCI#getCurrentCoolerTemperature()
 	 */
 	@Override
-	public double		getCurrentTemperature() throws Exception
+	public double		getCurrentCoolerTemperature() throws Exception
 	{
-		return ((AirConditioningInternalControlCI)this.getConnector()).
-													getCurrentTemperature();
+		return ((FridgeInternalControlCI)this.getConnector()).
+													getCurrentCoolerTemperature();
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#setTargetFreezerTemperature(double)
+	 */
+	@Override
+	public void		setTargetFreezerTemperature(double targetFreezer) throws Exception
+	{
+		((FridgeInternalControlCI)this.getConnector()).setTargetFreezerTemperature(targetFreezer);
+	}
+
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#getTargetFreezerTemperature()
+	 */
+	@Override
+	public double		getTargetFreezerTemperature() throws Exception
+	{
+		return ((FridgeInternalControlCI)this.getConnector()).
+													getTargetFreezerTemperature();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#startCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#getCurrentFreezerTemperature()
+	 */
+	@Override
+	public double		getCurrentFreezerTemperature() throws Exception
+	{
+		return ((FridgeInternalControlCI)this.getConnector()).
+													getCurrentFreezerTemperature();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCooling()
 	 */
 	@Override
 	public void			startCooling() throws Exception
 	{
-		((AirConditioningInternalControlCI)this.getConnector()).startCooling();
+		((FridgeInternalControlCI)this.getConnector()).startCooling();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#stopCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#stopCooling()
 	 */
 	@Override
 	public void			stopCooling() throws Exception
 	{
-		((AirConditioningInternalControlCI)this.getConnector()).stopCooling();
+		((FridgeInternalControlCI)this.getConnector()).stopCooling();
 	}
 }
 // -----------------------------------------------------------------------------

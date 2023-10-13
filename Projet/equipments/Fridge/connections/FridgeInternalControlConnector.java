@@ -1,6 +1,6 @@
 package equipments.Fridge.connections;
 
-import equipments.AirConditioning.AirConditioningInternalControlCI;
+import equipments.Fridge.FridgeInternalControlCI;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -38,8 +38,8 @@ import fr.sorbonne_u.components.connectors.AbstractConnector;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>AirConditioningInternalControlConnector</code> implements a connector
- * for the {@code AirConditioningInternalControlCI} component interface.
+ * The class <code>FridgeInternalControlConnector</code> implements a connector
+ * for the {@code FridgeInternalControlCI} component interface.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -62,51 +62,87 @@ import fr.sorbonne_u.components.connectors.AbstractConnector;
  */
 public class			FridgeInternalControlConnector
 extends		AbstractConnector
-implements	AirConditioningInternalControlCI
+implements	FridgeInternalControlCI
 {
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlI#cooling()
+	 * @see equipments.Fridge.FridgeInternalControlI#cooling()
 	 */
 	@Override
 	public boolean		cooling() throws Exception
 	{
-		return ((AirConditioningInternalControlCI)this.offering).cooling();
+		return ((FridgeInternalControlCI)this.offering).cooling();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#getTargetTemperature()
+	 * @see equipments.Fridge.FridgeInternalControlCI#setTargetCoolerTemperature(double)
 	 */
 	@Override
-	public double		getTargetTemperature() throws Exception
+	public void setTargetCoolerTemperature(double targetCooler) throws Exception
 	{
-		return ((AirConditioningInternalControlCI)this.offering).getTargetTemperature();
+		((FridgeInternalControlCI)this.offering).setTargetCoolerTemperature(targetCooler);
 	}
-
+	
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#getCurrentTemperature()
+	 * @see equipments.Fridge.FridgeInternalControlCI#getTargetCoolerTemperature()
 	 */
 	@Override
-	public double		getCurrentTemperature() throws Exception
+	public double		getTargetCoolerTemperature() throws Exception
 	{
-		return ((AirConditioningInternalControlCI)this.offering).getCurrentTemperature();
+		return ((FridgeInternalControlCI)this.offering).getTargetCoolerTemperature();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#startCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#getCurrentCoolerTemperature()
+	 */
+	@Override
+	public double		getCurrentCoolerTemperature() throws Exception
+	{
+		return ((FridgeInternalControlCI)this.offering).getCurrentCoolerTemperature();
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#setTargetFreezerTemperature(double)
+	 */
+	@Override
+	public void setTargetFreezerTemperature(double targetFreezer) throws Exception
+	{
+		((FridgeInternalControlCI)this.offering).setTargetFreezerTemperature(targetFreezer);
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#getTargetFreezerTemperature()
+	 */
+	@Override
+	public double		getTargetFreezerTemperature() throws Exception
+	{
+		return ((FridgeInternalControlCI)this.offering).getTargetFreezerTemperature();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#getCurrentFreezerTemperature()
+	 */
+	@Override
+	public double		getCurrentFreezerTemperature() throws Exception
+	{
+		return ((FridgeInternalControlCI)this.offering).getCurrentFreezerTemperature();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCooling()
 	 */
 	@Override
 	public void			startCooling() throws Exception
 	{
-		((AirConditioningInternalControlCI)this.offering).startCooling();
+		((FridgeInternalControlCI)this.offering).startCooling();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#stopCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#stopCooling()
 	 */
 	@Override
 	public void			stopCooling() throws Exception
 	{
-		((AirConditioningInternalControlCI)this.offering).stopCooling();
+		((FridgeInternalControlCI)this.offering).stopCooling();
 	}
 }
 // -----------------------------------------------------------------------------

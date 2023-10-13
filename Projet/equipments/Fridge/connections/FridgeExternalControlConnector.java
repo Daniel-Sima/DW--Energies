@@ -1,12 +1,12 @@
 package equipments.Fridge.connections;
 
-import equipments.AirConditioning.AirConditioningExternalControlCI;
+import equipments.Fridge.FridgeExternalControlCI;
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>AirConditioningExternalControlConnector</code> implements a
- * connector for the {@code AirConditioningExternalControlCI} component interface.
+ * The class <code>FridgeExternalControlConnector</code> implements a
+ * connector for the {@code FridgeExternalControlCI} component interface.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -29,52 +29,88 @@ import fr.sorbonne_u.components.connectors.AbstractConnector;
  */
 public class			FridgeExternalControlConnector
 extends		AbstractConnector
-implements	AirConditioningExternalControlCI
+implements	FridgeExternalControlCI
 {
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndControlI#getTargetTemperature()
+	 * @see equipments.Fridge.FridgeUserAndControlI#setTargetCoolerTemperature(double)
 	 */
 	@Override
-	public double		getTargetTemperature() throws Exception
+	public void setTargetCoolerTemperature(double targetCooler) throws Exception
 	{
-		return ((AirConditioningExternalControlCI)this.offering).getTargetTemperature();
+		((FridgeExternalControlCI)this.offering).setTargetCoolerTemperature(targetCooler);
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#getTargetCoolerTemperature()
+	 */
+	@Override
+	public double		getTargetCoolerTemperature() throws Exception
+	{
+		return ((FridgeExternalControlCI)this.offering).getTargetCoolerTemperature();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndControlI#getCurrentTemperature()
+	 * @see equipments.Fridge.FridgeUserAndControlI#getCurrentCoolerTemperature()
 	 */
 	@Override
-	public double		getCurrentTemperature() throws Exception
+	public double		getCurrentCoolerTemperature() throws Exception
 	{
-		return ((AirConditioningExternalControlCI)this.offering).getCurrentTemperature();
+		return ((FridgeExternalControlCI)this.offering).getCurrentCoolerTemperature();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningExternalControlCI#getMaxPowerLevel()
+	 * @see equipments.Fridge.FridgeUserAndControlI#setTargetFreezerTemperature(double)
+	 */
+	@Override
+	public void setTargetFreezerTemperature(double targetFreezer) throws Exception
+	{
+		((FridgeExternalControlCI)this.offering).setTargetFreezerTemperature(targetFreezer);
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#getTargetFreezerTemperature()
+	 */
+	@Override
+	public double		getTargetFreezerTemperature() throws Exception
+	{
+		return ((FridgeExternalControlCI)this.offering).getTargetFreezerTemperature();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#getCurrentFreezerTemperature()
+	 */
+	@Override
+	public double		getCurrentFreezerTemperature() throws Exception
+	{
+		return ((FridgeExternalControlCI)this.offering).getCurrentFreezerTemperature();
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeExternalControlCI#getMaxPowerLevel()
 	 */
 	@Override
 	public double		getMaxPowerLevel() throws Exception
 	{
-		return ((AirConditioningExternalControlCI)this.offering).getMaxPowerLevel();
+		return ((FridgeExternalControlCI)this.offering).getMaxPowerLevel();
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningExternalControlCI#setCurrentPowerLevel(double)
+	 * @see equipments.Fridge.FridgeExternalControlCI#setCurrentPowerLevel(double)
 	 */
 	@Override
 	public void			setCurrentPowerLevel(double powerLevel) throws Exception
 	{
-		((AirConditioningExternalControlCI)this.offering).
+		((FridgeExternalControlCI)this.offering).
 										setCurrentPowerLevel(powerLevel);
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningExternalControlCI#getCurrentPowerLevel()
+	 * @see equipments.Fridge.FridgeExternalControlCI#getCurrentPowerLevel()
 	 */
 	@Override
 	public double		getCurrentPowerLevel() throws Exception
 	{
-		return ((AirConditioningExternalControlCI)this.offering).getCurrentPowerLevel();
+		return ((FridgeExternalControlCI)this.offering).getCurrentPowerLevel();
 	}
 }
 // -----------------------------------------------------------------------------

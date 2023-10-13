@@ -1,14 +1,14 @@
 package equipments.Fridge.connections;
 
-import equipments.AirConditioning.AirConditioningInternalControlCI;
-import equipments.AirConditioning.AirConditioningInternalControlI;
+import equipments.Fridge.FridgeInternalControlCI;
+import equipments.Fridge.FridgeInternalControlI;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>AirConditioningInternalControlInboundPort</code> implements an
- * inbound port for the component interface {@code AirConditioningInternalControlCI}.
+ * The class <code>FridgeInternalControlInboundPort</code> implements an
+ * inbound port for the component interface {@code FridgeInternalControlCI}.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -31,7 +31,7 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
  */
 public class FridgeInternalControlInboundPort
 extends		AbstractInboundPort
-implements	AirConditioningInternalControlCI
+implements	FridgeInternalControlCI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -49,7 +49,7 @@ implements	AirConditioningInternalControlCI
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code owner instanceof AirConditioningInternalControlI}
+	 * pre	{@code owner instanceof FridgeInternalControlI}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
@@ -59,8 +59,8 @@ implements	AirConditioningInternalControlCI
 	public				FridgeInternalControlInboundPort(ComponentI owner)
 	throws Exception
 	{
-		super(AirConditioningInternalControlCI.class, owner);
-		assert owner instanceof AirConditioningInternalControlI;
+		super(FridgeInternalControlCI.class, owner);
+		assert owner instanceof FridgeInternalControlI;
 	}
 
 	/**
@@ -69,7 +69,7 @@ implements	AirConditioningInternalControlCI
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code owner instanceof AirConditioningInternalControlI}
+	 * pre	{@code owner instanceof FridgeInternalControlI}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
@@ -82,8 +82,8 @@ implements	AirConditioningInternalControlCI
 		ComponentI owner
 		) throws Exception
 	{
-		super(uri, AirConditioningInternalControlCI.class, owner);
-		assert owner instanceof AirConditioningInternalControlI;
+		super(uri, FridgeInternalControlCI.class, owner);
+		assert owner instanceof FridgeInternalControlI;
 	}
 
 	// -------------------------------------------------------------------------
@@ -91,58 +91,106 @@ implements	AirConditioningInternalControlCI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#cooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#cooling()
 	 */
 	@Override
 	public boolean		cooling() throws Exception
 	{
 		return this.getOwner().handleRequest(
-								o -> ((AirConditioningInternalControlI)o).cooling());
+								o -> ((FridgeInternalControlI)o).cooling());
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#getTargetTemperature()
+	 * @see equipments.Fridge.FridgeInternalControlCI#setTargetCoolerTemperature(double)
 	 */
 	@Override
-	public double		getTargetTemperature() throws Exception
+	public void		setTargetCoolerTemperature(double targetCooler) throws Exception
 	{
-		return this.getOwner().handleRequest(
-								o -> ((AirConditioningInternalControlI)o).
-														getTargetTemperature());
+		this.getOwner().handleRequest(
+								o -> { ((FridgeInternalControlI)o).
+														setTargetCoolerTemperature(targetCooler);
+										return null;
+								});
 	}
-
+	
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#getCurrentTemperature()
+	 * @see equipments.Fridge.FridgeInternalControlCI#getTargetCoolerTemperature()
 	 */
 	@Override
-	public double		getCurrentTemperature() throws Exception
+	public double		getTargetCoolerTemperature() throws Exception
 	{
 		return this.getOwner().handleRequest(
-								o -> ((AirConditioningInternalControlI)o).
-														getCurrentTemperature());
+								o -> ((FridgeInternalControlI)o).
+														getTargetCoolerTemperature());
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#startCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#getCurrentCoolerTemperature()
+	 */
+	@Override
+	public double		getCurrentCoolerTemperature() throws Exception
+	{
+		return this.getOwner().handleRequest(
+								o -> ((FridgeInternalControlI)o).
+														getCurrentCoolerTemperature());
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#setTargetFreezerTemperature(double)
+	 */
+	@Override
+	public void		setTargetFreezerTemperature(double targetFreezer) throws Exception
+	{
+		this.getOwner().handleRequest(
+								o -> { ((FridgeInternalControlI)o).
+														setTargetFreezerTemperature(targetFreezer);
+										return null;
+								});
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#getTargetFreezerTemperature()
+	 */
+	@Override
+	public double		getTargetFreezerTemperature() throws Exception
+	{
+		return this.getOwner().handleRequest(
+								o -> ((FridgeInternalControlI)o).
+														getTargetFreezerTemperature());
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#getCurrentFreezerTemperature()
+	 */
+	@Override
+	public double		getCurrentFreezerTemperature() throws Exception
+	{
+		return this.getOwner().handleRequest(
+								o -> ((FridgeInternalControlI)o).
+														getCurrentFreezerTemperature());
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCooling()
 	 */
 	@Override
 	public void			startCooling() throws Exception
 	{
 		this.getOwner().handleRequest(
-								o -> {	((AirConditioningInternalControlI)o).
+								o -> {	((FridgeInternalControlI)o).
 																startCooling();
 										return null;
 								});
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlCI#stopCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#stopCooling()
 	 */
 	@Override
 	public void			stopCooling() throws Exception
 	{
 		this.getOwner().handleRequest(
-								o -> {	((AirConditioningInternalControlI)o).
+								o -> {	((FridgeInternalControlI)o).
 																stopCooling();
 										return null;
 								});

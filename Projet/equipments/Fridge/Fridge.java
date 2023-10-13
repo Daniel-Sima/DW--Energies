@@ -136,11 +136,11 @@ implements	FridgeUserImplI,
 	/** when true, methods trace their actions.								*/
 	public static final boolean		VERBOSE = true;
 	/** fake current 	*/
-	public static final double		FAKE_CURRENT_TEMPERATURE = 10.0;
+	public static final double		FAKE_CURRENT_COOLER_TEMPERATURE = -5.0;
+	public static final double		FAKE_CURRENT_FREEZER_TEMPERATURE = 4.0;
 
-	private static final double STANDARD_TARGET_COOLER_TEMPERATURE = 4.0;
-
-	private static final double STANDARD_TARGET_FREEZER_TEMPERATURE = -18.0;
+	protected static final double STANDARD_TARGET_COOLER_TEMPERATURE = 4.0;
+	protected static final double STANDARD_TARGET_FREEZER_TEMPERATURE = -18.0;
 
 	/** current state (on, off) of the Fridge.								*/
 	protected FridgeState		currentState;
@@ -368,18 +368,18 @@ implements	FridgeUserImplI,
 	}
 	
 	/**
-	 * @see equipments.Fridge.FridgeUserImplI#setTargetFreezerTemperature(double)
+	 * @see equipments.Fridge.FridgeUserImplI#setTargetFreezerTemperature(double targetFreezer)
 	 */
 	@Override
-	public void	setTargetFreezeTemperature(double targetFreezer) throws Exception
+	public void	setTargetFreezerTemperature(double targetFreezer) throws Exception
 	{
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge sets a new target "
-										+ "temperature: " + targetFreezer + ".\n");
+										+ "freezer temperature: " + targetFreezer + ".\n");
 		}
 
-		assert	targetFreezer >= -50.0 && targetFreezer <= 50.0 :
-				new PreconditionException("target >= -50.0 && target <= 50.0");
+		assert	targetFreezer >= -20.0 && targetFreezer <= 0.0 :
+				new PreconditionException("target >= -25.0 && target <= 0.0");
 
 		this.targetFreezerTemperature = targetFreezer;
 
@@ -394,14 +394,14 @@ implements	FridgeUserImplI,
 	public double getTargetFreezerTemperature() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge returns its Freezer target"
+			this.traceMessage("Fridge returns its freezer target"
 							+ " temperature " + this.targetFreezerTemperature + ".\n");
 		}
 
 		double ret = this.targetFreezerTemperature;
 
-		assert	ret >= -50.0 && ret <= 50.0 :
-				new PostconditionException("return >= -50.0 && return <= 50.0");
+		assert	ret >= -20.0 && ret <= 0.0 :
+				new PostconditionException("return >= -25.0 && return <= 0.0");
 
 		return ret;
 	}
@@ -410,33 +410,33 @@ implements	FridgeUserImplI,
 	 * @see equipments.Fridge.FridgeUserAndControlI#getCurrentFreezeTemperature()
 	 */
 	@Override
-	public double		getCurrentFreezerTemperature() throws Exception
+	public double getCurrentFreezerTemperature() throws Exception
 	{
 		assert	this.on() : new PreconditionException("on()");
 
 		// Temporary implementation; would need a temperature sensor.
-		double currentFreezerTemperature = FAKE_CURRENT_TEMPERATURE;
+		double currentFreezerTemperature = FAKE_CURRENT_FREEZER_TEMPERATURE;
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge returns the current"
-							+ " temperature " + currentFreezerTemperature + ".\n");
+							+ " freezer temperature " + currentFreezerTemperature + ".\n");
 		}
 
 		return  currentFreezerTemperature;
 	}
 
 	/**
-	 * @see equipments.Fridge.FridgeUserImplI#setTargetCoolerTemperature(double)
+	 * @see equipments.Fridge.FridgeUserImplI#setTargetCoolerTemperature(double targetCooler)
 	 */
 	@Override
 	public void	setTargetCoolerTemperature(double targetCooler) throws Exception
 	{
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge sets a new target "
-										+ "temperature: " + targetCooler + ".\n");
+										+ "cooler temperature: " + targetCooler + ".\n");
 		}
 
-		assert	targetCooler >= -50.0 && targetCooler <= 50.0 :
-				new PreconditionException("target >= -50.0 && target <= 50.0");
+		assert	targetCooler >= 0.0 && targetCooler <= 15.0 :
+				new PreconditionException("target >= 0.0 && target <= 15.0");
 
 		this.targetCoolerTemperature = targetCooler;
 
@@ -457,8 +457,8 @@ implements	FridgeUserImplI,
 
 		double ret = this.targetCoolerTemperature;
 
-		assert	ret >= -50.0 && ret <= 50.0 :
-				new PostconditionException("return >= -50.0 && return <= 50.0");
+		assert	ret >= 0.0 && ret <= 15.0 :
+				new PostconditionException("return >= 0.0 && return <= 15.0");
 
 		return ret;
 	}
@@ -472,10 +472,10 @@ implements	FridgeUserImplI,
 		assert	this.on() : new PreconditionException("on()");
 
 		// Temporary implementation; would need a temperature sensor.
-		double currentCoolerTemperature = FAKE_CURRENT_TEMPERATURE;
+		double currentCoolerTemperature = FAKE_CURRENT_COOLER_TEMPERATURE;
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge returns the current"
-							+ " temperature " + currentCoolerTemperature + ".\n");
+							+ " cooler temperature " + currentCoolerTemperature + ".\n");
 		}
 
 		return  currentCoolerTemperature;

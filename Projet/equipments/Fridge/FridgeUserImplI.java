@@ -2,8 +2,8 @@ package equipments.Fridge;
 
 // -----------------------------------------------------------------------------
 /**
- * The interface <code>AirConditioningUserImplI</code> declares the signature of the
- * methods corresponding to actions performed by users on the air conditioning: switching
+ * The interface <code>FridgeConditioningUserImplI</code> declares the signature of the
+ * methods corresponding to actions performed by users on the fridge: switching
  * on and off, setting the target temperature, etc.
  *
  * <p><strong>Description</strong></p>
@@ -39,7 +39,7 @@ extends		FridgeUserAndControlI,
 	public boolean		on() throws Exception;
 
 	/**
-	 * switch on the air conditioning.
+	 * switch on the fridge.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -53,7 +53,7 @@ extends		FridgeUserAndControlI,
 	public void			switchOn() throws Exception;
 
 	/**
-	 * switch off the air conditioning.
+	 * switch off the fridge.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -65,21 +65,86 @@ extends		FridgeUserAndControlI,
 	 * @throws Exception	<i>to do</i>.
 	 */
 	public void			switchOff() throws Exception;
+	
+	/***********************************************************************************/
+	/**
+	 * return the target temperature of the cooler.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code true}	// no precondition.
+	 * post	{@code true}	// no postcondition.
+	 * </pre>
+	 *
+	 * @return				the target temperature of the cooler.
+	 * @throws Exception 	<i>TODO</i>.
+	 */
+	public double			getTargetCoolerTemperature()
+	throws Exception;
 
+	/**
+	 * return the current temperature of the cooler.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code true}	// no precondition.
+	 * post	{@code true}	// no postcondition.
+	 * </pre>
+	 *
+	 * @return				the current temperature of the cooler.
+	 * @throws Exception 	<i>TODO</i>.
+	 */
+	public double			getCurrentCoolerTemperature()
+	throws Exception;
+	
 	/**
 	 * set the target cooler temperature.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code target >= -50.0 && target <= 50.0}
-	 * post	{@code target == getTargetCoolerTemperature()}
+	 * pre	{@code targetCooler >= 0.0 && targetCooler <= 15.0}
+	 * post	{@code targetCooler == setTargetCoolerTemperature()}
 	 * </pre>
 	 *
-	 * @param target		the new target cooler temperature.
+	 * @param targetCooler		the new target cooler temperature.
 	 * @throws Exception	<i>to do</i>.
 	 */
 	public void			setTargetCoolerTemperature(double targetCooler)
+	throws Exception;
+	
+	/**
+	 * return the target temperature of the Freezer.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code true}	// no precondition.
+	 * post	{@code true}	// no postcondition.
+	 * </pre>
+	 *
+	 * @return				the target temperature of the Freezer.
+	 * @throws Exception 	<i>TODO</i>.
+	 */
+	public double			getTargetFreezerTemperature()
+	throws Exception;
+
+	/**
+	 * return the current temperature of the freezer.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code true}	// no precondition.
+	 * post	{@code true}	// no postcondition.
+	 * </pre>
+	 *
+	 * @return				the current temperature of the Freezer.
+	 * @throws Exception 	<i>TODO</i>.
+	 */
+	public double			getCurrentFreezerTemperature()
 	throws Exception;
 	
 	/**
@@ -88,14 +153,15 @@ extends		FridgeUserAndControlI,
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code targetFreezer >= -50.0 && targetFreezer <= 50.0}
-	 * post	{@code targetFreezer == getTargetFreezerTemperature()}
+	 * pre	{@code targetFreezer >= -20.0 && targetFreezer <= 0.0}
+	 * post	{@code targetFreezer == setTargetFreezerTemperature()}
 	 * </pre>
 	 *
 	 * @param targetFreezer		the new target freezer temperature.
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public void			setTargetFreezeTemperature(double targetFreezer)
+	public void			setTargetFreezerTemperature(double targetFreezer)
 	throws Exception;
+	
 }
 // -----------------------------------------------------------------------------

@@ -37,9 +37,8 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
 
 // -----------------------------------------------------------------------------
 /**
- * The component interface <code>HeaterInternalControlCI</code> declares the
- * signatures of services used by the thermostat to control the heating by the
- * heater.
+ * The component interface <code>FridgeInternalControlCI</code> declares the
+ * signatures of services used by the thermostat inside the fridge to control its temperature
  *
  * <p><strong>Description</strong></p>
  * 
@@ -61,31 +60,55 @@ extends		OfferedCI,
 			FridgeInternalControlI
 {
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlI#cooling()
+	 * @see equipments.Fridge.FridgeInternalControlI#cooling()
 	 */
 	@Override
 	public boolean		cooling() throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndControlI#getTargetTemperature()
+	 * @see equipments.Fridge.FridgeUserAndControlI#setTargetFreezerTemperature()
 	 */
 	@Override
-	public double		getTargetTemperature() throws Exception;
-
+	public void		setTargetFreezerTemperature(double targetFreezer) throws Exception;
+	
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndControlI#getCurrentTemperature()
+	 * @see equipments.Fridge.FridgeUserAndControlI#getTargetFreezerTemperature(double targetFreezer)
 	 */
 	@Override
-	public double		getCurrentTemperature() throws Exception;
+	public double		getTargetFreezerTemperature() throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlI#startCooling()
+	 * @see equipments.Fridge.FridgeUserAndControlI#getCurrentFreezerTemperature()
+	 */
+	@Override
+	public double		getCurrentFreezerTemperature() throws Exception;
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#setTargetCoolerTemperature(double targetCooler)
+	 */
+	@Override
+	public void		setTargetCoolerTemperature(double targetCooler) throws Exception;
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#getTargetCoolerTemperature()
+	 */
+	@Override
+	public double		getTargetCoolerTemperature() throws Exception;
+
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#getCurrentCoolerTemperature()
+	 */
+	@Override
+	public double		getCurrentCoolerTemperature() throws Exception;
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#startCooling()
 	 */
 	@Override
 	public void			startCooling() throws Exception;
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningInternalControlI#stopCooling()
+	 * @see equipments.Fridge.FridgeInternalControlI#stopCooling()
 	 */
 	@Override
 	public void			stopCooling() throws Exception;

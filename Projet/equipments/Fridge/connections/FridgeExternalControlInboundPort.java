@@ -1,8 +1,8 @@
 package equipments.Fridge.connections;
 
-import equipments.AirConditioning.AirConditioningExternalControlCI;
-import equipments.AirConditioning.AirConditioningUserAndControlI;
-import equipments.AirConditioning.AirConditioningUserAndExternalControlI;
+import equipments.Fridge.FridgeExternalControlCI;
+import equipments.Fridge.FridgeUserAndControlI;
+import equipments.Fridge.FridgeUserAndExternalControlI;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -41,7 +41,7 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>AirConditioningExternalControlInboundPort</code>
+ * The class <code>FridgeExternalControlInboundPort</code>
  *
  * <p><strong>Description</strong></p>
  * 
@@ -64,7 +64,7 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
  */
 public class			FridgeExternalControlInboundPort
 extends		AbstractInboundPort
-implements	AirConditioningExternalControlCI
+implements	FridgeExternalControlCI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -82,8 +82,8 @@ implements	AirConditioningExternalControlCI
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code owner instanceof AirConditioningUserAndExternalControlI}
-	 * pre	{@code owner instanceof AirConditioningUserAndControlI}
+	 * pre	{@code owner instanceof FridgeUserAndExternalControlI}
+	 * pre	{@code owner instanceof FridgeUserAndControlI}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
@@ -93,9 +93,9 @@ implements	AirConditioningExternalControlCI
 	public				FridgeExternalControlInboundPort(ComponentI owner)
 	throws Exception
 	{
-		super(AirConditioningExternalControlCI.class, owner);
-		assert	owner instanceof AirConditioningUserAndExternalControlI;
-		assert	owner instanceof AirConditioningUserAndControlI;
+		super(FridgeExternalControlCI.class, owner);
+		assert	owner instanceof FridgeUserAndExternalControlI;
+		assert	owner instanceof FridgeUserAndControlI;
 	}
 
 	/**
@@ -104,8 +104,8 @@ implements	AirConditioningExternalControlCI
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code owner instanceof AirConditioningUserAndExternalControlI}
-	 * pre	{@code owner instanceof AirConditioningUserAndControlI}
+	 * pre	{@code owner instanceof FridgeUserAndExternalControlI}
+	 * pre	{@code owner instanceof FridgeUserAndControlI}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
@@ -118,9 +118,9 @@ implements	AirConditioningExternalControlCI
 		ComponentI owner
 		) throws Exception
 	{
-		super(uri,AirConditioningExternalControlCI.class, owner);
-		assert	owner instanceof AirConditioningUserAndExternalControlI;
-		assert	owner instanceof AirConditioningUserAndControlI;
+		super(uri,FridgeExternalControlCI.class, owner);
+		assert	owner instanceof FridgeUserAndExternalControlI;
+		assert	owner instanceof FridgeUserAndControlI;
 	}
 
 	// -------------------------------------------------------------------------
@@ -128,57 +128,103 @@ implements	AirConditioningExternalControlCI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndControlI#getTargetTemperature()
+	 * @see equipments.Fridge.FridgeUserAndControlI#setTargetCoolerTemperature(double)
 	 */
 	@Override
-	public double		getTargetTemperature() throws Exception
+	public void setTargetCoolerTemperature(double targetCooler) throws Exception
+	{
+		this.getOwner().handleRequest(
+					o -> {((FridgeUserAndControlI)o).
+									setTargetCoolerTemperature(targetCooler);
+							return null;
+					});
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#getTargetCoolerTemperature()
+	 */
+	@Override
+	public double		getTargetCoolerTemperature() throws Exception
 	{
 		return this.getOwner().handleRequest(
-					o -> ((AirConditioningUserAndControlI)o).getTargetTemperature());
+					o -> ((FridgeUserAndControlI)o).getTargetCoolerTemperature());
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserAndControlI#getCurrentTemperature()
+	 * @see equipments.Fridge.FridgeUserAndControlI#getCurrentCoolerTemperature()
 	 */
 	@Override
-	public double		getCurrentTemperature() throws Exception
+	public double		getCurrentCoolerTemperature() throws Exception
 	{
 		return this.getOwner().handleRequest(
-					o -> ((AirConditioningUserAndControlI)o).getCurrentTemperature());
+					o -> ((FridgeUserAndControlI)o).getCurrentCoolerTemperature());
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#setTargetFreezerTemperature(double)
+	 */
+	@Override
+	public void setTargetFreezerTemperature(double targetFreezer) throws Exception
+	{
+		this.getOwner().handleRequest(
+					o -> {((FridgeUserAndControlI)o).
+									setTargetFreezerTemperature(targetFreezer);
+							return null;
+					});
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserAndControlI#getTargetFreezerTemperature()
+	 */
+	@Override
+	public double		getTargetFreezerTemperature() throws Exception
+	{
+		return this.getOwner().handleRequest(
+					o -> ((FridgeUserAndControlI)o).getTargetFreezerTemperature());
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningExternalControlCI#getMaxPowerLevel()
+	 * @see equipments.Fridge.FridgeUserAndControlI#getCurrentFreezerTemperature()
+	 */
+	@Override
+	public double		getCurrentFreezerTemperature() throws Exception
+	{
+		return this.getOwner().handleRequest(
+					o -> ((FridgeUserAndControlI)o).getCurrentFreezerTemperature());
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeExternalControlCI#getMaxPowerLevel()
 	 */
 	@Override
 	public double		getMaxPowerLevel() throws Exception
 	{
 		return this.getOwner().handleRequest(
-								o -> ((AirConditioningUserAndExternalControlI)o).
+								o -> ((FridgeUserAndExternalControlI)o).
 															getMaxPowerLevel());
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningExternalControlCI#setCurrentPowerLevel(double)
+	 * @see equipments.Fridge.FridgeExternalControlCI#setCurrentPowerLevel(double)
 	 */
 	@Override
 	public void			setCurrentPowerLevel(double powerLevel) throws Exception
 	{
 		this.getOwner().handleRequest(
-							o -> {	((AirConditioningUserAndExternalControlI)o).
+							o -> {	((FridgeUserAndExternalControlI)o).
 											setCurrentPowerLevel(powerLevel);
 									return null;
 							});
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningExternalControlCI#getCurrentPowerLevel()
+	 * @see equipments.Fridge.FridgeExternalControlCI#getCurrentPowerLevel()
 	 */
 	@Override
 	public double		getCurrentPowerLevel() throws Exception
 	{
 		return this.getOwner().handleRequest(
-								o -> ((AirConditioningUserAndExternalControlI)o).
+								o -> ((FridgeUserAndExternalControlI)o).
 													getCurrentPowerLevel());
 	}
 }

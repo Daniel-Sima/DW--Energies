@@ -8,12 +8,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 
-import equipments.AirConditioning.connections.AirConditioningExternalControlConnector;
-import equipments.AirConditioning.connections.AirConditioningExternalControlOutboundPort;
-import equipments.AirConditioning.connections.AirConditioningInternalControlConnector;
-import equipments.AirConditioning.connections.AirConditioningInternalControlOutboundPort;
-import equipments.AirConditioning.connections.AirConditioningUserConnector;
-import equipments.AirConditioning.connections.AirConditioningUserOutboundPort;
+import equipments.Fridge.connections.FridgeExternalControlConnector;
+import equipments.Fridge.connections.FridgeExternalControlOutboundPort;
+import equipments.Fridge.connections.FridgeInternalControlConnector;
+import equipments.Fridge.connections.FridgeInternalControlOutboundPort;
+import equipments.Fridge.connections.FridgeUserConnector;
+import equipments.Fridge.connections.FridgeUserOutboundPort;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -60,8 +60,8 @@ import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>AirConditioningTester</code> implements a component performing 
- * tests for the class <code>AirConditioning</code> as a BCM component.
+ * The class <code>FridgeTester</code> implements a component performing 
+ * tests for the class <code>Fridge</code> as a BCM component.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -91,18 +91,18 @@ extends		AbstractComponent
 	 *  executes integration tests actions.									*/
 	protected final boolean		isUnitTest;
 	/** URI of the user component interface inbound port.					*/
-	protected String			AirConditioningUserInboundPortURI;
+	protected String			FridgeUserInboundPortURI;
 	/** URI of the internal control component interface inbound port.		*/
-	protected String			AirConditioningInternalControlInboundPortURI;
+	protected String			FridgeInternalControlInboundPortURI;
 	/** URI of the external control component interface inbound port.		*/
-	protected String			AirConditioningExternalControlInboundPortURI;
+	protected String			FridgeExternalControlInboundPortURI;
 
 	/** user component interface inbound port.								*/
-	protected AirConditioningUserOutboundPort			acop;
-	/** internal control component interface inbound port.					*/
-	protected AirConditioningInternalControlOutboundPort	acicop;
-	/** external control component interface inbound port.					*/
-	protected AirConditioningExternalControlOutboundPort	acecop;
+	protected FridgeUserOutboundPort			acop;
+	/** internal control component interface outbound port.					*/
+	protected FridgeInternalControlOutboundPort	acicop;
+	/** external control component interface outbound port.					*/
+	protected FridgeExternalControlOutboundPort	acecop;
 	/** port to connect to the clocks server.								*/
 	protected ClocksServerOutboundPort	clocksServerOutboundPort;
 
@@ -111,7 +111,7 @@ extends		AbstractComponent
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a AirConditioning test component.
+	 * create a Fridge test component.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -132,107 +132,107 @@ extends		AbstractComponent
 	}
 
 	/**
-	 * create a AirConditioning test component.
+	 * create a Fridge test component.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code AirConditioningUserInboundPortURI != null && !AirConditioningUserInboundPortURI.isEmpty()}
-	 * pre	{@code AirConditioningInternalControlInboundPortURI != null && !AirConditioningInternalControlInboundPortURI.isEmpty()}
-	 * pre	{@code AirConditioningExternalControlInboundPortURI != null && !AirConditioningExternalControlInboundPortURI.isEmpty()}
+	 * pre	{@code FridgeUserInboundPortURI != null && !FridgeUserInboundPortURI.isEmpty()}
+	 * pre	{@code FridgeInternalControlInboundPortURI != null && !FridgeInternalControlInboundPortURI.isEmpty()}
+	 * pre	{@code FridgeExternalControlInboundPortURI != null && !FridgeExternalControlInboundPortURI.isEmpty()}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param isUnitTest							true if the component must perform unit tests, otherwise it executes integration tests actions.
-	 * @param AirConditioningUserInboundPortURI				URI of the user component interface inbound port.
-	 * @param AirConditioningInternalControlInboundPortURI	URI of the internal control component interface inbound port.
-	 * @param AirConditioningExternalControlInboundPortURI	URI of the external control component interface inbound port.
+	 * @param FridgeUserInboundPortURI				URI of the user component interface inbound port.
+	 * @param FridgeInternalControlInboundPortURI	URI of the internal control component interface inbound port.
+	 * @param FridgeExternalControlInboundPortURI	URI of the external control component interface inbound port.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected			FridgeTester(
 		boolean isUnitTest,
-		String AirConditioningUserInboundPortURI,
-		String AirConditioningInternalControlInboundPortURI,
-		String AirConditioningExternalControlInboundPortURI
+		String FridgeUserInboundPortURI,
+		String FridgeInternalControlInboundPortURI,
+		String FridgeExternalControlInboundPortURI
 		) throws Exception
 	{
 		super(1, 1);
 		this.isUnitTest = isUnitTest;
-		this.initialise(AirConditioningUserInboundPortURI,
-				AirConditioningInternalControlInboundPortURI,
-				AirConditioningExternalControlInboundPortURI);
+		this.initialise(FridgeUserInboundPortURI,
+				FridgeInternalControlInboundPortURI,
+				FridgeExternalControlInboundPortURI);
 	}
 
 	/**
-	 * create a AirConditioning test component.
+	 * create a Fridge test component.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code AirConditioningUserInboundPortURI != null && !AirConditioningUserInboundPortURI.isEmpty()}
-	 * pre	{@code AirConditioningInternalControlInboundPortURI != null && !AirConditioningInternalControlInboundPortURI.isEmpty()}
-	 * pre	{@code AirConditioningExternalControlInboundPortURI != null && !AirConditioningExternalControlInboundPortURI.isEmpty()}
+	 * pre	{@code FridgeUserInboundPortURI != null && !FridgeUserInboundPortURI.isEmpty()}
+	 * pre	{@code FridgeInternalControlInboundPortURI != null && !FridgeInternalControlInboundPortURI.isEmpty()}
+	 * pre	{@code FridgeExternalControlInboundPortURI != null && !FridgeExternalControlInboundPortURI.isEmpty()}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param isUnitTest							true if the component must perform unit tests, otherwise it executes integration tests actions.
 	 * @param reflectionInboundPortURI				URI of the reflection inbound port of the component.
-	 * @param AirConditioningUserInboundPortURI				URI of the user component interface inbound port.
-	 * @param AirConditioningInternalControlInboundPortURI	URI of the internal control component interface inbound port.
-	 * @param AirConditioningExternalControlInboundPortURI	URI of the external control component interface inbound port.
+	 * @param FridgeUserInboundPortURI				URI of the user component interface inbound port.
+	 * @param FridgeInternalControlInboundPortURI	URI of the internal control component interface inbound port.
+	 * @param FridgeExternalControlInboundPortURI	URI of the external control component interface inbound port.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected			FridgeTester(
 		boolean isUnitTest,
 		String reflectionInboundPortURI,
-		String AirConditioningUserInboundPortURI,
-		String AirConditioningInternalControlInboundPortURI,
-		String AirConditioningExternalControlInboundPortURI
+		String FridgeUserInboundPortURI,
+		String FridgeInternalControlInboundPortURI,
+		String FridgeExternalControlInboundPortURI
 		) throws Exception
 	{
 		super(reflectionInboundPortURI, 1, 1);
 		this.isUnitTest = isUnitTest;
-		this.initialise(AirConditioningUserInboundPortURI,
-						AirConditioningInternalControlInboundPortURI,
-						AirConditioningExternalControlInboundPortURI);
+		this.initialise(FridgeUserInboundPortURI,
+						FridgeInternalControlInboundPortURI,
+						FridgeExternalControlInboundPortURI);
 	}
 
 	/**
-	 * initialise a AirConditioning test component.
+	 * initialise a Fridge test component.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code AirConditioningUserInboundPortURI != null && !AirConditioningUserInboundPortURI.isEmpty()}
-	 * pre	{@code AirConditioningInternalControlInboundPortURI != null && !AirConditioningInternalControlInboundPortURI.isEmpty()}
-	 * pre	{@code AirConditioningExternalControlInboundPortURI != null && !AirConditioningExternalControlInboundPortURI.isEmpty()}
+	 * pre	{@code FridgeUserInboundPortURI != null && !FridgeUserInboundPortURI.isEmpty()}
+	 * pre	{@code FridgeInternalControlInboundPortURI != null && !FridgeInternalControlInboundPortURI.isEmpty()}
+	 * pre	{@code FridgeExternalControlInboundPortURI != null && !FridgeExternalControlInboundPortURI.isEmpty()}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param AirConditioningUserInboundPortURI				URI of the user component interface inbound port.
-	 * @param AirConditioningInternalControlInboundPortURI	URI of the internal control component interface inbound port.
-	 * @param AirConditioningExternalControlInboundPortURI	URI of the external control component interface inbound port.
+	 * @param FridgeUserInboundPortURI				URI of the user component interface inbound port.
+	 * @param FridgeInternalControlInboundPortURI	URI of the internal control component interface inbound port.
+	 * @param FridgeExternalControlInboundPortURI	URI of the external control component interface inbound port.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected void		initialise(
-		String AirConditioningUserInboundPortURI,
-		String AirConditioningInternalControlInboundPortURI,
-		String AirConditioningExternalControlInboundPortURI
+		String FridgeUserInboundPortURI,
+		String FridgeInternalControlInboundPortURI,
+		String FridgeExternalControlInboundPortURI
 		) throws Exception
 	{
-		this.AirConditioningUserInboundPortURI = AirConditioningUserInboundPortURI;
-		this.acop = new AirConditioningUserOutboundPort(this);
+		this.FridgeUserInboundPortURI = FridgeUserInboundPortURI;
+		this.acop = new FridgeUserOutboundPort(this);
 		this.acop.publishPort();
-		this.AirConditioningInternalControlInboundPortURI =
-									AirConditioningInternalControlInboundPortURI;
-		this.acicop = new AirConditioningInternalControlOutboundPort(this);
+		this.FridgeInternalControlInboundPortURI =
+									FridgeInternalControlInboundPortURI;
+		this.acicop = new FridgeInternalControlOutboundPort(this);
 		this.acicop.publishPort();
-		this.AirConditioningExternalControlInboundPortURI =
-									AirConditioningExternalControlInboundPortURI;
-		this.acecop = new AirConditioningExternalControlOutboundPort(this);
+		this.FridgeExternalControlInboundPortURI =
+									FridgeExternalControlInboundPortURI;
+		this.acecop = new FridgeExternalControlOutboundPort(this);
 		this.acecop.publishPort();
 
-		this.tracer.get().setTitle("AirConditioning tester component");
+		this.tracer.get().setTitle("Fridge tester component");
 		this.tracer.get().setRelativePosition(0, 1);
 		this.toggleTracing();		
 	}
@@ -279,13 +279,13 @@ extends		AbstractComponent
 		this.traceMessage("...testOn() done.\n");
 	}
 
-	protected void		testTargetTemperature()
+	protected void		testTargetCoolerTemperature()
 	{
-		this.traceMessage("testTargetTemperature()...\n");
+		this.traceMessage("testTargetCoolerTemperature()...\n");
 		try {
-			this.acop.setTargetTemperature(10.0);
-			assertEquals(10.0, this.acop.getTargetTemperature());
-			this.acop.setTargetTemperature(Fridge.STANDARD_TARGET_TEMPERATURE);
+			this.acop.setTargetCoolerTemperature(10.0);
+			assertEquals(10.0, this.acop.getTargetCoolerTemperature());
+			this.acop.setTargetCoolerTemperature(Fridge.STANDARD_TARGET_COOLER_TEMPERATURE);
 		} catch (Exception e) {
 			this.traceMessage("...KO.\n" + e);
 			assertTrue(false);
@@ -294,19 +294,49 @@ extends		AbstractComponent
 
 	}
 
-	protected void		testCurrentTemperature()
+	protected void		testCurrentCoolerTemperature()
 	{
-		this.traceMessage("testCurrentTemperature()...\n");
+		this.traceMessage("testCurrentCoolerTemperature()...\n");
 		try {
 			this.acop.switchOn();
-			assertEquals(Fridge.FAKE_CURRENT_TEMPERATURE,
-						 this.acop.getCurrentTemperature());
+			assertEquals(Fridge.FAKE_CURRENT_COOLER_TEMPERATURE,
+						 this.acop.getCurrentCoolerTemperature());
 			this.acop.switchOff();
 		} catch (Exception e) {
 			this.traceMessage("...KO.\n" + e);
 			assertTrue(false);
 		}
-		this.traceMessage("...testCurrentTemperature() done.\n");
+		this.traceMessage("...testCurrentCoolerTemperature() done.\n");
+	}
+	
+	protected void		testTargetFreezerTemperature()
+	{
+		this.traceMessage("testTargetFreezerTemperature()...\n");
+		try {
+			this.acop.setTargetFreezerTemperature(-15.0);
+			assertEquals(-15.0, this.acop.getTargetFreezerTemperature());
+			this.acop.setTargetFreezerTemperature(Fridge.STANDARD_TARGET_FREEZER_TEMPERATURE);
+		} catch (Exception e) {
+			this.traceMessage("...KO.\n" + e);
+			assertTrue(false);
+		}
+		this.traceMessage("...testTargetTemperature() done.\n");
+
+	}
+
+	protected void		testCurrentFreezerTemperature()
+	{
+		this.traceMessage("testCurrentFreezerTemperature()...\n");
+		try {
+			this.acop.switchOn();
+			assertEquals(Fridge.FAKE_CURRENT_FREEZER_TEMPERATURE,
+						 this.acop.getCurrentFreezerTemperature());
+			this.acop.switchOff();
+		} catch (Exception e) {
+			this.traceMessage("...KO.\n" + e);
+			assertTrue(false);
+		}
+		this.traceMessage("...testCurrentFreezerTemperature() done.\n");
 	}
 
 	protected void		testPowerLevel()
@@ -327,16 +357,17 @@ extends		AbstractComponent
 		this.traceMessage("...testPowerLevel() done.\n");
 	}
 
-	protected void		testInternalControl()
+	protected void		testInternalControlForCooler()
 	{
-		this.traceMessage("testInternalControl()...\n");
+		this.traceMessage("testInternalControlForCooler()...\n");
 		try {
-			assertEquals(Fridge.STANDARD_TARGET_TEMPERATURE,
-						 this.acicop.getTargetTemperature());
+			this.acicop.getTargetCoolerTemperature();
 			this.acop.switchOn();
 			assertEquals(true, this.acop.on());
-			assertEquals(Fridge.FAKE_CURRENT_TEMPERATURE,
-						 this.acicop.getCurrentTemperature());
+			assertEquals(Fridge.FAKE_CURRENT_COOLER_TEMPERATURE,
+						 this.acicop.getCurrentCoolerTemperature());
+			this.acicop.setTargetCoolerTemperature(3.0);
+			assertEquals(3.0, this.acicop.getTargetCoolerTemperature());
 			this.acicop.startCooling();
 			assertEquals(true, this.acicop.cooling());
 			this.acicop.stopCooling();
@@ -345,8 +376,31 @@ extends		AbstractComponent
 			this.traceMessage("...KO.\n");
 			assertTrue(false);
 		}
-		this.traceMessage("...testInternalControl() done.\n");
+		this.traceMessage("...testInternalControlForCooler() done.\n");
 	}
+	
+	protected void		testInternalControlForFreezer()
+	{
+		this.traceMessage("testInternalControlForFreezer()...\n");
+		try {
+			this.acicop.getTargetFreezerTemperature();
+			this.acop.switchOn();
+			assertEquals(true, this.acop.on());
+			assertEquals(Fridge.FAKE_CURRENT_FREEZER_TEMPERATURE,
+						 this.acicop.getCurrentFreezerTemperature());
+			this.acicop.setTargetFreezerTemperature(-20.0);
+			assertEquals(-20.0, this.acicop.getTargetFreezerTemperature());
+			this.acicop.startCooling();
+			assertEquals(true, this.acicop.cooling());
+			this.acicop.stopCooling();
+			assertEquals(false, this.acicop.cooling());
+		} catch (Exception e) {
+			this.traceMessage("...KO.\n");
+			assertTrue(false);
+		}
+		this.traceMessage("...testInternalControlForFreezer() done.\n");
+	}
+
 
 	protected void		testExternalControl()
 	{
@@ -368,10 +422,13 @@ extends		AbstractComponent
 	{
 		this.testSwitchOnSwitchOff();
 		this.testOn();
-		this.testTargetTemperature();
-		this.testCurrentTemperature();
+		this.testTargetCoolerTemperature();
+		this.testCurrentCoolerTemperature();
+		this.testTargetFreezerTemperature();
+		this.testCurrentFreezerTemperature();
 		this.testPowerLevel();
-		this.testInternalControl();
+		this.testInternalControlForCooler();
+		this.testInternalControlForFreezer();
 		this.testExternalControl();
 	}
 
@@ -390,16 +447,16 @@ extends		AbstractComponent
 		try {
 			this.doPortConnection(
 					this.acop.getPortURI(),
-					this.AirConditioningUserInboundPortURI,
-					AirConditioningUserConnector.class.getCanonicalName());
+					this.FridgeUserInboundPortURI,
+					FridgeUserConnector.class.getCanonicalName());
 			this.doPortConnection(
 					this.acicop.getPortURI(),
-					AirConditioningInternalControlInboundPortURI,
-					AirConditioningInternalControlConnector.class.getCanonicalName());
+					FridgeInternalControlInboundPortURI,
+					FridgeInternalControlConnector.class.getCanonicalName());
 			this.doPortConnection(
 					this.acecop.getPortURI(),
-					AirConditioningExternalControlInboundPortURI,
-					AirConditioningExternalControlConnector.class.getCanonicalName());
+					FridgeExternalControlInboundPortURI,
+					FridgeExternalControlConnector.class.getCanonicalName());
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;
 		}
@@ -420,46 +477,46 @@ extends		AbstractComponent
 					this.clocksServerOutboundPort.getPortURI(),
 					ClocksServer.STANDARD_INBOUNDPORT_URI,
 					ClocksServerConnector.class.getCanonicalName());
-			System.out.println("AirConditioning tester gets the clock");
+			System.out.println("Fridge tester gets the clock");
 			AcceleratedClock ac =
 					this.clocksServerOutboundPort.getClock(
 										CVMIntegrationTest.TEST_CLOCK_URI);
-			System.out.println("AirConditioning tester waits until start");
+			System.out.println("Fridge tester waits until start");
 			this.doPortDisconnection(
 						this.clocksServerOutboundPort.getPortURI());
 			this.clocksServerOutboundPort.unpublishPort();
 
-			Instant AirConditioningSwitchOn = Instant.parse("2023-09-20T15:00:02.00Z");
-			Instant AirConditioningSwitchOff = Instant.parse("2023-09-20T15:00:08.00Z");
+			Instant FridgeSwitchOn = Instant.parse("2023-09-20T15:00:02.00Z");
+			Instant FridgeSwitchOff = Instant.parse("2023-09-20T15:00:08.00Z");
 			ac.waitUntilStart();
-			System.out.println("AirConditioning tester schedules switch on and off");
-			long delayToSwitchOn = ac.nanoDelayUntilInstant(AirConditioningSwitchOn);
-			long delayToSwitchOff = ac.nanoDelayUntilInstant(AirConditioningSwitchOff);
+			System.out.println("Fridge tester schedules switch on and off");
+			long delayToSwitchOn = ac.nanoDelayUntilInstant(FridgeSwitchOn);
+			long delayToSwitchOff = ac.nanoDelayUntilInstant(FridgeSwitchOff);
 
 			// This is to avoid mixing the 'this' of the task object with the 'this'
 			// representing the component object in the code of the next methods run
 			AbstractComponent o = this;
 
-			// schedule the switch on AirConditioning
+			// schedule the switch on Fridge
 			this.scheduleTaskOnComponent(
 					new AbstractComponent.AbstractTask() {
 						@Override
 						public void run() {
 							try {
-								o.traceMessage("AirConditioning switches on.\n");
+								o.traceMessage("Fridge switches on.\n");
 								acop.switchOn();
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
 					}, delayToSwitchOn, TimeUnit.NANOSECONDS);
-			// schedule the switch off AirConditioning
+			// schedule the switch off Fridge
 			this.scheduleTaskOnComponent(
 					new AbstractComponent.AbstractTask() {
 						@Override
 						public void run() {
 							try {
-								o.traceMessage("AirConditioning switches off.\n");
+								o.traceMessage("Fridge switches off.\n");
 								acop.switchOff();
 							} catch (Exception e) {
 								e.printStackTrace();

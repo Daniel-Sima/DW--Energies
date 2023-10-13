@@ -1,9 +1,9 @@
 package equipments.Fridge.connections;
 
-import equipments.AirConditioning.AirConditioningUserAndControlI;
-import equipments.AirConditioning.AirConditioningUserAndExternalControlI;
-import equipments.AirConditioning.AirConditioningUserCI;
-import equipments.AirConditioning.AirConditioningUserImplI;
+import equipments.Fridge.FridgeUserAndControlI;
+import equipments.Fridge.FridgeUserAndExternalControlI;
+import equipments.Fridge.FridgeUserCI;
+import equipments.Fridge.FridgeUserImplI;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -42,8 +42,8 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>HeaterUserInboundPort</code> implements an inbound port for
- * the {@code HeaterUserCI} component interface.
+ * The class <code>FridgeUserInboundPort</code> implements an inbound port for
+ * the {@code FridgeUserCI} component interface.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -66,7 +66,7 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
  */
 public class			FridgeUserInboundPort
 extends		AbstractInboundPort
-implements	AirConditioningUserCI
+implements	FridgeUserCI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -84,9 +84,9 @@ implements	AirConditioningUserCI
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code owner instanceof HeaterUserImplI}
-	 * pre	{@code owner instanceof HeaterUserAndControlI}
-	 * pre	{@code owner instanceof HeaterUserAndExternalControlI}
+	 * pre	{@code owner instanceof FridgeUserImplI}
+	 * pre	{@code owner instanceof FridgeUserAndControlI}
+	 * pre	{@code owner instanceof FridgeUserAndExternalControlI}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
@@ -95,11 +95,11 @@ implements	AirConditioningUserCI
 	 */
 	public				FridgeUserInboundPort(ComponentI owner) throws Exception
 	{
-		super(AirConditioningUserCI.class, owner);
+		super(FridgeUserCI.class, owner);
 
-		assert	owner instanceof AirConditioningUserImplI;
-		assert	owner instanceof AirConditioningUserAndControlI;
-		assert	owner instanceof AirConditioningUserAndExternalControlI;
+		assert	owner instanceof FridgeUserImplI;
+		assert	owner instanceof FridgeUserAndControlI;
+		assert	owner instanceof FridgeUserAndExternalControlI;
 	}
 
 	/**
@@ -121,11 +121,11 @@ implements	AirConditioningUserCI
 	public				FridgeUserInboundPort(String uri, ComponentI owner)
 	throws Exception
 	{
-		super(uri, AirConditioningUserCI.class, owner);
+		super(uri, FridgeUserCI.class, owner);
 
-		assert	owner instanceof AirConditioningUserImplI;
-		assert	owner instanceof AirConditioningUserAndControlI;
-		assert	owner instanceof AirConditioningUserAndExternalControlI;
+		assert	owner instanceof FridgeUserImplI;
+		assert	owner instanceof FridgeUserAndControlI;
+		assert	owner instanceof FridgeUserAndExternalControlI;
 	}
 
 	// -------------------------------------------------------------------------
@@ -133,104 +133,139 @@ implements	AirConditioningUserCI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#on()
+	 * @see equipments.Fridge.FridgeUserCI#on()
 	 */
 	@Override
 	public boolean		on() throws Exception
 	{
-		return this.getOwner().handleRequest(o -> ((AirConditioningUserImplI)o).on());
+		return this.getOwner().handleRequest(o -> ((FridgeUserImplI)o).on());
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#switchOn()
+	 * @see equipments.Fridge.FridgeUserCI#switchOn()
 	 */
 	@Override
 	public void			switchOn() throws Exception
 	{
 		this.getOwner().handleRequest(
-							o -> {	((AirConditioningUserImplI)o).switchOn();;
+							o -> {	((FridgeUserImplI)o).switchOn();;
 									return null;
 							});
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#switchOff()
+	 * @see equipments.Fridge.FridgeUserCI#switchOff()
 	 */
 	@Override
 	public void			switchOff() throws Exception
 	{
 		this.getOwner().handleRequest(
-							o -> {	((AirConditioningUserImplI)o).switchOff();;
+							o -> {	((FridgeUserImplI)o).switchOff();;
 									return null;
 							});
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#setTargetTemperature(double)
+	 * @see equipments.Fridge.FridgeUserCI#setTargetFreezerTemperature(doubleFreezer)
 	 */
 	@Override
-	public void			setTargetTemperature(double target) throws Exception
+	public void			setTargetFreezerTemperature(double targetFreezer) throws Exception
 	{
 		this.getOwner().handleRequest(
-							o -> {	((AirConditioningUserImplI)o).
-												setTargetTemperature(target);
+							o -> {	((FridgeUserImplI)o).
+												setTargetFreezerTemperature(targetFreezer);
 									return null;
 							});
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#getTargetTemperature()
+	 * @see equipments.Fridge.FridgeUserCI#getTargetFreezerTemperature()
 	 */
 	@Override
-	public double		getTargetTemperature() throws Exception
+	public double		getTargetFreezerTemperature() throws Exception
 	{
 		return this.getOwner().handleRequest(
-							o -> ((AirConditioningUserAndControlI)o).
-													getTargetTemperature());
+							o -> ((FridgeUserAndControlI)o).
+													getTargetFreezerTemperature());
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#getCurrentTemperature()
+	 * @see equipments.Fridge.FridgeUserCI#getCurrentFreezerTemperature()
 	 */
 	@Override
-	public double		getCurrentTemperature() throws Exception
+	public double		getCurrentFreezerTemperature() throws Exception
 	{
 		return this.getOwner().handleRequest(
-							o -> ((AirConditioningUserAndControlI)o).
-													getCurrentTemperature());
+							o -> ((FridgeUserAndControlI)o).
+													getCurrentFreezerTemperature());
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeUserCI#setTargetCoolerTemperature(doubleCooler)
+	 */
+	@Override
+	public void			setTargetCoolerTemperature(double targetCooler) throws Exception
+	{
+		this.getOwner().handleRequest(
+							o -> {	((FridgeUserImplI)o).
+												setTargetCoolerTemperature(targetCooler);
+									return null;
+							});
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#getCurrentPowerLevel()
+	 * @see equipments.Fridge.FridgeUserCI#getTargetCoolerTemperature()
+	 */
+	@Override
+	public double		getTargetCoolerTemperature() throws Exception
+	{
+		return this.getOwner().handleRequest(
+							o -> ((FridgeUserAndControlI)o).
+													getTargetCoolerTemperature());
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeUserCI#getCurrentCoolerTemperature()
+	 */
+	@Override
+	public double		getCurrentCoolerTemperature() throws Exception
+	{
+		return this.getOwner().handleRequest(
+							o -> ((FridgeUserAndControlI)o).
+													getCurrentCoolerTemperature());
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeUserCI#getCurrentPowerLevel()
 	 */
 	@Override
 	public double		getCurrentPowerLevel() throws Exception
 	{
 		return this.getOwner().handleRequest(
-							o -> ((AirConditioningUserAndExternalControlI)o).
+							o -> ((FridgeUserAndExternalControlI)o).
 														getCurrentPowerLevel());
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#getMaxPowerLevel()
+	 * @see equipments.Fridge.FridgeUserCI#getMaxPowerLevel()
 	 */
 	@Override
 	public double		getMaxPowerLevel() throws Exception
 	{
 		return this.getOwner().handleRequest(
-							o -> ((AirConditioningUserAndExternalControlI)o).
+							o -> ((FridgeUserAndExternalControlI)o).
 														getMaxPowerLevel());
 	}
 
 	/**
-	 * @see equipments.AirConditioning.AirConditioningUserCI#setCurrentPowerLevel(double)
+	 * @see equipments.Fridge.FridgeUserCI#setCurrentPowerLevel(double)
 	 */
 	@Override
 	public void			setCurrentPowerLevel(double powerLevel)
 	throws Exception
 	{
 		this.getOwner().handleRequest(
-							o -> { ((AirConditioningUserAndExternalControlI)o).
+							o -> { ((FridgeUserAndExternalControlI)o).
 											setCurrentPowerLevel(powerLevel);
 									return null;
 							});
