@@ -5,8 +5,7 @@ package production.intermittent.PetrolGenerator;
 /***********************************************************************************/
 /** 
  * The interface <code>PetrolGeneratorUserAndExternalControlI</code> declares the
- * signatures of service implementations accessible both to the user and
- * to the external controller.
+ * signatures of service implementations accessible to the external controller.
  *
  * <p><strong>Description</strong></p>
  * 

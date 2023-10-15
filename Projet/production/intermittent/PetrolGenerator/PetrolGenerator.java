@@ -3,7 +3,6 @@ package production.intermittent.PetrolGenerator;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
-import fr.sorbonne_u.components.hem2023e1.equipments.heater.Heater;
 import fr.sorbonne_u.exceptions.PostconditionException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import production.intermittent.PetrolGenerator.connections.PetrolGeneratorExternalControlInboundPort;
@@ -43,7 +42,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	/***********************************************************************************/
 	/**
 	 * The enumeration <code>GeneratorState</code> describes the operation
-	 * states of the heater.
+	 * states of the Petrol Generator.
 	 *
 	 * <p><strong>Description</strong></p>
 	 * 
@@ -59,7 +58,6 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 		/** petrol generator  is off.										*/
 		OFF
 	}
-	/***********************************************************************************/
 
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -78,7 +76,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 			"PETROL-GENERATOR-EXTERNAL-CONTROL-INBOUND-PORT-URI";
 
 	/** when true, methods trace their actions.										*/
-	public static final boolean		VERBOSE = true;
+	public static final boolean	VERBOSE = true;
 
 	/** current state (on, off) of the petrol generator.							*/
 	protected GeneratorState currentState;
@@ -92,7 +90,6 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	/** inbound port offering the <code>PetrolGeneratorExternalControlCI</code>
 	 *  interface.																	*/
 	protected PetrolGeneratorExternalControlInboundPort	petrolGeneratorExternalControlInboundPort;
-	/***********************************************************************************/
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -126,8 +123,8 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 * 
-	 * @param petrolGeneratorInternalControlInboundPortURI	URI of the inbound port to call the petrol generator component for internal control.
-	 * @param petrolGeneratorExternalControlInboundPortURI	URI of the inbound port to call the petrol generato component for external control.
+	 * @param petrolGeneratorInternalControlInboundPortURI	URI of the inbound port to call the Petrol Generator component for internal control.
+	 * @param petrolGeneratorExternalControlInboundPortURI	URI of the inbound port to call the Petrol Generator component for external control.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected PetrolGenerator(
@@ -169,7 +166,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 
 	/***********************************************************************************/
 	/**
-	 * create a new thermostated heater.
+	 * initialise the Petrol Generator
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -179,7 +176,6 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param heaterUserInboundPortURI				URI of the inbound port to call the heater component for user interactions.
 	 * @param petrolGeneratorInternalControlInboundPortURI	URI of the inbound port to call the petrol generator component for internal control.
 	 * @param petrolGeneratorExternalControlInboundPortURI	URI of the inbound port to call the petrol generator component for external control.
 	 * @throws Exception							<i>to do</i>.
@@ -211,7 +207,6 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 		}
 	}
 
-	/***********************************************************************************/
 	// -------------------------------------------------------------------------
 	// Component life-cycle
 	// -------------------------------------------------------------------------
@@ -231,7 +226,6 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 		super.shutdown();
 	}
 
-	/***********************************************************************************/
 	// -------------------------------------------------------------------------
 	// Component services implementation
 	// -------------------------------------------------------------------------
@@ -257,7 +251,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public void startProducing() throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator starts producing.\n");
 		}
 		
@@ -274,7 +268,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public void stopProducing() throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator stops producing.\n");
 		}
 		assert	(this.currentState == GeneratorState.PRODUCING) : new PreconditionException("(this.currentState == GeneratorState.PRODUCING) ");
@@ -291,7 +285,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public double getMaxPowerProductionLevel() throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator returns its max power production level " + 
 					MAX_POWER_LEVEL_PRODUCTION + ".\n");
 		}
@@ -305,7 +299,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public double getCurrentPowerLevel() throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator returns its current power production level " + 
 					this.currentPowerLevelProduction + ".\n");
 		}
@@ -325,7 +319,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public double getMaxPetrolLevel() throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator returns its max fuel tank level " + 
 					MAX_FUEL_TANK_LEVEL + ".\n");
 		}
@@ -339,7 +333,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public double getCurrentPetrolLevel() throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator returns its current fuel tank level " + 
 					this.currentFuelTankLevel + "L.\n");
 		}
@@ -359,7 +353,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public void switchOn() throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator switches on.\n");
 		}
 
@@ -376,7 +370,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public void switchOff() throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator switches off.\n");
 		}
 
@@ -393,7 +387,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public void fillFuelTank(double liters) throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator fills its petrol level with " + 
 					liters + "L.\n");
 		}
@@ -401,9 +395,10 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 		assert	liters >= 0.0 : new PreconditionException("liters >= 0.0");
 
 		if (this.currentFuelTankLevel+liters <= MAX_FUEL_TANK_LEVEL) {
-			this.currentFuelTankLevel = getCurrentPetrolLevel()+liters;
+			this.currentFuelTankLevel = this.currentFuelTankLevel + liters;
 		} else {
 			this.currentFuelTankLevel = MAX_FUEL_TANK_LEVEL;
+			this.traceMessage("Petrol Generator petrol leve is full. \n");
 		}
 	}
 
@@ -413,7 +408,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 	 */
 	@Override
 	public boolean on() throws Exception {
-		if (Heater.VERBOSE) {
+		if (PetrolGenerator.VERBOSE) {
 			this.traceMessage("Petrol Generator returns its state: " +
 											this.currentState + ".\n");
 		}

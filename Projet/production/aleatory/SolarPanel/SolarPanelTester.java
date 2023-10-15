@@ -4,9 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Instant;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
@@ -127,22 +125,22 @@ extends	AbstractComponent {
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param isUnitTest							true if the component must perform unit tests, otherwise it executes integration tests actions.
-	 * @param reflectionInboundPortURI				URI of the reflection inbound port of the component.
+	 * @param isUnitTest								true if the component must perform unit tests, otherwise it executes integration tests actions.
+	 * @param reflectionInboundPortURI					URI of the reflection inbound port of the component.
 	 * @param solarPanelExternalControlInboundPortURI	URI of the external control component interface inbound port.
-	 * @param solarPanelMeteoControlInboundPort  	URI of the meteo control component interface inbound port.
+	 * @param solarPanelMeteoControlInboundPortURI  	URI of the meteo control component interface inbound port.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected SolarPanelTester(
 			boolean isUnitTest,
 			String reflectionInboundPortURI,
 			String solarPanelExternalControlInboundPortURI,
-			String solarPanelMeteoControlInboundPort
+			String solarPanelMeteoControlInboundPortURI
 			) throws Exception{
 		super(reflectionInboundPortURI, 1, 1);
 		this.isUnitTest = isUnitTest;
 		this.initialise(solarPanelExternalControlInboundPortURI,
-				solarPanelMeteoControlInboundPort);
+				solarPanelMeteoControlInboundPortURI);
 	}
 
 	/***********************************************************************************/

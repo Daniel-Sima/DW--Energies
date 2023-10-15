@@ -54,12 +54,12 @@ extends	AbstractComponent {
 	protected String petrolGeneratorExternalControlInboundPortURI;
 	/** URI of the meteo control component interface inbound port.		*/
 	protected String petrolGeneratorInternalControlInboundPortURI;
-	/** port to connect to the clocks server.								*/
 
 	/** external control component interface inbound port.					*/
 	protected PetrolGeneratorExternalControlOutboundPort petrolGeneratorExternalControlOutboundPort;
 	/** internal control component interface inbound port.					*/
 	protected PetrolGeneratorInternalControlOutboundPort petrolGeneratorInternalControlOutboundPort;
+	/** port to connect to the clocks server.								*/
 	protected ClocksServerOutboundPort	clocksServerOutboundPort;
 
 	// -------------------------------------------------------------------------
@@ -90,25 +90,25 @@ extends	AbstractComponent {
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code petrolGeneratorExternalControlOutboundPort != null && !petrolGeneratorExternalControlOutboundPort.isEmpty()}
-	 * pre	{@code petrolGeneratorInternalControlOutboundPort != null && !petrolGeneratorInternalControlOutboundPort.isEmpty()}
+	 * pre	{@code petrolGeneratorInternalControlInboundPortURI != null && !petrolGeneratorInternalControlInboundPortURI.isEmpty()}
+	 * pre	{@code petrolGeneratorInternalControlInboundPortURI != null && !petrolGeneratorInternalControlInboundPortURI.isEmpty()}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param isUnitTest							true if the component must perform unit tests, otherwise it executes integration tests actions.
-	 * @param petrolGeneratorExternalControlOutboundPort	URI of the external control component interface inbound port.
-	 * @param petrolGeneratorInternalControlOutboundPort  	URI of the internal control component interface inbound port.
+	 * @param petrolGeneratorInternalControlInboundPortURI	URI of the external control component interface inbound port.
+	 * @param petrolGeneratorInternalControlInboundPortURI  	URI of the internal control component interface inbound port.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected PetrolGeneratorTester(
 			boolean isUnitTest,
-			String petrolGeneratorExternalControlOutboundPort,
-			String petrolGeneratorInternalControlOutboundPort
+			String petrolGeneratorInternalControlInboundPortURI,
+			String petrolGeneratorExternalControlInboundPortURI
 			) throws Exception {
 		super(1, 1);
 		this.isUnitTest = isUnitTest;
-		this.initialise(petrolGeneratorExternalControlOutboundPort,
-				petrolGeneratorInternalControlOutboundPort);
+		this.initialise(petrolGeneratorInternalControlInboundPortURI,
+				petrolGeneratorExternalControlInboundPortURI);
 	}
 
 	/***********************************************************************************/
@@ -118,29 +118,28 @@ extends	AbstractComponent {
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code petrolGeneratorExternalControlOutboundPort != null && !petrolGeneratorExternalControlOutboundPort.isEmpty()}
-	 * pre	{@code petrolGeneratorInternalControlOutboundPort != null && !petrolGeneratorInternalControlOutboundPort.isEmpty()}
+	 * pre	{@code petrolGeneratorExternalControlInboundPortURI != null && !petrolGeneratorExternalControlInboundPortURI.isEmpty()}
+	 * pre	{@code petrolGeneratorInternalControlInboundPortURI != null && !petrolGeneratorInternalControlInboundPortURI.isEmpty()}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param isUnitTest							true if the component must perform unit tests, otherwise it executes integration tests actions.
-	 * @param reflectionInboundPortURI				URI of the reflection inbound port of the component.
-	 * @param petrolGeneratorExternalControlOutboundPort	URI of the external control component interface inbound port.
-	 * @param petrolGeneratorInternalControlOutboundPort  	URI of the internal control component interface inbound port.
+	 * @param isUnitTest										true if the component must perform unit tests, otherwise it executes integration tests actions.
+	 * @param reflectionInboundPortURI							URI of the reflection inbound port of the component.
+	 * @param petrolGeneratorExternalControlInboundPortURI		URI of the external control component interface inbound port.
+	 * @param petrolGeneratorInternalControlInboundPortURI  	URI of the internal control component interface inbound port.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected PetrolGeneratorTester(
 			boolean isUnitTest,
 			String reflectionInboundPortURI,
-			String petrolGeneratorExternalControlOutboundPort,
-			String petrolGeneratorInternalControlOutboundPort
+			String petrolGeneratorExternalControlInboundPortURI,
+			String petrolGeneratorInternalControlInboundPortURI
 			) throws Exception{
 		super(reflectionInboundPortURI, 1, 1);
 		this.isUnitTest = isUnitTest;
-		this.initialise(petrolGeneratorExternalControlOutboundPort,
-				petrolGeneratorInternalControlOutboundPort);
+		this.initialise(petrolGeneratorExternalControlInboundPortURI,
+				petrolGeneratorInternalControlInboundPortURI);
 	}
-
 
 	/***********************************************************************************/
 	/**
@@ -158,7 +157,7 @@ extends	AbstractComponent {
 	 * @param petrolGeneratorInternalControlInboundPortURI	    URI of the internal control component interface inbound port.
 	 * @throws Exception							<i>to do</i>.
 	 */
-	protected void		initialise(
+	protected void initialise(
 			String petrolGeneratorExternalControlInboundPortURI,
 			String petrolGeneratorInternalControlInboundPortURI
 			) throws Exception{
@@ -183,7 +182,7 @@ extends	AbstractComponent {
 	/***********************************************************************************/
 	protected void tests()
 	{
-		this.traceMessage("testPowerLevel...\n");
+		this.traceMessage("tests...\n");
 		try {
 			assertFalse(this.petrolGeneratorExternalControlOutboundPort.on());
 			
@@ -213,7 +212,7 @@ extends	AbstractComponent {
 			assertTrue(false);
 		}
 
-		this.traceMessage("...testPowerLevel() done.\n");
+		this.traceMessage("...tests() done.\n");
 	}
 
 	// -------------------------------------------------------------------------

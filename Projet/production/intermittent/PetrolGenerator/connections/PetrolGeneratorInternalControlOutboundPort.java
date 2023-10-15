@@ -83,6 +83,9 @@ implements PetrolGeneratorInternalControlCI {
 		super(uri, PetrolGeneratorInternalControlCI.class, owner);
 	}
 
+	// -------------------------------------------------------------------------
+	// Methods
+	// -------------------------------------------------------------------------
 	/***********************************************************************************/
 	/**
 	 * @see
@@ -99,7 +102,7 @@ implements PetrolGeneratorInternalControlCI {
 	@Override
 	public void startProducing() throws Exception {
 		((PetrolGeneratorInternalControlCI)this.getConnector()).startProducing();
-		
+
 	}
 
 	/***********************************************************************************/
