@@ -1,36 +1,45 @@
-package production.aleatory;
+package production.aleatory.SolarPanel.connections;
+
+import fr.sorbonne_u.components.connectors.AbstractConnector;
+import production.aleatory.SolarPanel.SolarPanelMeteoControlCI;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The interface <code>SolarPanelMeteoControI</code> declares 
- * signatures of service implementations accessible based on weather.
+ * The class <code>SolarPanelMeteoControlConnector</code> implements a
+ * connector for the {@code SolarPanelMeteoControlCI} component interface.
  *
  * <p><strong>Description</strong></p>
  * 
+ * <p><strong>White-box Invariant</strong></p>
+ * 
+ * <pre>
+ * invariant	{@code true}	// no more invariant
+ * </pre>
+ * 
  * <p><strong>Black-box Invariant</strong></p>
+ * 
+ * <pre>
+ * invariant	{@code true}	// no more invariant
+ * </pre>
  * 
  * <p>Created on : 2023-10-15</p>
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public interface SolarPanelMeteoControlI {
+public class SolarPanelMeteoControlConnector 
+extends		AbstractConnector
+implements SolarPanelMeteoControlCI{
 	/***********************************************************************************/
 	/**
-	 * return the power level production of the solar panel in watts based on the 
-	 * sunshine percentage.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code true}	// no precondition.
-	 * post	{@code return > 0.0}
-	 * </pre>
-	 *
-	 * @throws Exception	<i>to do</i>.
+	 * @see
 	 */
-	public void setPowerLevelProduction(double percentage) throws Exception;
+	@Override
+	public void setPowerLevelProduction(double percentage) throws Exception {
+		((SolarPanelMeteoControlCI)this.offering).setPowerLevelProduction(percentage);	
+	}
+
 }
 /***********************************************************************************/
 /***********************************************************************************/

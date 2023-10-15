@@ -1,4 +1,4 @@
-package production.aleatory;
+package production.aleatory.SolarPanel;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
@@ -27,9 +27,7 @@ extends AbstractCVM {
 	// Constructors
 	// -------------------------------------------------------------------------
 	/***********************************************************************************/
-	public CVMUnitTest() throws Exception{
-
-	}
+	public CVMUnitTest() throws Exception {}
 
 	// -------------------------------------------------------------------------
 	// CVM life-cycle

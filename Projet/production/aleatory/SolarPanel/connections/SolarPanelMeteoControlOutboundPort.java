@@ -1,14 +1,15 @@
-package production.aleatory;
+package production.aleatory.SolarPanel.connections;
 
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
+import production.aleatory.SolarPanel.SolarPanelMeteoControlCI;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>SolarPanelExternalControlOutboundPort</code> implements an
- * outbound port for the {@code SolarPanelExternalControlCI} component interface.
+ * The class <code>SolarPanelMeteoOutboundPort</code> implements an
+ * outbound port for the {@code SolarPanelMeteoControlCI} component interface.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -28,9 +29,9 @@ import fr.sorbonne_u.components.ports.AbstractOutboundPort;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class SolarPanelExternalControlOutboundPort 
+public class SolarPanelMeteoControlOutboundPort 
 extends		AbstractOutboundPort
-implements SolarPanelExternalControlCI{
+implements SolarPanelMeteoControlCI{
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -54,8 +55,8 @@ implements SolarPanelExternalControlCI{
 	 * @param owner					component that owns this port.
 	 * @throws Exception 			<i>to do</i>.
 	 */
-	public SolarPanelExternalControlOutboundPort(ComponentI owner) throws Exception{
-		super(SolarPanelExternalControlCI.class, owner);
+	public SolarPanelMeteoControlOutboundPort(ComponentI owner) throws Exception{
+		super(SolarPanelMeteoControlCI.class, owner);
 	}
 
 	/***********************************************************************************/
@@ -73,11 +74,11 @@ implements SolarPanelExternalControlCI{
 	 * @param owner					component that owns this port.
 	 * @throws Exception 			<i>to do</i>.
 	 */
-	public SolarPanelExternalControlOutboundPort(
+	public SolarPanelMeteoControlOutboundPort(
 			String uri,
 			ComponentI owner
 			) throws Exception{
-		super(uri, SolarPanelExternalControlCI.class, owner);
+		super(uri, SolarPanelMeteoControlCI.class, owner);
 	}
 
 	// -------------------------------------------------------------------------
@@ -88,18 +89,10 @@ implements SolarPanelExternalControlCI{
 	 * @see
 	 */
 	@Override
-	public double getMaxPowerLevelProduction() throws Exception {
-		return ((SolarPanelExternalControlCI)this.getConnector()).getMaxPowerLevelProduction();
+	public void setPowerLevelProduction(double percentage) throws Exception {
+		((SolarPanelMeteoControlCI)this.getConnector()).setPowerLevelProduction(percentage);
 	}
 
-	/***********************************************************************************/
-	/**
-	 * @see
-	 */
-	@Override
-	public double getCurrentPowerLevelProduction() throws Exception {
-		return ((SolarPanelExternalControlCI)this.getConnector()).getCurrentPowerLevelProduction();
-	}
 }
 /***********************************************************************************/
 /***********************************************************************************/

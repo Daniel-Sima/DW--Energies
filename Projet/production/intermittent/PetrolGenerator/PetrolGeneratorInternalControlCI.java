@@ -1,21 +1,17 @@
-package production.aleatory;
+package production.intermittent.PetrolGenerator;
 
-import fr.sorbonne_u.components.connectors.AbstractConnector;
+import fr.sorbonne_u.components.interfaces.OfferedCI;
+import fr.sorbonne_u.components.interfaces.RequiredCI;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>SolarPanelExternalControlConnector</code> implements a
- * connector for the {@code SolarPanelExternalControlCI} component interface.
+ * The component interface <code>PetrolGeneratorInternalControlCI</code> declares the
+ * signatures of services used by the sensor to control the power produced by the
+ * petrol generator.
  *
  * <p><strong>Description</strong></p>
- * 
- * <p><strong>White-box Invariant</strong></p>
- * 
- * <pre>
- * invariant	{@code true}	// no more invariant
- * </pre>
  * 
  * <p><strong>Black-box Invariant</strong></p>
  * 
@@ -27,26 +23,29 @@ import fr.sorbonne_u.components.connectors.AbstractConnector;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class SolarPanelExternalControlConnector 
-extends		AbstractConnector
-implements SolarPanelExternalControlCI {
+public interface PetrolGeneratorInternalControlCI 
+extends		OfferedCI,
+RequiredCI, PetrolGeneratorInternalControlI{
 	/***********************************************************************************/
 	/**
-	 * @see
+	 * @see 
 	 */
 	@Override
-	public double getMaxPowerLevelProduction() throws Exception {
-		return ((SolarPanelExternalControlCI)this.offering).getMaxPowerLevelProduction();
-	}
+	public boolean isProducing() throws Exception;
+	
+	/***********************************************************************************/
+	/**
+	 * @see 
+	 */
+	@Override
+	public void	startProducing() throws Exception;
 
 	/***********************************************************************************/
 	/**
-	 * @see
+	 * @see 
 	 */
 	@Override
-	public double getCurrentPowerLevelProduction() throws Exception {
-		return ((SolarPanelExternalControlCI)this.offering).getCurrentPowerLevelProduction();
-	}
+	public void	stopProducing() throws Exception;
 }
 /***********************************************************************************/
 /***********************************************************************************/

@@ -1,4 +1,4 @@
-package production.aleatory;
+package production.aleatory.SolarPanel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,6 +18,10 @@ import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
 import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
+import production.aleatory.SolarPanel.connections.SolarPanelExternalControlConnector;
+import production.aleatory.SolarPanel.connections.SolarPanelExternalControlOutboundPort;
+import production.aleatory.SolarPanel.connections.SolarPanelMeteoControlConnector;
+import production.aleatory.SolarPanel.connections.SolarPanelMeteoControlOutboundPort;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -149,12 +153,12 @@ extends	AbstractComponent {
 	 * 
 	 * <pre>
 	 * pre	{@code solarPanelExternalControlInboundPortURI != null && !solarPanelExternalControlInboundPortURI.isEmpty()}
-	 * pre	{@code solarPanelMeteoControlInboundPort != null && !solarPanelMeteoControlInboundPort.isEmpty()}
+	 * pre	{@code solarPanelMeteoControlInboundPortURI != null && !solarPanelMeteoControlInboundPortURI.isEmpty()}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param solarPanelExternalControlInboundPortURI	URI of the external control component interface inbound port.
-	 * @param solarPanelMeteoControlInboundPort	    URI of the meteo control component interface inbound port.
+	 * @param solarPanelMeteoControlInboundPortURI	    URI of the meteo control component interface inbound port.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected void		initialise(
@@ -273,7 +277,7 @@ extends	AbstractComponent {
 	 * @see fr.sorbonne_u.components.AbstractComponent#finalise()
 	 */
 	@Override
-	public synchronized void	finalise() throws Exception
+	public synchronized void finalise() throws Exception
 	{
 		this.doPortDisconnection(this.solarPanelExternalControlOutboundPort.getPortURI());
 		this.doPortDisconnection(this.solarPanelMeteoControlOutboundPort.getPortURI());
@@ -285,7 +289,7 @@ extends	AbstractComponent {
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
 	 */
 	@Override
-	public synchronized void	shutdown() throws ComponentShutdownException
+	public synchronized void shutdown() throws ComponentShutdownException
 	{
 		try {
 			this.solarPanelExternalControlOutboundPort.unpublishPort();

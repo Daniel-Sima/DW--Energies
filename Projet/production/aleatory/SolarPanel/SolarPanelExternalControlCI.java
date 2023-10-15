@@ -1,11 +1,15 @@
-package production.aleatory;
+package production.aleatory.SolarPanel;
+
+import fr.sorbonne_u.components.interfaces.OfferedCI;
+import fr.sorbonne_u.components.interfaces.RequiredCI;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The interface <code>SolarPanelExternalControlI</code> declares the
- * signatures of service implementations accessible to the external controller.
+ * The component interface <code>SolarPanelExternalControlCI</code> declares the
+ * signatures of services used by the household energy manager to manage
+ * the power production of the solar panels.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -19,39 +23,23 @@ package production.aleatory;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public interface SolarPanelExternalControlI {
+public interface SolarPanelExternalControlCI 
+extends		RequiredCI,
+			OfferedCI,
+			SolarPanelExternalControlI {
 	/***********************************************************************************/
 	/**
-	 * return the maximum power production of the solar panel in watts.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code true}	// no precondition.
-	 * post	{@code return > 0.0}
-	 * </pre>
-	 *
-	 * @return				the maximum power production of the solar panel in watts.
-	 * @throws Exception	<i>to do</i>.
+	 * @see
 	 */
+	@Override
 	public double getMaxPowerLevelProduction() throws Exception;
 	
 	/***********************************************************************************/
 	/**
-	 * return the current power level production of the solar panel in watts.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code on()}
-	 * post	{@code return >= 0.0 && return <= getMaxPowerLevelProduction()}
-	 * </pre>
-	 *
-	 * @return				the current power level production of the solar panel.
-	 * @throws Exception	<i>to do</i>.
+	 * @see
 	 */
+	@Override
 	public double getCurrentPowerLevelProduction() throws Exception;
-
 }
 /***********************************************************************************/
 /***********************************************************************************/

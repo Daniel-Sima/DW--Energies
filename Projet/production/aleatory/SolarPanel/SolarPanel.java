@@ -1,9 +1,11 @@
-package production.aleatory;
+package production.aleatory.SolarPanel;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.exceptions.PreconditionException;
+import production.aleatory.SolarPanel.connections.SolarPanelExternalControlInboundPort;
+import production.aleatory.SolarPanel.connections.SolarPanelMeteoControlInboundPort;
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
@@ -37,7 +39,7 @@ implements SolarPanelExternalControlI, SolarPanelMeteoControlI {
 	// -------------------------------------------------------------------------
 	/***********************************************************************************/
 	/** max power level production of the solar panel, in watts.			*/
-	protected static final double MAX_POWER_LEVEL_PRODUCTION = 400.0;
+	protected final double MAX_POWER_LEVEL_PRODUCTION = 400.0;
 
 	/** URI of the solar panel port for external control.				    */
 	public static final String EXTERNAL_CONTROL_INBOUND_PORT_URI =
@@ -166,7 +168,7 @@ implements SolarPanelExternalControlI, SolarPanelMeteoControlI {
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
 	 */
 	@Override
-	public synchronized void	shutdown() throws ComponentShutdownException
+	public synchronized void shutdown() throws ComponentShutdownException
 	{
 		try {
 			this.solarPanelExternalControlInbound.unpublishPort();

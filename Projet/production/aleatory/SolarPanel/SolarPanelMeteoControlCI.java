@@ -1,44 +1,32 @@
-package production.aleatory;
+package production.aleatory.SolarPanel;
 
-import fr.sorbonne_u.components.connectors.AbstractConnector;
+import fr.sorbonne_u.components.interfaces.OfferedCI;
+import fr.sorbonne_u.components.interfaces.RequiredCI;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>SolarPanelMeteoControlConnector</code> implements a
- * connector for the {@code SolarPanelMeteoControlCI} component interface.
+ * The component interface <code>SolarPanelMeteoControlCI</code> declares the
+ * signatures of services used for the simulation.
  *
  * <p><strong>Description</strong></p>
  * 
- * <p><strong>White-box Invariant</strong></p>
- * 
- * <pre>
- * invariant	{@code true}	// no more invariant
- * </pre>
- * 
  * <p><strong>Black-box Invariant</strong></p>
- * 
- * <pre>
- * invariant	{@code true}	// no more invariant
- * </pre>
  * 
  * <p>Created on : 2023-10-15</p>
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class SolarPanelMeteoControlConnector 
-extends		AbstractConnector
-implements SolarPanelMeteoControlCI{
+public interface SolarPanelMeteoControlCI
+extends		RequiredCI,
+OfferedCI,
+SolarPanelMeteoControlI{
 	/***********************************************************************************/
 	/**
 	 * @see
 	 */
-	@Override
-	public void setPowerLevelProduction(double percentage) throws Exception {
-		((SolarPanelMeteoControlCI)this.offering).setPowerLevelProduction(percentage);	
-	}
-
+	public void setPowerLevelProduction(double percentage) throws Exception;
 }
 /***********************************************************************************/
 /***********************************************************************************/

@@ -1,14 +1,11 @@
-package production.aleatory;
-
-import fr.sorbonne_u.components.interfaces.OfferedCI;
-import fr.sorbonne_u.components.interfaces.RequiredCI;
+package production.aleatory.SolarPanel;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The component interface <code>SolarPanelMeteoControlCI</code> declares the
- * signatures of services used for the simulation.
+ * The interface <code>SolarPanelMeteoControI</code> declares 
+ * signatures of service implementations accessible based on weather.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -18,13 +15,20 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public interface SolarPanelMeteoControlCI
-extends		RequiredCI,
-OfferedCI,
-SolarPanelMeteoControlI{
+public interface SolarPanelMeteoControlI {
 	/***********************************************************************************/
 	/**
-	 * @see
+	 * return the power level production of the solar panel in watts based on the 
+	 * sunshine percentage.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code true}	// no precondition.
+	 * post	{@code return > 0.0}
+	 * </pre>
+	 *
+	 * @throws Exception	<i>to do</i>.
 	 */
 	public void setPowerLevelProduction(double percentage) throws Exception;
 }

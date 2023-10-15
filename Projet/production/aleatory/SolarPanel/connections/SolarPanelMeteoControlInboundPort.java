@@ -1,14 +1,15 @@
-package production.aleatory;
+package production.aleatory.SolarPanel.connections;
 
 import fr.sorbonne_u.components.ComponentI;
-import fr.sorbonne_u.components.ports.AbstractOutboundPort;
+import fr.sorbonne_u.components.ports.AbstractInboundPort;
+import production.aleatory.SolarPanel.SolarPanelMeteoControlCI;
+import production.aleatory.SolarPanel.SolarPanelMeteoControlI;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>SolarPanelMeteoOutboundPort</code> implements an
- * outbound port for the {@code SolarPanelMeteoControlCI} component interface.
+ * The class <code>SolarPanelMeteoControlInboundPort</code>
  *
  * <p><strong>Description</strong></p>
  * 
@@ -28,8 +29,8 @@ import fr.sorbonne_u.components.ports.AbstractOutboundPort;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class SolarPanelMeteoControlOutboundPort 
-extends		AbstractOutboundPort
+public class SolarPanelMeteoControlInboundPort 
+extends		AbstractInboundPort
 implements SolarPanelMeteoControlCI{
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -42,42 +43,44 @@ implements SolarPanelMeteoControlCI{
 	// -------------------------------------------------------------------------
 	/***********************************************************************************/
 	/**
-	 * create an outbound port.
+	 * create an inbound port.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code true}	// no precondition.
+	 * pre	{@code owner instanceof SolarPanelMeteoControlI}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param owner					component that owns this port.
-	 * @throws Exception 			<i>to do</i>.
+	 * @throws Exception			<i>to do</i>.
 	 */
-	public SolarPanelMeteoControlOutboundPort(ComponentI owner) throws Exception{
+	public SolarPanelMeteoControlInboundPort(ComponentI owner) throws Exception{
 		super(SolarPanelMeteoControlCI.class, owner);
+		assert	owner instanceof SolarPanelMeteoControlI;
 	}
 
 	/***********************************************************************************/
 	/**
-	 * create an outbound port.
+	 * create an inbound port.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code true}	// no precondition.
+	 * pre	{@code owner instanceof SolarPanelMeteoControlI}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param uri					unique identifier of the port.
 	 * @param owner					component that owns this port.
-	 * @throws Exception 			<i>to do</i>.
+	 * @throws Exception			<i>to do</i>.
 	 */
-	public SolarPanelMeteoControlOutboundPort(
-			String uri,
+	public SolarPanelMeteoControlInboundPort(String uri,
 			ComponentI owner
-			) throws Exception{
-		super(uri, SolarPanelMeteoControlCI.class, owner);
+			) throws Exception
+	{
+		super(uri,SolarPanelMeteoControlCI.class, owner);
+		assert	owner instanceof SolarPanelMeteoControlI;
 	}
 
 	// -------------------------------------------------------------------------
@@ -89,9 +92,13 @@ implements SolarPanelMeteoControlCI{
 	 */
 	@Override
 	public void setPowerLevelProduction(double percentage) throws Exception {
-		((SolarPanelMeteoControlCI)this.getConnector()).setPowerLevelProduction(percentage);
-	}
+		this.getOwner().handleRequest(
+				o -> {
+					((SolarPanelMeteoControlI)o).setPowerLevelProduction(percentage);
+					return null;
+				});
 
+	}
 }
 /***********************************************************************************/
 /***********************************************************************************/

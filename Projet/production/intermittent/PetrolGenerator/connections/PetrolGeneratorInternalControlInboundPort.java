@@ -1,13 +1,16 @@
-package production.aleatory;
+package production.intermittent.PetrolGenerator.connections;
 
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
+import production.intermittent.PetrolGenerator.PetrolGeneratorInternalControlCI;
+import production.intermittent.PetrolGenerator.PetrolGeneratorInternalControlI;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>SolarPanelExternalControlInboundPort</code>
+ * The class <code>PetrolGeneratorInternalControlInboundPort</code> implements an
+ * inbound port for the component interface {@code PetrolGeneratorInternalControlCI}.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -27,9 +30,9 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class SolarPanelExternalControlInboundPort 
+public class PetrolGeneratorInternalControlInboundPort 
 extends		AbstractInboundPort
-implements	SolarPanelExternalControlCI{
+implements PetrolGeneratorInternalControlCI {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -46,16 +49,17 @@ implements	SolarPanelExternalControlCI{
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code owner instanceof SolarPanelExternalControlI}
+	 * pre	{@code owner instanceof PetrolGeneratorInternalControlI}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param owner					component that owns this port.
 	 * @throws Exception			<i>to do</i>.
 	 */
-	public SolarPanelExternalControlInboundPort(ComponentI owner) throws Exception{
-		super(SolarPanelExternalControlCI.class, owner);
-		assert	owner instanceof SolarPanelExternalControlI;
+	public PetrolGeneratorInternalControlInboundPort(ComponentI owner)
+			throws Exception {
+		super(PetrolGeneratorInternalControlCI.class, owner);
+		assert owner instanceof PetrolGeneratorInternalControlI;
 	}
 
 	/***********************************************************************************/
@@ -65,7 +69,7 @@ implements	SolarPanelExternalControlCI{
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code owner instanceof SolarPanelExternalControlI}
+	 * pre	{@code owner instanceof PetrolGeneratorInternalControlI}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
@@ -73,12 +77,13 @@ implements	SolarPanelExternalControlCI{
 	 * @param owner					component that owns this port.
 	 * @throws Exception			<i>to do</i>.
 	 */
-	public SolarPanelExternalControlInboundPort(String uri,
+	public PetrolGeneratorInternalControlInboundPort(
+			String uri,
 			ComponentI owner
 			) throws Exception
 	{
-		super(uri,SolarPanelExternalControlCI.class, owner);
-		assert	owner instanceof SolarPanelExternalControlI;
+		super(uri, PetrolGeneratorInternalControlCI.class, owner);
+		assert owner instanceof PetrolGeneratorInternalControlI;
 	}
 
 	// -------------------------------------------------------------------------
@@ -89,9 +94,9 @@ implements	SolarPanelExternalControlCI{
 	 * @see
 	 */
 	@Override
-	public double getMaxPowerLevelProduction() throws Exception {
+	public boolean isProducing() throws Exception {
 		return this.getOwner().handleRequest(
-				o -> ((SolarPanelExternalControlI)o).getMaxPowerLevelProduction());
+				o -> ((PetrolGeneratorInternalControlI)o).isProducing());
 	}
 
 	/***********************************************************************************/
@@ -99,9 +104,25 @@ implements	SolarPanelExternalControlCI{
 	 * @see
 	 */
 	@Override
-	public double getCurrentPowerLevelProduction() throws Exception {
-		return this.getOwner().handleRequest(
-				o -> ((SolarPanelExternalControlI)o).getCurrentPowerLevelProduction());
+	public void startProducing() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {
+					((PetrolGeneratorInternalControlI)o).startProducing();
+					return null;
+				});
+	}
+
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void stopProducing() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {
+					((PetrolGeneratorInternalControlI)o).stopProducing();
+					return null;
+				});
 	}
 }
 /***********************************************************************************/

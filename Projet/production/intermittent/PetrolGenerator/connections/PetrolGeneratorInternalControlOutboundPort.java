@@ -1,13 +1,15 @@
-package production.aleatory;
+package production.intermittent.PetrolGenerator.connections;
 
 import fr.sorbonne_u.components.ComponentI;
-import fr.sorbonne_u.components.ports.AbstractInboundPort;
+import fr.sorbonne_u.components.ports.AbstractOutboundPort;
+import production.intermittent.PetrolGenerator.PetrolGeneratorInternalControlCI;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>SolarPanelMeteoControlInboundPort</code>
+ * The class <code>PetrolGeneratorInternalControlOutboundPort</code> implements an
+ * outbound port for the {@code PetrolGeneratorInternalControlCI} component interface.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -27,9 +29,9 @@ import fr.sorbonne_u.components.ports.AbstractInboundPort;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class SolarPanelMeteoControlInboundPort 
-extends		AbstractInboundPort
-implements SolarPanelMeteoControlCI{
+public class PetrolGeneratorInternalControlOutboundPort 
+extends		AbstractOutboundPort
+implements PetrolGeneratorInternalControlCI {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -41,61 +43,72 @@ implements SolarPanelMeteoControlCI{
 	// -------------------------------------------------------------------------
 	/***********************************************************************************/
 	/**
-	 * create an inbound port.
+	 * create an outbound port.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code owner instanceof SolarPanelMeteoControlI}
+	 * pre	{@code true}	// no precondition.
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param owner					component that owns this port.
-	 * @throws Exception			<i>to do</i>.
+	 * @throws Exception 			<i>to do</i>.
 	 */
-	public SolarPanelMeteoControlInboundPort(ComponentI owner) throws Exception{
-		super(SolarPanelMeteoControlCI.class, owner);
-		assert	owner instanceof SolarPanelMeteoControlI;
+	public PetrolGeneratorInternalControlOutboundPort(ComponentI owner)
+			throws Exception {
+		super(PetrolGeneratorInternalControlCI.class, owner);
 	}
 
 	/***********************************************************************************/
 	/**
-	 * create an inbound port.
+	 * create an outbound port.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code owner instanceof SolarPanelMeteoControlI}
+	 * pre	{@code true}	// no precondition.
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param uri					unique identifier of the port.
 	 * @param owner					component that owns this port.
-	 * @throws Exception			<i>to do</i>.
+	 * @throws Exception 			<i>to do</i>.
 	 */
-	public SolarPanelMeteoControlInboundPort(String uri,
+	public PetrolGeneratorInternalControlOutboundPort(
+			String uri,
 			ComponentI owner
 			) throws Exception
 	{
-		super(uri,SolarPanelMeteoControlCI.class, owner);
-		assert	owner instanceof SolarPanelMeteoControlI;
+		super(uri, PetrolGeneratorInternalControlCI.class, owner);
 	}
 
-	// -------------------------------------------------------------------------
-	// Methods
-	// -------------------------------------------------------------------------
 	/***********************************************************************************/
 	/**
 	 * @see
 	 */
 	@Override
-	public void setPowerLevelProduction(double percentage) throws Exception {
-		this.getOwner().handleRequest(
-				o -> {
-					((SolarPanelMeteoControlI)o).setPowerLevelProduction(percentage);
-					return null;
-				});
+	public boolean isProducing() throws Exception {
+		return ((PetrolGeneratorInternalControlCI)this.getConnector()).isProducing();
+	}
 
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void startProducing() throws Exception {
+		((PetrolGeneratorInternalControlCI)this.getConnector()).startProducing();
+		
+	}
+
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void stopProducing() throws Exception {
+		((PetrolGeneratorInternalControlCI)this.getConnector()).stopProducing();
 	}
 }
 /***********************************************************************************/
