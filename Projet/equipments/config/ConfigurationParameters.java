@@ -337,7 +337,7 @@ public class				ConfigurationParameters
 			double			consumptionMax,
 			String			required,
 			InstanceVar[]	instanceVars,
-			String		internalModifiers,
+			String			internalModifiers,
 			String			internalType,
 			String			internalName,
 			Parameter		internalParameter,
