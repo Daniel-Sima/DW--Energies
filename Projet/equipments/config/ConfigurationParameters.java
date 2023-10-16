@@ -155,7 +155,96 @@ body =
 
 # Canonical name of the thrown exception
 thrown-exception = element thrown { text }
+ */
 
+/**
+ * 
+ * @author walte
+ *
+ */
+class Parameter {
+	protected String type;
+	protected String name;
+
+	/**
+	 * 
+	 * @param type
+	 * @param name
+	 */
+	public Parameter(String type, String name) {
+		this.name = name;
+		this.type = type;
+	}
+}
+
+/**
+ * 
+ * @author walte
+ *
+ */
+class InstanceVar {
+	/** modifiers (public/private..., static, ...)			*/
+	protected String modifiers;
+	/** type of the variable								*/
+	protected String	type;
+	/** name of the variable								*/
+	protected String	name;
+	/** static Java expression to initialise the variable	*/
+	protected String	staticInit;
+
+	/**
+	 * 
+	 * @param modifiers
+	 * @param type
+	 * @param name
+	 * @param staticInit
+	 */
+	public InstanceVar(
+			String	modifiers,
+			String		type,
+			String		name,
+			String		staticInit
+			) 
+	{
+		this.modifiers = modifiers;
+		this.type = type;
+		this.name = name;
+		this.staticInit = staticInit;
+	}
+}
+
+/**
+ * 
+ * @author walte
+ *
+ */
+class Body {
+	/** exceptions thrown by the method					*/
+	protected String		thrownException;
+	/** variable referring to the equipment in the code	*/
+	protected String 		equipmentRef; 
+	/**  the code itself, a Java statement				*/
+	protected String 		text;
+
+	/**
+	 * 
+	 * @param thrownException
+	 * @param equipmentRef
+	 * @param text
+	 */
+	public Body(
+			String thrownException,
+			String equipmentRef,
+			String text
+			) 
+	{
+		this.equipmentRef = equipmentRef;
+		this.thrownException = thrownException;
+		this.text = text;
+	}
+}
+
+/**
  * </pre>
  * <p>
  * Most of this information and derived one are included in instances of
@@ -175,177 +264,7 @@ thrown-exception = element thrown { text }
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
 public class				ConfigurationParameters
-{
-	/**
-	 * 
-	 * @author walte
-	 *
-	 */
-	class Modifiers {
-		protected String type;
-		protected String name;
-		
-		/**
-		 * 
-		 * @param type
-		 * @param name
-		 */
-		public Modifiers(String type, String name) {
-			this.name = name;
-			this.type = type;
-		}
-	}
-	
-	/**
-	 * 
-	 * @author walte
-	 *
-	 */
-	class InstanceVar {
-		/** modifiers (public/private..., static, ...)			*/
-		protected Modifiers modifiers;
-		/** type of the variable								*/
-		protected String	type;
-		/** name of the variable								*/
-		protected String	name;
-		/** static Java expression to initialise the variable	*/
-		protected String	staticInit;
-		
-		/**
-		 * 
-		 * @param modifiers
-		 * @param type
-		 * @param name
-		 * @param staticInit
-		 */
-		public InstanceVar(
-				Modifiers	modifiers,
-				String		type,
-				String		name,
-				String		staticInit
-				) 
-		{
-			this.modifiers = modifiers;
-			this.type = type;
-			this.name = name;
-			this.staticInit = staticInit;
-		}
-	}
-	/**
-	 * 
-	 * @author walte
-	 *
-	 */
-	class Body {
-		/** exceptions thrown by the method					*/
-		protected String		thrownException;
-		/** variable referring to the equipment in the code	*/
-		protected String 		equipmentRef; 
-		/**  the code itself, a Java statement				*/
-		protected String 		text;
-		
-		/**
-		 * 
-		 * @param thrownException
-		 * @param equipmentRef
-		 * @param text
-		 */
-		public Body(
-				String thrownException,
-				String equipmentRef,
-				String text
-				) 
-		{
-			this.equipmentRef = equipmentRef;
-			this.thrownException = thrownException;
-			this.text = text;
-		}
-	}
-	
-	/**
-	 * 
-	 * @author walte
-	 *
-	 */
-	class Operations {
-		/** modifiers (public/private..., static, ...)			*/
-		protected Modifiers		internalModifiers;
-		/** type of the variable								*/
-		protected String		internalType;
-		/** name of the variable								*/
-		protected String		internalName;
-		/** static Java expression to initialise the variable	*/
-		protected String		internalParameter;
-		
-		/** number of modes.										*/
-		protected Body		maxMode;
-		/** forcing the equipment to the next more consuming mode	*/
-		protected Body		upMode;  
-		/** forcing the equipment to the next less consuming mode	*/
-		protected Body		downMode;   
-		/** set the current mode, take [1, numberOfModes]			*/
-		protected Body 		setMode;
-		/** get the current mode, return [1, numberOfModes]			*/
-		protected Body 		currentMode;
-		/** is the equipment currently suspended, return boolean	*/
-		protected Body 		suspended;
-		/** suspend the equipment									*/
-		protected Body 		suspend;
-		/** resume normal operation for the equipment				*/
-		protected Body 		resume;
-		/** degree of emergency of a resumption [0, 1];
-		 * 	the higher is this degree, the more it should be
-		 *  allowed to resume (e.g., the water temperature of
-		 *   the boiler becomes too cold to be useful)				*/
-		protected Body 		emergency;
-		  
-		/**
-		 * 
-		 * @param internalModifiers
-		 * @param internalType
-		 * @param internalName
-		 * @param internalParameter
-		 * @param maxMode
-		 * @param upMode
-		 * @param downMode
-		 * @param setMode
-		 * @param currentMode
-		 * @param suspended
-		 * @param suspend
-		 * @param resume
-		 * @param emergency
-		 */
-		public Operations(
-				Modifiers	internalModifiers,
-				String		internalType,
-				String		internalName,
-				String		internalParameter,
-				Body		maxMode,
-				Body		upMode,
-				Body		downMode,
-				Body		setMode,
-				Body		currentMode,
-				Body		suspended,
-				Body		suspend,
-				Body		resume,
-				Body		emergency
-				) {
-			this.internalModifiers = internalModifiers;
-			this.internalName = internalName;
-			this.internalParameter = internalParameter;
-			this.internalType = internalType;
-			this.currentMode = currentMode;
-			this.downMode = downMode;
-			this.setMode = setMode;
-			this.upMode = upMode;
-			this.maxMode = maxMode;
-			this.emergency = emergency;
-			this.suspend = suspend;
-			this.suspended = suspended;
-			this.resume = resume;
-		}
-	}
-	
+{	
 	/** identification uid of the equipment and its control interface		*/
 	protected long 				identificationUid;
 	/** identification offered of the equipment and its control interface	*/
@@ -359,11 +278,38 @@ public class				ConfigurationParameters
 	/** classes required to compile the code 								*/
 	protected String			required;
 	/** Instance variables to be defined in the connector class				*/
-	protected InstanceVar		instanceVar;
-	/** Relate operations in the required interface to the corresponding
-	 *  operations in the offered one 										*/
-	protected Operations		operations;
-	
+	protected InstanceVar[]		instanceVars;
+	/** modifiers (public/private..., static, ...)							*/
+	protected String		internalModifiers;
+	/** type of the variable												*/
+	protected String		internalType;
+	/** name of the variable												*/
+	protected String		internalName;
+	/** static Java expression to initialise the variable					*/
+	protected Parameter		internalParameter;
+
+	/** number of modes.													*/
+	protected Body		maxMode;
+	/** forcing the equipment to the next more consuming mode				*/
+	protected Body		upMode;  
+	/** forcing the equipment to the next less consuming mode				*/
+	protected Body		downMode;   
+	/** set the current mode, take [1, numberOfModes]						*/
+	protected Body 		setMode;
+	/** get the current mode, return [1, numberOfModes]						*/
+	protected Body 		currentMode;
+	/** is the equipment currently suspended, return boolean				*/
+	protected Body 		suspended;
+	/** suspend the equipment												*/
+	protected Body 		suspend;
+	/** resume normal operation for the equipment							*/
+	protected Body 		resume;
+	/** degree of emergency of a resumption [0, 1];
+	 * 	the higher is this degree, the more it should be
+	 *  allowed to resume (e.g., the water temperature of
+	 *   the boiler becomes too cold to be useful)							*/
+	protected Body 		emergency;
+
 	/**
 	 * create a configuration parameters holder.
 	 * 
@@ -384,15 +330,27 @@ public class				ConfigurationParameters
 	 * @param operations
 	 */
 	public	ConfigurationParameters(
-		long			identificationUid,
-		String			identificationOffered,
-		double			consumptionMin,
-		double			consumptionNominal,
-		double			consumptionMax,
-		String			required,
-		InstanceVar		instanceVar,
-		Operations		operations
-		)
+			long			identificationUid,
+			String			identificationOffered,
+			double			consumptionMin,
+			double			consumptionNominal,
+			double			consumptionMax,
+			String			required,
+			InstanceVar[]	instanceVars,
+			String		internalModifiers,
+			String			internalType,
+			String			internalName,
+			Parameter		internalParameter,
+			Body			maxMode,
+			Body			upMode,
+			Body			downMode,
+			Body			setMode,
+			Body			currentMode,
+			Body			suspended,
+			Body			suspend,
+			Body			resume,
+			Body			emergency
+			)
 	{
 		super();
 		this.identificationUid = identificationUid;
@@ -401,65 +359,153 @@ public class				ConfigurationParameters
 		this.consumptionNominal = consumptionNominal;
 		this.consumptionMax = consumptionMax;
 		this.required = required;
-		this.instanceVar = instanceVar;
-		this.operations	= operations;
+		this.instanceVars = instanceVars;
 	}
-	
+
 	/**
 	 * @return the identificationUid
 	 */
 	public long		getIdentificationUid() {
 		return this.identificationUid;
 	}
-	
+
 	/**
 	 * @return the identificationOffered
 	 */
 	public String		getIdentificationOffered() {
 		return this.identificationOffered;
 	}
-	
+
 	/**
 	 * @return the consumptionMin;
 	 */
 	public double		getConsumptionMin() {
 		return this.consumptionMin;
 	}
-	
+
 	/**
 	 * @return the consumptionMax;
 	 */
 	public double		getConsumptionMax() {
 		return this.consumptionMax;
 	}
-	
+
 	/**
 	 * @return the consumptionNominal;
 	 */
 	public double		getConsumptionNominal() {
 		return this.consumptionNominal;
 	}
-	
+
 	/**
 	 * @return the required;
 	 */
 	public String		getRequired() {
 		return this.required;
 	}
-	
+
 	/**
-	 * @return the instanceVar;
+	 * @return the instanceVars;
 	 */
-	public InstanceVar	getInstanceVar() {
-		return this.instanceVar;
+	public InstanceVar[]	getInstanceVars() {
+		return this.instanceVars;
 	}
 	
 	/**
-	 * @return the operations;
+	 * @return the getInternalModifiers;
 	 */
-	public Operations	getOperations() {
-		return this.operations;
+	public String		getInternalModifiers() {
+		return this.internalModifiers;
 	}
 	
+	/**
+	 * @return the internalType;
+	 */
+	public String		getInternalType() {
+		return this.internalType;
+	}
+	
+	/**
+	 * @return the internalName;
+	 */
+	public String		getInternalName() {
+		return this.internalName;
+	}
+	
+	/**
+	 * @return the internalParameter;
+	 */
+	public Parameter		getInternalParameter() {
+		return this.internalParameter;
+	}
+	
+	/**
+	 * @return the maxMode;
+	 */
+	public Body		getMaxMode() {
+		return this.maxMode;
+	}
+
+	/**
+	 * @return the maupMode;
+	 */
+	public Body		getUpMode() {
+		return this.upMode;
+	}
+	
+	/**
+	 * @return the downMode;
+	 */
+	public Body		getDownMode() {
+		return this.downMode;
+	}
+	
+	/**
+	 * @return the setMode;
+	 */
+	public Body		getSetMode() {
+		return this.setMode;
+	}
+	
+	/**
+	 * @return the currentMode;
+	 */
+	public Body		getCurrentMode() {
+		return this.currentMode;
+	}
+	
+	/**
+	 * @return the suspended;
+	 */
+	public Body		getSuspended() {
+		return this.suspended;
+	}
+	
+	/**
+	 * @return the suspend;
+	 */
+	public Body		getSuspend() {
+		return this.suspend;
+	}
+	
+	/**
+	 * @return the resume;
+	 */
+	public Body		getResume() {
+		return this.resume;
+	}
+	
+	/**
+	 * @return the emergency;
+	 */
+	public Body		getEmergency() {
+		return this.emergency;
+	}
+	
+	@Override
+	public String		toString() {
+		return "nada";
+
+	}
 }
 // -----------------------------------------------------------------------------

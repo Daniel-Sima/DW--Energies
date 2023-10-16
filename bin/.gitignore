@@ -1,5 +1,6 @@
 /.DS_Store
-/stocking/
-/equipments/
+/.gitignore
 /fr/
+/equipments/
 /production/
+/stocking/

@@ -55,6 +55,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import fr.sorbonne_u.components.cvm.AbstractDistributedCVM;
 import fr.sorbonne_u.components.cvm.config.exceptions.ConfigurationException;
 
@@ -193,368 +194,160 @@ public class			ConfigurationFileParser
 	public ConfigurationParameters	parseConfigurationFile(File configFile)
 	throws	ConfigurationException
 	{
-		String 						codebaseHostname = null ;
-		String						codebaseDirectory = null ;
-		Hashtable<String,String>	hosts2dirs = new Hashtable<String,String>() ;
-		String						cyclicBarrierHostname = null ;
-		int							cyclicBarrierPort = -1 ;
-		String						globalRegistryHostname = null ;
-		int							globalRegistryPort = -1 ;
-		int							rmiRegistryPort = -1 ;
-		String[]					jvmURIs = null ;
-		Hashtable<String,String>	jvmURIs2hosts = new Hashtable<String,String>() ;
-		Hashtable<String,String>	jvmURIs2mainclasses = new Hashtable<String,String>() ;
-		HashSet<String> 			rmiRegistryCreators = new HashSet<String>() ;
-		HashSet<String> 			rmiRegistryHosts = new HashSet<String>() ;
-
-		Document doc = null ;
+		long			identificationUid = -1;
+		String			identificationOffered = null;
+		double			consumptionMin = -1;
+		double			consumptionNominal = -1;
+		double			consumptionMax = -1;
+		String			required = null;
+		InstanceVar[]	instanceVars = null;
+		String			internalModifiers = null;
+		String			internalType = null;
+		String			internalName = null;
+		Parameter		internalParameter = new Parameter(null, null);
+		Body			maxMode = new Body(null, null, null);
+		Body			upMode = new Body(null, null, null);
+		Body			downMode = new Body(null, null, null);
+		Body			setMode = new Body(null, null, null);
+		Body			currentMode = new Body(null, null, null);
+		Body			suspended = new Body(null, null, null);
+		Body			suspend = new Body(null, null, null);
+		Body			resume = new Body(null, null, null);
+		Body			emergency = new Body(null, null, null);
+		
+		Document doc = null;
 		try {
 			doc = this.db.parse(configFile);
 		} catch (SAXException e) {
 			throw new ConfigurationException(
-								"configuration file XML parsing problem "
-								+ "(invalid format)", e) ;
+							"configuration file XML parsing problem "
+							+ "(invalid format)", e) ;
 		} catch (IOException e) {
-			throw new ConfigurationException(
-								"configuration file I/0 problem", e) ;
+		throw new ConfigurationException(
+							"configuration file I/0 problem", e) ;
 		}
-
-		XPath xpathEvaluator = XPathFactory.newInstance().newXPath() ;
-
-		Node codebaseNode;
+		
+		XPath xpathEvaluator = XPathFactory.newInstance().newXPath();
+		
+		Node identificationNode;
 		try {
-			codebaseNode = ((Node)xpathEvaluator.evaluate(
-											"/deployment/codebase",
-											doc,
-											XPathConstants.NODE));
+			identificationNode = ((Node)xpathEvaluator.evaluate(
+							"/control-adapter/identification",
+							doc,
+							XPathConstants.NODE));
 		} catch (XPathExpressionException e) {
-			throw new ConfigurationException(
-						"error fetching the code base node", e) ;
+		throw new ConfigurationException(
+		"error fetching the identification node", e) ;
 		}
-		if (codebaseNode != null) {
+		
+		if (identificationNode != null) {
 			try {
-				codebaseHostname =
-						((Node)xpathEvaluator.evaluate(
-								"@hostname",
-								codebaseNode,
-								XPathConstants.NODE)).getNodeValue() ;
+				identificationUid =
+						Long.parseLong(((Node)xpathEvaluator.evaluate(
+								"@uid",
+								identificationNode,
+								XPathConstants.NODE)).getNodeValue());
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the code base hostname node",
+							"node access error for the identification uid node",
 							e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-							"error fetching the code base hostname node", e) ;
+							"error fetching the identification uid node", e) ;
 			}
 			try {
-				codebaseDirectory = ((Node)xpathEvaluator.evaluate(
-											"@directory",
-											codebaseNode,
-											XPathConstants.NODE)).getNodeValue() ;
+				identificationOffered =
+						((Node)xpathEvaluator.evaluate(
+								"@offered",
+								identificationNode,
+								XPathConstants.NODE)).getNodeValue();
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the code base "
-							+ " directory node", e) ;
-			} catch (XPathExpressionException e) {
-				throw new ConfigurationException(
-							"error fetching the code base directory node", e) ;
-			}
-		}
-
-		NodeList hs;
-		try {
-			hs = (NodeList)xpathEvaluator.evaluate(
-											"/deployment/hosts/host",
-											doc,
-											XPathConstants.NODESET);
-		} catch (XPathExpressionException e) {
-			throw new ConfigurationException(
-						"error fetching the list of host nodes", e) ;
-		}
-		for (int i = 0 ; i < hs.getLength() ; i++) {
-			String name;
-			try {
-				name = ((Node)xpathEvaluator.evaluate(
-									"@name", hs.item(i), XPathConstants.NODE)).
-																getNodeValue();
-			} catch (DOMException e) {
-				throw new ConfigurationException(
-							"node access error for the name attribute of a "
-							+ "host node", e) ;
-			} catch (XPathExpressionException e) {
-				throw new ConfigurationException(
-							"error fetching the name attribute of a host node",
+							"node access error for the identification offered node",
 							e) ;
-			}
-			String dir;
-			try {
-				dir = ((Node)xpathEvaluator.evaluate(
-									"@dir", hs.item(i), XPathConstants.NODE)).
-																getNodeValue();
-			} catch (DOMException e) {
-				throw new ConfigurationException(
-							"node access error for the dir attribute of the "
-							+ "host node " + name, e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-						"error fetching the dir attribute of the host node "
-						+ name, e) ;
+							"error fetching the identification offered node", e) ;
 			}
-			hosts2dirs.put(name, dir) ;
 		}
-
-		try {
-			cyclicBarrierHostname =
-					((Node)xpathEvaluator.evaluate(
-							"/deployment/cyclicBarrier/@hostname",
-							doc,
-							XPathConstants.NODE)).getNodeValue() ;
-		} catch (DOMException e) {
-			throw new ConfigurationException(
-						"node access error for the hostname attribute of the "
-						+ "cyclicBarrier node", e) ;
-		} catch (XPathExpressionException e) {
-			throw new ConfigurationException(
-						"error fetching the hostname attribute of the "
-						+ "cyclicBarrier node", e) ;
-		}
-		assert	cyclicBarrierHostname != null :
-					new ConfigurationException(
-									"Cyclic barrier hostname undefined!") ;
-		try {
-			cyclicBarrierPort =
-					Integer.parseInt(
-						((Node)xpathEvaluator.evaluate(
-								"/deployment/cyclicBarrier/@port",
-								doc,
-								XPathConstants.NODE)).getNodeValue()) ;
-		} catch (NumberFormatException e) {
-			throw new ConfigurationException(
-						"cyclic barrier port number not a number!", e) ;
-		} catch (DOMException e) {
-			throw new ConfigurationException(
-						"node access error for the port attribute of the "
-						+ "cyclicBarrier node", e) ;
-		} catch (XPathExpressionException e) {
-			throw new ConfigurationException(
-						"error fetching the port attribute of the "
-						+ "cyclicBarrier node", e) ;
-		}
-		assert	cyclicBarrierPort > 0 && cyclicBarrierPort <= 65535 :
-					new ConfigurationException(
-							"Cyclic barrier port illegal: "
-										  		+ cyclicBarrierPort + "!") ;
-
-		try {
-			globalRegistryHostname =
-					((Node)xpathEvaluator.evaluate(
-							"/deployment/globalRegistry/@hostname",
-							doc,
-							XPathConstants.NODE)).getNodeValue() ;
-		} catch (DOMException e) {
-			throw new ConfigurationException(
-						"node access error for the hostname attribute of the "
-						+ "globalRegistry node", e) ;
-		} catch (XPathExpressionException e) {
-			throw new ConfigurationException(
-						"error fetching the hostname attribute of the "
-						+ "globalRegistry node", e) ;
-		}
-		assert	globalRegistryHostname != null :
-					new ConfigurationException(
-							"Global registry hostname undefined!") ;
-		try {
-			globalRegistryPort =
-					Integer.parseInt(
-							((Node)xpathEvaluator.evaluate(
-									"/deployment/globalRegistry/@port",
-									doc,
-									XPathConstants.NODE)).getNodeValue()) ;
-		} catch (NumberFormatException e) {
-			throw new ConfigurationException(
-						"global registry port number not a number!", e) ;
-		} catch (DOMException e) {
-			throw new ConfigurationException(
-						"node access error for the port attribute of the "
-						+ "globalRegistry node", e) ;
-		} catch (XPathExpressionException e) {
-			throw new ConfigurationException(
-						"error fetching the port attribute of the "
-						+ "globalRegistry node", e) ;
-		}
-		assert	globalRegistryPort > 0 && globalRegistryPort <= 65535 :
-					new ConfigurationException(
-							"Global registry port illegal: "
-												+ globalRegistryPort + "!") ;
-
-		try {
-			rmiRegistryPort =
-					Integer.parseInt(
-							((Node)xpathEvaluator.evaluate(
-									"/deployment/rmiRegistryPort/@no",
-									doc,
-									XPathConstants.NODE)).getNodeValue()) ;
-		} catch (NumberFormatException e) {
-			throw new ConfigurationException(
-					"rmi registry port number not a number!", e) ;
-		} catch (DOMException e) {
-			throw new ConfigurationException(
-						"node access error for the no attribute of the "
-						+ "rmiRegistryPort node", e) ;
-		} catch (XPathExpressionException e) {
-			throw new ConfigurationException(
-						"error fetching the no attribute of the "
-						+ "rmiRegistryPort node", e) ;
-		}
-		assert	rmiRegistryPort > 0 && rmiRegistryPort <= 65535 :
-					new ConfigurationException(
-							"RMI registry port illegal: "
-										   + rmiRegistryPort + "!") ;
-
-		NodeList ns;
-		try {
-			ns = (NodeList)xpathEvaluator.evaluate(
-						"/deployment/jvms2hostnames/jvm2hostname/@jvmuri",
+		
+		Node consumptionNode;
+		try{
+			consumptionNode = ((Node)xpathEvaluator.evaluate(
+						"/control-adapter/consumption",
 						doc,
-						XPathConstants.NODESET);
+						XPathConstants.NODE));
 		} catch (XPathExpressionException e) {
-			throw new ConfigurationException(
-						"error fetching the list of jvmuri attributes of "
-						+ "jvm2hostname nodes", e) ;
+		throw new ConfigurationException(
+		"error fetching the consumption node", e) ;
 		}
-		jvmURIs = new String[ns.getLength()] ;
-		for (int i = 0 ; i < ns.getLength() ; i++) {
-			jvmURIs[i] = ns.item(i).getNodeValue() ;
-			assert	jvmURIs[i] != null :
-						new ConfigurationException("JVM uri undefined!") ;
-		}
-		try {
-			ns = (NodeList)xpathEvaluator.evaluate(
-						"/deployment/jvms2hostnames/jvm2hostname",
-						doc,
-						XPathConstants.NODESET) ;
-		} catch (XPathExpressionException e) {
-			throw new ConfigurationException(
-						"error fetching the list of jvm2hostname nodes", e) ;
-		}
-		Set<String> allHostnames = new HashSet<String>() ;
-		Set<String> reflectiveJVM_URIs = new HashSet<String>() ;
-		for (int i = 0 ; i < ns.getLength() ; i++) {
-			String uri;
+		
+		if (consumptionNode != null) {
 			try {
-				uri = ((Node)xpathEvaluator.evaluate(
-								"@jvmuri", ns.item(i), XPathConstants.NODE)).
-																getNodeValue();
+				consumptionMin =
+						Double.parseDouble(((Node)xpathEvaluator.evaluate(
+								"@consumptionMin",
+								consumptionNode,
+								XPathConstants.NODE)).getNodeValue());
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the jvmuri attribute of a "
-							+ "jvm2hostname node", e) ;
+							"node access error for the consumption min node",
+							e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-							"error fetching the jvmuri attribute of a "
-							+ "jvm2hostname node", e) ;
+							"error fetching the consumption min node", e) ;
 			}
-			assert	uri != null :
-						new ConfigurationException("JVM uri undefined!") ;
-			String hostname;
 			try {
-				hostname = ((Node)xpathEvaluator.evaluate(
-								"@hostname", ns.item(i), XPathConstants.NODE)).
-																getNodeValue();
+				consumptionNominal =
+						Double.parseDouble(((Node)xpathEvaluator.evaluate(
+								"@consumptionNominal",
+								consumptionNode,
+								XPathConstants.NODE)).getNodeValue());
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the hostname attribute of "
-							+ "the jvm2hostname node " + uri, e) ;
+							"node access error for the consumption nominal node",
+							e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-							"error fetching the hostname attribute of "
-							+ "the jvm2hostname node " + uri, e) ;
+							"error fetching the consumption nominal node", e) ;
 			}
-			assert	hostname != null :
-						new ConfigurationException("Hostname of JVM " + uri
-															+ " undefined!");
-			allHostnames.add(hostname) ;
-			jvmURIs2hosts.put(uri, hostname) ;
-
-			String mainclass;
 			try {
-				mainclass = ((Node)xpathEvaluator.evaluate(
-									"@mainclass", ns.item(i),
-										XPathConstants.NODE)).getNodeValue();
+				consumptionMax =
+						Double.parseDouble(((Node)xpathEvaluator.evaluate(
+								"@consumptionMax",
+								consumptionNode,
+								XPathConstants.NODE)).getNodeValue());
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the mainclass attribute of "
-							+ "the jvm2hostname node " + uri, e) ;
+							"node access error for the consumption max node",
+							e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-							"error fetching the mainclass attribute of "
-							+ "the jvm2hostname node " + uri, e) ;
-			}
-			assert	mainclass != null :
-					new ConfigurationException(
-							"Main class undefined for the JVM " + uri + "!") ;
-
-			jvmURIs2mainclasses.put(uri, mainclass) ;
-
-			Node reflectiveNode;
-			try {
-				reflectiveNode =
-						((Node)xpathEvaluator.evaluate(
-							"@reflective", ns.item(i), XPathConstants.NODE));
-			} catch (XPathExpressionException e) {
-				throw new ConfigurationException(
-							"error fetching the reflective attribute of "
-							+ "the jvm2hostname node " + uri + "!", e) ;
-			}
-			String reflective = null ;
-			if (reflectiveNode != null) {
-				reflective = reflectiveNode.getNodeValue() ;
-			}
-			if (reflective != null && reflective.equals("true")) {
-				reflectiveJVM_URIs.add(uri) ;
-			}
-
-			String rmiRegistryCreator;
-			try {
-				rmiRegistryCreator =
-						((Node)xpathEvaluator.evaluate(
-								"@rmiRegistryCreator", ns.item(i),
-										XPathConstants.NODE)).getNodeValue();
-			} catch (DOMException e) {
-				throw new ConfigurationException(
-							"node access error for the rmiRegistryCreator "
-							+ "attribute of the jvm2hostname node " + uri, e) ;
-			} catch (XPathExpressionException e) {
-				throw new ConfigurationException(
-						"error fetching the rmiRegistryCreator "
-						+ "attribute of the jvm2hostname node " + uri, e) ;
-			}
-			assert	rmiRegistryCreator != null :
-						new ConfigurationException(
-								"attribute rmiRegistryCreator " + 
-								"of the jvm2hostname node " + uri +
-								" undefined!");
-			if (rmiRegistryCreator.equals("true")) {
-				rmiRegistryCreators.add(uri) ;
-				rmiRegistryHosts.add(hostname) ;
+							"error fetching the consumption max node", e) ;
 			}
 		}
 
-		if (AbstractDistributedCVM.RMI_REGISTRY_ON_ALL_HOSTS) {
-			boolean	allHostsHaveRMIRegistryCreator = true ;
-			for (String s : allHostnames) {
-				allHostsHaveRMIRegistryCreator = rmiRegistryHosts.contains(s) ;
-			}
-			assert	allHostsHaveRMIRegistryCreator :
-						new ConfigurationException(
-							"Some hosts do not have a RMI registry creator!") ;
-		} else {
-			assert	rmiRegistryHosts.size() > 0 :
-						new ConfigurationException(
-								"RMI registry creator undefined!") ;
-		}
-
-		return new ConfigurationParameters() ;
+		return new ConfigurationParameters(identificationUid,
+											identificationOffered,
+											consumptionMin,
+											consumptionNominal,
+											consumptionMax,
+											required,
+											instanceVars,
+											internalModifiers,
+											internalType,
+											internalName,
+											internalParameter,
+											maxMode,
+											upMode,
+											downMode,
+											setMode,
+											currentMode,
+											suspended,
+											suspend,
+											resume,
+											emergency
+											) ;
 	}
 }
 // -----------------------------------------------------------------------------
