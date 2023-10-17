@@ -570,4 +570,21 @@ public class			ConfigurationFileParser
 										   reflectiveJVM_URIs) ;
 	}
 }
+
+/** Exemple of what XML file could be for this parser
+ * <deployment>
+    <codebase hostname="codebase.example.com" directory="/path/to/codebase"/>
+    <hosts>
+        <host name="host1" dir="/path/to/host1"/>
+        <host name="host2" dir="/path/to/host2"/>
+    </hosts>
+    <cyclicBarrier hostname="barrier.example.com" port="12345"/>
+    <globalRegistry hostname="registry.example.com" port="6789"/>
+    <rmiRegistryPort no="1099"/>
+    <jvms2hostnames>
+        <jvm2hostname jvmuri="jvm1" hostname="host1" mainclass="MainClass1" reflective="false" rmiRegistryCreator="true"/>
+        <jvm2hostname jvmuri="jvm2" hostname="host2" mainclass="MainClass2" reflective="true" rmiRegistryCreator="false"/>
+    </jvms2hostnames>
+</deployment>
+ */
 // -----------------------------------------------------------------------------

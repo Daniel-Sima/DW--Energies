@@ -62,7 +62,7 @@ import fr.sorbonne_u.components.cvm.config.exceptions.ConfigurationException;
 // -----------------------------------------------------------------------------
 /**
  * The class <code>ConfigurationFileParser</code> provides methods to validate
- * and parse component deployment configuration files.
+ * and parse component control-adapter configuration files.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -91,7 +91,7 @@ public class			ConfigurationFileParser
 	/** standard file name for the schema file used to validate the
 	 *  XML configuration file.												*/
 	public static String	SCHEMA_FILENAME = "config" + File.separatorChar +
-															"control-adapter.rnc" ;
+			"control-adapter.rnc" ;
 	/** the XML document builder used to parse the configuration file.		*/
 	protected DocumentBuilder db ;
 
@@ -116,8 +116,8 @@ public class			ConfigurationFileParser
 			this.db = dbf.newDocumentBuilder() ;
 		} catch (ParserConfigurationException e) {
 			throw new ConfigurationException(
-						"ConfigurationFileParser can't configure the XML "
-						+ "document builder!", e) ;
+					"ConfigurationFileParser can't configure the XML "
+							+ "document builder!", e) ;
 		}
 	}
 
@@ -139,14 +139,14 @@ public class			ConfigurationFileParser
 	 * @throws ConfigurationException 	<i>to do.</i>
 	 */
 	public boolean		validateConfigurationFile(File configFile)
-	throws	ConfigurationException
+			throws	ConfigurationException
 	{
 		// Specify you want a factory for RELAX NG
 		System.setProperty(
-			SchemaFactory.class.getName() + ":" + XMLConstants.RELAXNG_NS_URI,
-			"com.thaiopensource.relaxng.jaxp.CompactSyntaxSchemaFactory");
+				SchemaFactory.class.getName() + ":" + XMLConstants.RELAXNG_NS_URI,
+				"com.thaiopensource.relaxng.jaxp.CompactSyntaxSchemaFactory");
 		SchemaFactory factory =
-			SchemaFactory.newInstance(XMLConstants.RELAXNG_NS_URI);
+				SchemaFactory.newInstance(XMLConstants.RELAXNG_NS_URI);
 
 		// Load the specific schema you want.
 		// Here I load it from a java.io.File, but we could also use a
@@ -167,11 +167,11 @@ public class			ConfigurationFileParser
 			validator.validate(new StreamSource(configFile));
 		} catch (SAXException e) {
 			throw new ConfigurationException(
-								"configuration file XML validation problem "
-								+ "(invalid format)", e) ;
+					"configuration file XML validation problem "
+							+ "(invalid format)", e) ;
 		} catch (IOException e) {
 			throw new ConfigurationException(
-								"configuration file I/0 problem", e) ;
+					"configuration file I/0 problem", e) ;
 		}
 		return true ;
 	}
@@ -192,7 +192,7 @@ public class			ConfigurationFileParser
 	 * @throws ConfigurationException	<i>to do.</i>
 	 */
 	public ConfigurationParameters	parseConfigurationFile(File configFile)
-	throws	ConfigurationException
+			throws	ConfigurationException, XPathExpressionException
 	{
 		long			identificationUid = -1;
 		String			identificationOffered = null;
@@ -201,45 +201,38 @@ public class			ConfigurationFileParser
 		double			consumptionMax = -1;
 		String			required = null;
 		InstanceVar[]	instanceVars = null;
+		Operation[]		operations = null;
 		String			internalModifiers = null;
 		String			internalType = null;
 		String			internalName = null;
-		Parameter		internalParameter = new Parameter(null, null);
-		Body			maxMode = new Body(null, null, null);
-		Body			upMode = new Body(null, null, null);
-		Body			downMode = new Body(null, null, null);
-		Body			setMode = new Body(null, null, null);
-		Body			currentMode = new Body(null, null, null);
-		Body			suspended = new Body(null, null, null);
-		Body			suspend = new Body(null, null, null);
-		Body			resume = new Body(null, null, null);
-		Body			emergency = new Body(null, null, null);
-		
+		Parameter		internalParameter = null;
+		Body			internalEquipmentRef = null;
+
 		Document doc = null;
 		try {
 			doc = this.db.parse(configFile);
 		} catch (SAXException e) {
 			throw new ConfigurationException(
-							"configuration file XML parsing problem "
+					"configuration file XML parsing problem "
 							+ "(invalid format)", e) ;
 		} catch (IOException e) {
-		throw new ConfigurationException(
-							"configuration file I/0 problem", e) ;
+			throw new ConfigurationException(
+					"configuration file I/0 problem", e) ;
 		}
-		
+
 		XPath xpathEvaluator = XPathFactory.newInstance().newXPath();
-		
+
 		Node identificationNode;
 		try {
 			identificationNode = ((Node)xpathEvaluator.evaluate(
-							"/control-adapter/identification",
-							doc,
-							XPathConstants.NODE));
+					"/control-adapter/identification",
+					doc,
+					XPathConstants.NODE));
 		} catch (XPathExpressionException e) {
-		throw new ConfigurationException(
-		"error fetching the identification node", e) ;
+			throw new ConfigurationException(
+					"error fetching the identification node", e) ;
 		}
-		
+
 		if (identificationNode != null) {
 			try {
 				identificationUid =
@@ -249,11 +242,11 @@ public class			ConfigurationFileParser
 								XPathConstants.NODE)).getNodeValue());
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the identification uid node",
-							e) ;
+						"node access error for the identification uid node",
+						e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-							"error fetching the identification uid node", e) ;
+						"error fetching the identification uid node", e) ;
 			}
 			try {
 				identificationOffered =
@@ -263,25 +256,25 @@ public class			ConfigurationFileParser
 								XPathConstants.NODE)).getNodeValue();
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the identification offered node",
-							e) ;
+						"node access error for the identification offered node",
+						e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-							"error fetching the identification offered node", e) ;
+						"error fetching the identification offered node", e) ;
 			}
 		}
-		
+
 		Node consumptionNode;
 		try{
 			consumptionNode = ((Node)xpathEvaluator.evaluate(
-						"/control-adapter/consumption",
-						doc,
-						XPathConstants.NODE));
+					"/control-adapter/consumption",
+					doc,
+					XPathConstants.NODE));
 		} catch (XPathExpressionException e) {
-		throw new ConfigurationException(
-		"error fetching the consumption node", e) ;
+			throw new ConfigurationException(
+					"error fetching the consumption node", e) ;
 		}
-		
+
 		if (consumptionNode != null) {
 			try {
 				consumptionMin =
@@ -291,11 +284,11 @@ public class			ConfigurationFileParser
 								XPathConstants.NODE)).getNodeValue());
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the consumption min node",
-							e) ;
+						"node access error for the consumption min node",
+						e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-							"error fetching the consumption min node", e) ;
+						"error fetching the consumption min node", e) ;
 			}
 			try {
 				consumptionNominal =
@@ -305,11 +298,11 @@ public class			ConfigurationFileParser
 								XPathConstants.NODE)).getNodeValue());
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the consumption nominal node",
-							e) ;
+						"node access error for the consumption nominal node",
+						e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-							"error fetching the consumption nominal node", e) ;
+						"error fetching the consumption nominal node", e) ;
 			}
 			try {
 				consumptionMax =
@@ -319,35 +312,286 @@ public class			ConfigurationFileParser
 								XPathConstants.NODE)).getNodeValue());
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-							"node access error for the consumption max node",
-							e) ;
+						"node access error for the consumption max node",
+						e) ;
 			} catch (XPathExpressionException e) {
 				throw new ConfigurationException(
-							"error fetching the consumption max node", e) ;
+						"error fetching the consumption max node", e) ;
 			}
 		}
 
-		return new ConfigurationParameters(identificationUid,
-											identificationOffered,
-											consumptionMin,
-											consumptionNominal,
-											consumptionMax,
-											required,
-											instanceVars,
-											internalModifiers,
-											internalType,
-											internalName,
-											internalParameter,
-											maxMode,
-											upMode,
-											downMode,
-											setMode,
-											currentMode,
-											suspended,
-											suspend,
-											resume,
-											emergency
-											) ;
-	}
+		try{
+			required = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/required",
+					doc,
+					XPathConstants.NODE)).getNodeValue();
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the required node", e) ;
+		}
+
+		NodeList varsList = doc.getElementsByTagName("instance-var");
+		for (int i = 0; i < varsList.getLength(); i++) {
+			Node instanceVar = (Node) varsList.item(i);
+			String modifiers;
+			try {
+				modifiers = ((Node)xpathEvaluator.evaluate(
+						"@modifiers", instanceVar,
+						XPathConstants.NODE)).getNodeValue();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for setMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the setMode body node", e) ;
+			}
+			String type;
+			try {
+				type = ((Node)xpathEvaluator.evaluate(
+						"@type", instanceVar,
+						XPathConstants.NODE)).getNodeValue();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for setMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the setMode body node", e) ;
+			}
+			String name;
+			try {
+				name = ((Node)xpathEvaluator.evaluate(
+						"@name", instanceVar,
+						XPathConstants.NODE)).getNodeValue();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for setMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the setMode body node", e) ;
+			}
+			String staticInit;
+			try {
+				staticInit = ((Node)xpathEvaluator.evaluate(
+						"@static-init", instanceVar,
+						XPathConstants.NODE)).getNodeValue();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for setMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the setMode body node", e) ;
+			}
+			instanceVars[i] = new InstanceVar(modifiers, type, name, staticInit);
+		}
+
+		Node internalNode;
+		try{
+			internalNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/internal",
+					doc,
+					XPathConstants.NODE));
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the internal node", e) ;
+		}
+		if (internalNode != null) {
+			try {
+				internalModifiers = (((Node)xpathEvaluator.evaluate(
+						"@modifiers",
+						internalNode,
+						XPathConstants.NODE)).getNodeValue());
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for the internal modifiers node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the internal modifiers node", e) ;
+			}
+			try {
+				internalType = (((Node)xpathEvaluator.evaluate(
+						"@type",
+						internalNode,
+						XPathConstants.NODE)).getNodeValue());
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for the internal type node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the internal type node", e) ;
+			}
+			try {
+				internalName = (((Node)xpathEvaluator.evaluate(
+						"@name",
+						internalNode,
+						XPathConstants.NODE)).getNodeValue());
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for the internal name node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the internal name node", e) ;
+			}
+			try {
+				String thrownException = null;
+				String equipmentRef = null;
+				String text = null;
+				try {
+					Node thrownNode = ((Node)xpathEvaluator.evaluate(
+							"@thrown",
+							internalNode,
+							XPathConstants.NODE));
+					thrownException = thrownNode.getNodeValue();
+				} catch (DOMException e) {
+					throw new ConfigurationException(
+							"node access error for the thrown node",
+							e) ;
+				} catch (XPathExpressionException e) {
+					throw new ConfigurationException(
+							"error fetching the thrown node", e) ;
+				}
+				try {
+					Node bodyNode = ((Node)xpathEvaluator.evaluate(
+							"@body",
+							internalNode,
+							XPathConstants.NODE));
+					try {
+						equipmentRef = (((Node)xpathEvaluator.evaluate(
+								"@equipmentRef",
+								bodyNode,
+								XPathConstants.NODE)).getNodeValue());
+						text = bodyNode.getNodeValue();
+					} catch (DOMException e) {
+						throw new ConfigurationException(
+								"node access error for the equipmentRef inside internal body node",
+								e) ;
+					} catch (XPathExpressionException e) {
+						throw new ConfigurationException(
+								"error fetching the equipmentRef inside internal body node", e) ;
+					}
+				} catch (DOMException e) {
+					throw new ConfigurationException(
+							"node access error for the internal equipmentRef node",
+							e) ;
+				} catch (XPathExpressionException e) {
+					throw new ConfigurationException(
+							"error fetching the internal equipmentRef node", e) ;
+				}
+
+				internalEquipmentRef = new Body(thrownException, equipmentRef, text);
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for the internal name node",
+						e) ;
+			}
+		}
+
+		/*
+		Node maxModeNode;
+		try{
+			maxModeNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/maxMode",
+					doc,
+					XPathConstants.NODE));
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the maxMode node", e) ;
+		}
+		if (maxModeNode != null) {
+			try {
+				String text = ((Node)xpathEvaluator.evaluate(
+						"@body",
+						maxModeNode,
+						XPathConstants.NODE)).getNodeValue();
+				maxMode = new Operation("maxMode",null,new Body(null,null,text));
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for maxMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the maxMode body node", e) ;
+			}
+		}
+		 */
+
+		NodeList operationList;
+		try{
+			operationList = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/operations",
+					doc,
+					XPathConstants.NODE)).getChildNodes();
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the operations node", e) ;
+		}
+		for (int i = 0; i < operationList.getLength(); i++) {
+			Node operation = (Node) operationList.item(i);
+			String 		opName = null;
+			Parameter[] opParameters = null;
+			Body		opBody = null;
+			if(operation.getAttributes() != null) {
+				try {
+					opName = operation.getNodeValue();
+				} catch (DOMException e) {
+					throw new ConfigurationException(
+							"node access error for node (operation) name", e) ;
+				}
+				for(int h=0; h<operation.getAttributes().getLength(); h++) {
+					if(operation.getAttributes().item(h).getNodeValue() == "parameter") {
+						Node parameterNode = operation.getAttributes().item(h);
+						String name;
+						try {
+							name = ((Node)xpathEvaluator.evaluate(
+									"@name",
+									parameterNode,
+									XPathConstants.NODE)).getNodeValue();
+						} catch (DOMException e) {
+							throw new ConfigurationException(
+									"node access error for the parameter name of the operation",
+									e) ;
+						} catch (XPathExpressionException e) {
+							throw new ConfigurationException(
+									"error fetching the parameter name of the operation", e) ;
+						}
+						opParameters[i] = new Parameter(null,name);
+					} 
+					else if (operation.getAttributes().item(h).getNodeValue() == "body") {
+						Node bodyNode = operation.getAttributes().item(h);
+						String text;
+						try {
+							text = bodyNode.getNodeValue();
+						} catch (DOMException e) {
+							throw new ConfigurationException(
+									"node access error for " + opName + " body node",
+									e) ;
+						}
+						opBody = new Body(null,null,text);
+					}
+				}
+			}
+			operations[i] = new Operation(opName, opParameters, opBody);
+		}
+	return new ConfigurationParameters(identificationUid,
+			identificationOffered,
+			consumptionMin,
+			consumptionNominal,
+			consumptionMax,
+			required,
+			instanceVars,
+			operations,
+			internalModifiers,
+			internalType,
+			internalName,
+			internalParameter,
+			internalEquipmentRef
+			) ;
+}
 }
 // -----------------------------------------------------------------------------

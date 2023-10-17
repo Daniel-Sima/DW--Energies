@@ -244,6 +244,21 @@ class Body {
 	}
 }
 
+class Operation {
+	/** operation name					*/
+	protected String name;
+	/** parameters of the operation		*/
+	protected Parameter[] 	parameters;
+	/** body of the operation			*/
+	protected Body		  	body;
+	
+	public Operation(String name, Parameter[] parameters, Body body) {
+		this.name = name;
+		this.parameters = parameters;
+		this.body = body;
+	}
+}
+
 /**
  * </pre>
  * <p>
@@ -279,6 +294,8 @@ public class				ConfigurationParameters
 	protected String			required;
 	/** Instance variables to be defined in the connector class				*/
 	protected InstanceVar[]		instanceVars;
+	/** Operations to be defined on the connector class						*/
+	protected Operation[]		operations;
 	/** modifiers (public/private..., static, ...)							*/
 	protected String		internalModifiers;
 	/** type of the variable												*/
@@ -287,28 +304,29 @@ public class				ConfigurationParameters
 	protected String		internalName;
 	/** static Java expression to initialise the variable					*/
 	protected Parameter		internalParameter;
-
 	/** number of modes.													*/
-	protected Body		maxMode;
+	protected Body			internalEquipmentRef;
+	/** number of modes.													*/
+	//protected Operation		maxMode;
 	/** forcing the equipment to the next more consuming mode				*/
-	protected Body		upMode;  
+	//protected Operation		upMode;  
 	/** forcing the equipment to the next less consuming mode				*/
-	protected Body		downMode;   
+	//protected Operation		downMode;   
 	/** set the current mode, take [1, numberOfModes]						*/
-	protected Body 		setMode;
+	//protected Operation 		setMode;
 	/** get the current mode, return [1, numberOfModes]						*/
-	protected Body 		currentMode;
+	//protected Operation 		currentMode;
 	/** is the equipment currently suspended, return boolean				*/
-	protected Body 		suspended;
+	//protected Operation 		suspended;
 	/** suspend the equipment												*/
-	protected Body 		suspend;
+	//protected Operation 		suspend;
 	/** resume normal operation for the equipment							*/
-	protected Body 		resume;
+	//protected Operation 		resume;
 	/** degree of emergency of a resumption [0, 1];
 	 * 	the higher is this degree, the more it should be
 	 *  allowed to resume (e.g., the water temperature of
 	 *   the boiler becomes too cold to be useful)							*/
-	protected Body 		emergency;
+	//protected Operation 		emergency;
 
 	/**
 	 * create a configuration parameters holder.
@@ -326,6 +344,7 @@ public class				ConfigurationParameters
 	 * @param consumptionNominal
 	 * @param consumptionMax
 	 * @param required
+	 * @param  
 	 * @param instanceVar
 	 * @param operations
 	 */
@@ -337,19 +356,12 @@ public class				ConfigurationParameters
 			double			consumptionMax,
 			String			required,
 			InstanceVar[]	instanceVars,
+			Operation[]		operations,
 			String			internalModifiers,
 			String			internalType,
 			String			internalName,
 			Parameter		internalParameter,
-			Body			maxMode,
-			Body			upMode,
-			Body			downMode,
-			Body			setMode,
-			Body			currentMode,
-			Body			suspended,
-			Body			suspend,
-			Body			resume,
-			Body			emergency
+			Body			internalEquipmentRef
 			)
 	{
 		super();
@@ -360,6 +372,12 @@ public class				ConfigurationParameters
 		this.consumptionMax = consumptionMax;
 		this.required = required;
 		this.instanceVars = instanceVars;
+		this.operations = operations;
+		this.internalModifiers = internalModifiers;
+		this.internalType = internalType;
+		this.internalName = internalName;
+		this.internalParameter = internalParameter;
+		this.internalEquipmentRef = internalEquipmentRef;
 	}
 
 	/**
@@ -440,72 +458,86 @@ public class				ConfigurationParameters
 	}
 	
 	/**
-	 * @return the maxMode;
+	 * @return the internalEquipmentRef;
 	 */
-	public Body		getMaxMode() {
-		return this.maxMode;
-	}
-
-	/**
-	 * @return the maupMode;
-	 */
-	public Body		getUpMode() {
-		return this.upMode;
+	public Body		getInternalEquipmentRef() {
+		return this.internalEquipmentRef;
 	}
 	
 	/**
-	 * @return the downMode;
+	 * @return the operations;
 	 */
-	public Body		getDownMode() {
-		return this.downMode;
+	public Operation[]		getOperations() {
+		return this.operations;
 	}
 	
-	/**
-	 * @return the setMode;
-	 */
-	public Body		getSetMode() {
-		return this.setMode;
-	}
-	
-	/**
-	 * @return the currentMode;
-	 */
-	public Body		getCurrentMode() {
-		return this.currentMode;
-	}
-	
-	/**
-	 * @return the suspended;
-	 */
-	public Body		getSuspended() {
-		return this.suspended;
-	}
-	
-	/**
-	 * @return the suspend;
-	 */
-	public Body		getSuspend() {
-		return this.suspend;
-	}
-	
-	/**
-	 * @return the resume;
-	 */
-	public Body		getResume() {
-		return this.resume;
-	}
-	
-	/**
-	 * @return the emergency;
-	 */
-	public Body		getEmergency() {
-		return this.emergency;
-	}
-	
-	@Override
-	public String		toString() {
-		return "nada";
-
-	}
+//	/**
+//	 * @return the maxMode;
+//	 */
+//	public Operation		getMaxMode() {
+//		return this.maxMode;
+//	}
+//
+//	/**
+//	 * @return the maupMode;
+//	 */
+//	public Operation		getUpMode() {
+//		return this.upMode;
+//	}
+//	
+//	/**
+//	 * @return the downMode;
+//	 */
+//	public Operation		getDownMode() {
+//		return this.downMode;
+//	}
+//	
+//	/**
+//	 * @return the setMode;
+//	 */
+//	public Operation		getSetMode() {
+//		return this.setMode;
+//	}
+//	
+//	/**
+//	 * @return the currentMode;
+//	 */
+//	public Operation		getCurrentMode() {
+//		return this.currentMode;
+//	}
+//	
+//	/**
+//	 * @return the suspended;
+//	 */
+//	public Operation		getSuspended() {
+//		return this.suspended;
+//	}
+//	
+//	/**
+//	 * @return the suspend;
+//	 */
+//	public Operation		getSuspend() {
+//		return this.suspend;
+//	}
+//	
+//	/**
+//	 * @return the resume;
+//	 */
+//	public Operation		getResume() {
+//		return this.resume;
+//	}
+//	
+//	/**
+//	 * @return the emergency;
+//	 */
+//	public Operation		getEmergency() {
+//		return this.emergency;
+//	}
+//	
+//	@Override
+//	public String		toString() {
+//		return "nada";
+//
+//	}
 }
 // -----------------------------------------------------------------------------
