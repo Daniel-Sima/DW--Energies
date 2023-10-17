@@ -60,12 +60,6 @@ extends		OfferedCI,
 			FridgeInternalControlI
 {
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlI#cooling()
-	 */
-	@Override
-	public boolean		cooling() throws Exception;
-
-	/**
 	 * @see equipments.Fridge.FridgeUserAndControlI#setTargetFreezerTemperature()
 	 */
 	@Override
@@ -100,17 +94,41 @@ extends		OfferedCI,
 	 */
 	@Override
 	public double		getCurrentCoolerTemperature() throws Exception;
-
+	
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlI#startCooling()
+	 * @see equipments.Fridge.FridgeInternalControlI#coolingFreezer()
 	 */
 	@Override
-	public void			startCooling() throws Exception;
+	public boolean		coolingFreezer() throws Exception;
 
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlI#stopCooling()
+	 * @see equipments.Fridge.FridgeInternalControlI#startCoolingFreezer()
 	 */
 	@Override
-	public void			stopCooling() throws Exception;
+	public void			startCoolingFreezer() throws Exception;
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#stopCoolingFreezer()
+	 */
+	@Override
+	public void			stopCoolingFreezer() throws Exception;
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#coolingCooler()
+	 */
+	@Override
+	public boolean		coolingCooler() throws Exception;
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#startCoolingCooler()
+	 */
+	@Override
+	public void			startCoolingCooler() throws Exception;
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#stopCoolingCooler()
+	 */
+	@Override
+	public void			stopCoolingCooler() throws Exception;
 }
 // -----------------------------------------------------------------------------

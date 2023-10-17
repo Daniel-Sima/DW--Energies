@@ -92,8 +92,10 @@ implements	FridgeUserImplI,
 	{
 		/** Fridge is on.													*/
 		ON,
-		/** Fridge is cooling.												*/
-		COOLING,
+		/** Cooler is cooling.												*/
+		COOLER_COOLING,
+		/** Freezer is cooling.												*/
+		FREEZER_COOLING,
 		/** Fridge is off.													*/
 		OFF
 	}
@@ -327,10 +329,13 @@ implements	FridgeUserImplI,
 											this.currentState + ".\n");
 		}
 		this.traceMessage(""+(this.currentState == FridgeState.ON ||
-				this.currentState == FridgeState.COOLING)+"\n");
+						this.currentState == FridgeState.COOLER_COOLING ||
+						this.currentState == FridgeState.FREEZER_COOLING
+						)+"\n");
 		
 		return this.currentState == FridgeState.ON ||
-									this.currentState == FridgeState.COOLING;
+									this.currentState == FridgeState.COOLER_COOLING || 
+									this.currentState == FridgeState.FREEZER_COOLING;
 	}
 
 	/**
@@ -485,50 +490,101 @@ implements	FridgeUserImplI,
 	 * @see equipments.Fridge.FridgeInternalControlI#cooling()
 	 */
 	@Override
-	public boolean		cooling() throws Exception
+	public boolean		coolingCooler() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge returns its cooling status " + 
-						(this.currentState == FridgeState.COOLING) + ".\n");
+			this.traceMessage("Cooler returns its cooling status " + 
+						(this.currentState == FridgeState.COOLER_COOLING) + ".\n");
 		}
 
 		assert	this.on() : new PreconditionException("on()");
 
-		return this.currentState == FridgeState.COOLING;
+		return this.currentState == FridgeState.COOLER_COOLING;
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#cooling()
+	 */
+	@Override
+	public boolean		coolingFreezer() throws Exception
+	{
+		if (Fridge.VERBOSE) {
+			this.traceMessage("Freezer returns its cooling status " + 
+						(this.currentState == FridgeState.FREEZER_COOLING) + ".\n");
+		}
+
+		assert	this.on() : new PreconditionException("on()");
+
+		return this.currentState == FridgeState.FREEZER_COOLING;
+	}
+
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#startCoolingCooler()
+	 */
+	@Override
+	public void			startCoolingCooler() throws Exception
+	{
+		if (Fridge.VERBOSE) {
+			this.traceMessage("Fridge cooler starts cooling.\n");
+		}
+		assert	this.on() : new PreconditionException("on()");
+		assert	!this.coolingCooler() : new PreconditionException("!coolingCooler()");
+
+		this.currentState = FridgeState.COOLER_COOLING;
+
+		assert	this.coolingCooler() : new PostconditionException("coolingCooler()");
 	}
 
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlI#startCooling()
+	 * @see equipments.Fridge.FridgeInternalControlI#stopCoolingCooler()
 	 */
 	@Override
-	public void			startCooling() throws Exception
+	public void			stopCoolingCooler() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge starts cooling.\n");
+			this.traceMessage("Fridge cooler stops cooling.\\n");
 		}
 		assert	this.on() : new PreconditionException("on()");
-		assert	!this.cooling() : new PreconditionException("!cooling()");
-
-		this.currentState = FridgeState.COOLING;
-
-		assert	this.cooling() : new PostconditionException("cooling()");
-	}
-
-	/**
-	 * @see equipments.Fridge.FridgeInternalControlI#stopCooling()
-	 */
-	@Override
-	public void			stopCooling() throws Exception
-	{
-		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge stops cooling.\\n");
-		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	this.cooling() : new PreconditionException("cooling()");
+		assert	this.coolingCooler() : new PreconditionException("coolingCooler()");
 
 		this.currentState = FridgeState.ON;
 
-		assert	!this.cooling() : new PostconditionException("!cooling()");
+		assert	!this.coolingCooler() : new PostconditionException("!coolingCooler()");
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#startCoolingCooler()
+	 */
+	@Override
+	public void			startCoolingFreezer() throws Exception
+	{
+		if (Fridge.VERBOSE) {
+			this.traceMessage("Fridge freezer starts cooling.\n");
+		}
+		assert	this.on() : new PreconditionException("on()");
+		assert	!this.coolingFreezer() : new PreconditionException("!coolingFreezer()");
+
+		this.currentState = FridgeState.FREEZER_COOLING;
+
+		assert	this.coolingFreezer() : new PostconditionException("coolingFreezer()");
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#stopCoolingFreezer()
+	 */
+	@Override
+	public void			stopCoolingFreezer() throws Exception
+	{
+		if (Fridge.VERBOSE) {
+			this.traceMessage("Fridge Freezer stops cooling.\\n");
+		}
+		assert	this.on() : new PreconditionException("on()");
+		assert	this.coolingFreezer() : new PreconditionException("coolingFreezer()");
+
+		this.currentState = FridgeState.ON;
+
+		assert	!this.coolingFreezer() : new PostconditionException("!coolingFreezer()");
 	}
 
 	/**

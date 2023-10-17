@@ -91,16 +91,6 @@ implements	FridgeInternalControlCI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlCI#cooling()
-	 */
-	@Override
-	public boolean		cooling() throws Exception
-	{
-		return this.getOwner().handleRequest(
-								o -> ((FridgeInternalControlI)o).cooling());
-	}
-
-	/**
 	 * @see equipments.Fridge.FridgeInternalControlCI#setTargetCoolerTemperature(double)
 	 */
 	@Override
@@ -170,28 +160,75 @@ implements	FridgeInternalControlCI
 														getCurrentFreezerTemperature());
 	}
 
+
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlCI#startCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#coolingCooler()
 	 */
 	@Override
-	public void			startCooling() throws Exception
+	public boolean		coolingCooler() throws Exception
+	{
+		return this.getOwner().handleRequest(
+								o -> ((FridgeInternalControlI)o).coolingCooler());
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCoolingCooler()
+	 */
+	@Override
+	public void			startCoolingCooler() throws Exception
 	{
 		this.getOwner().handleRequest(
 								o -> {	((FridgeInternalControlI)o).
-																startCooling();
+																startCoolingCooler();
 										return null;
 								});
 	}
 
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlCI#stopCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#stopCoolingCooler()
 	 */
 	@Override
-	public void			stopCooling() throws Exception
+	public void			stopCoolingCooler() throws Exception
 	{
 		this.getOwner().handleRequest(
 								o -> {	((FridgeInternalControlI)o).
-																stopCooling();
+																stopCoolingCooler();
+										return null;
+								});
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#coolingFreezer()
+	 */
+	@Override
+	public boolean		coolingFreezer() throws Exception
+	{
+		return this.getOwner().handleRequest(
+								o -> ((FridgeInternalControlI)o).coolingFreezer());
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCoolingFreezer()
+	 */
+	@Override
+	public void			startCoolingFreezer() throws Exception
+	{
+		this.getOwner().handleRequest(
+								o -> {	((FridgeInternalControlI)o).
+																startCoolingFreezer();
+										return null;
+								});
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#stopCoolingFreezer()
+	 */
+	@Override
+	public void			stopCoolingFreezer() throws Exception
+	{
+		this.getOwner().handleRequest(
+								o -> {	((FridgeInternalControlI)o).
+																stopCoolingFreezer();
 										return null;
 								});
 	}

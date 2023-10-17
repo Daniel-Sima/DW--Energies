@@ -65,15 +65,6 @@ extends		AbstractConnector
 implements	FridgeInternalControlCI
 {
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlI#cooling()
-	 */
-	@Override
-	public boolean		cooling() throws Exception
-	{
-		return ((FridgeInternalControlCI)this.offering).cooling();
-	}
-
-	/**
 	 * @see equipments.Fridge.FridgeInternalControlCI#setTargetCoolerTemperature(double)
 	 */
 	@Override
@@ -128,21 +119,57 @@ implements	FridgeInternalControlCI
 	}
 
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlCI#startCooling()
+	 * @see equipments.Fridge.FridgeInternalControlI#coolingCooler()
 	 */
 	@Override
-	public void			startCooling() throws Exception
+	public boolean		coolingCooler() throws Exception
 	{
-		((FridgeInternalControlCI)this.offering).startCooling();
+		return ((FridgeInternalControlCI)this.offering).coolingCooler();
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCoolingCooler()
+	 */
+	@Override
+	public void			startCoolingCooler() throws Exception
+	{
+		((FridgeInternalControlCI)this.offering).startCoolingCooler();
 	}
 
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlCI#stopCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#stopCoolingCooler()
 	 */
 	@Override
-	public void			stopCooling() throws Exception
+	public void			stopCoolingCooler() throws Exception
 	{
-		((FridgeInternalControlCI)this.offering).stopCooling();
+		((FridgeInternalControlCI)this.offering).stopCoolingCooler();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlI#coolingFreezer()
+	 */
+	@Override
+	public boolean		coolingFreezer() throws Exception
+	{
+		return ((FridgeInternalControlCI)this.offering).coolingFreezer();
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCoolingFreezer()
+	 */
+	@Override
+	public void			startCoolingFreezer() throws Exception
+	{
+		((FridgeInternalControlCI)this.offering).startCoolingFreezer();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#stopCoolingFreezer()
+	 */
+	@Override
+	public void			stopCoolingFreezer() throws Exception
+	{
+		((FridgeInternalControlCI)this.offering).stopCoolingFreezer();
 	}
 }
 // -----------------------------------------------------------------------------

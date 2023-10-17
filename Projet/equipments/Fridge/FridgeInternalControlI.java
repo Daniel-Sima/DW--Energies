@@ -23,7 +23,7 @@ public interface		FridgeInternalControlI
 extends		FridgeUserAndControlI
 {
 	/**
-	 * return true if the air conditioning is currently heating.
+	 * return true if Freezer is currently cooling.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -32,39 +32,85 @@ extends		FridgeUserAndControlI
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @return				true if the air conditioning is currently cooling.
+	 * @return				true if freezer is currently cooling.
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public boolean		cooling() throws Exception;
-
+	boolean coolingFreezer() throws Exception;
+	
 	/**
-	 * start cooling.
+	 * start cooling freezer.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
 	 * pre	{@code on()}
-	 * pre	{@code !cooling()}
-	 * post	{@code cooling()}
+	 * pre	{@code coolingFreezer()}
+	 * post	{@code !coolingFreezer()}
 	 * </pre>
 	 *
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public void			startCooling() throws Exception;
-
+	void startCoolingFreezer() throws Exception;
+	
 	/**
-	 * stop cooling.
+	 * stop cooling freezer.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
 	 * pre	{@code on()}
-	 * pre	{@code cooling()}
-	 * post	{@code !cooling()}
+	 * pre	{@code coolingFreezer()}
+	 * post	{@code !coolingFreezer()}
 	 * </pre>
 	 *
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public void			stopCooling() throws Exception;
+	void stopCoolingFreezer() throws Exception;
+	
+	/**
+	 * return true if Cooler is currently cooling.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code on()}
+	 * post	{@code true}	// no postcondition.
+	 * </pre>
+	 *
+	 * @return				true if cooler is currently cooling.
+	 * @throws Exception	<i>to do</i>.
+	 */
+	boolean coolingCooler() throws Exception;
+	
+	/**
+	 * start cooling cooler.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code on()}
+	 * pre	{@code coolingCooler()}
+	 * post	{@code !coolingCooler()}
+	 * </pre>
+	 *
+	 * @throws Exception	<i>to do</i>.
+	 */
+	void startCoolingCooler() throws Exception;
+	
+	/**
+	 * stop cooling Cooler.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code on()}
+	 * pre	{@code coolingCooler()}
+	 * post	{@code !coolingCooler()}
+	 * </pre>
+	 *
+	 * @throws Exception	<i>to do</i>.
+	 */
+	void stopCoolingCooler() throws Exception;
+	
 }
 // -----------------------------------------------------------------------------

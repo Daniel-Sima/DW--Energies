@@ -116,14 +116,6 @@ implements	FridgeInternalControlCI
 		super(uri, FridgeInternalControlCI.class, owner);
 	}
 
-	/**
-	 * @see equipments.Fridge.FridgeInternalControlI#cooling()
-	 */
-	@Override
-	public boolean	cooling() throws Exception
-	{
-		return ((FridgeInternalControlCI)this.getConnector()).cooling();
-	}
 
 	// -------------------------------------------------------------------------
 	// Methods
@@ -188,21 +180,57 @@ implements	FridgeInternalControlCI
 	}
 
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlCI#startCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCoolingFreezer()
 	 */
 	@Override
-	public void			startCooling() throws Exception
+	public boolean coolingFreezer() throws Exception 
 	{
-		((FridgeInternalControlCI)this.getConnector()).startCooling();
+		return ((FridgeInternalControlCI)this.getConnector()).coolingFreezer();
 	}
 
 	/**
-	 * @see equipments.Fridge.FridgeInternalControlCI#stopCooling()
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCoolingFreezer()
 	 */
 	@Override
-	public void			stopCooling() throws Exception
+	public void startCoolingFreezer() throws Exception 
 	{
-		((FridgeInternalControlCI)this.getConnector()).stopCooling();
+		((FridgeInternalControlCI)this.getConnector()).startCoolingFreezer();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#stopCoolingFreezer()
+	 */
+	@Override
+	public void stopCoolingFreezer() throws Exception 
+	{
+		((FridgeInternalControlCI)this.getConnector()).stopCoolingFreezer();
+	}
+	
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCoolingCooler()
+	 */
+	@Override
+	public boolean coolingCooler() throws Exception 
+	{
+		return ((FridgeInternalControlCI)this.getConnector()).coolingCooler();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#startCoolingCooler()
+	 */
+	@Override
+	public void startCoolingCooler() throws Exception 
+	{
+		((FridgeInternalControlCI)this.getConnector()).startCoolingCooler();
+	}
+
+	/**
+	 * @see equipments.Fridge.FridgeInternalControlCI#stopCoolingCooler()
+	 */
+	@Override
+	public void stopCoolingCooler() throws Exception 
+	{
+		((FridgeInternalControlCI)this.getConnector()).stopCoolingCooler();
 	}
 }
 // -----------------------------------------------------------------------------

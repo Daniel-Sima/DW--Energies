@@ -368,10 +368,10 @@ extends		AbstractComponent
 						 this.acicop.getCurrentCoolerTemperature());
 			this.acicop.setTargetCoolerTemperature(3.0);
 			assertEquals(3.0, this.acicop.getTargetCoolerTemperature());
-			this.acicop.startCooling();
-			assertEquals(true, this.acicop.cooling());
-			this.acicop.stopCooling();
-			assertEquals(false, this.acicop.cooling());
+			this.acicop.startCoolingCooler();
+			assertEquals(true, this.acicop.coolingCooler());
+			this.acicop.stopCoolingCooler();
+			assertEquals(false, this.acicop.coolingCooler());
 		} catch (Exception e) {
 			this.traceMessage("...KO.\n");
 			assertTrue(false);
@@ -390,10 +390,10 @@ extends		AbstractComponent
 						 this.acicop.getCurrentFreezerTemperature());
 			this.acicop.setTargetFreezerTemperature(-20.0);
 			assertEquals(-20.0, this.acicop.getTargetFreezerTemperature());
-			this.acicop.startCooling();
-			assertEquals(true, this.acicop.cooling());
-			this.acicop.stopCooling();
-			assertEquals(false, this.acicop.cooling());
+			this.acicop.startCoolingFreezer();
+			assertEquals(true, this.acicop.coolingFreezer());
+			this.acicop.stopCoolingFreezer();
+			assertEquals(false, this.acicop.coolingFreezer());
 		} catch (Exception e) {
 			this.traceMessage("...KO.\n");
 			assertTrue(false);
