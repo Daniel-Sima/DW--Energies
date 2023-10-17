@@ -1,5 +1,7 @@
 package equipments.config;
 
+import java.util.ArrayList;
+
 //Copyright Jacques Malenfant, Sorbonne Universite.
 //
 //Jacques.Malenfant@lip6.fr
@@ -36,6 +38,8 @@ package equipments.config;
 
 import java.util.Hashtable;
 import java.util.Set;
+
+import equipments.AirConditioning.AirConditioningExternalControlCI;
 
 //-----------------------------------------------------------------------------
 /**
@@ -244,15 +248,64 @@ class Body {
 	}
 }
 
+/**
+ * 
+ * @author walte
+ *
+ */
 class Operation {
 	/** operation name					*/
 	protected String name;
+	/** operation return type			*/
+	protected String type;
 	/** parameters of the operation		*/
-	protected Parameter[] 	parameters;
+	protected ArrayList<Parameter> parameters;
 	/** body of the operation			*/
 	protected Body		  	body;
 	
-	public Operation(String name, Parameter[] parameters, Body body) {
+	/**
+	 * 
+	 * @param name
+	 * @param opParameters
+	 * @param body
+	 */
+	public Operation(String name, ArrayList<Parameter> opParameters, Body body) {
+		this.name = name;
+		this.parameters = opParameters;
+		this.body = body;
+	}
+}
+
+/**
+ * 
+ * @author walte
+ *
+ */
+class Internal {
+	protected String modifiers;
+	protected String type;
+	protected String name;
+	protected String thrown;
+	protected ArrayList<Parameter> parameters;
+	protected Body body;
+	
+	/**
+	 * 
+	 * @param modifiers
+	 * @param type
+	 * @param name
+	 * @param parameter
+	 * @param body
+	 */
+	public Internal(
+			String modifiers, 
+			String type, 
+			String name,
+			ArrayList<Parameter> parameters,
+			Body body) 
+	{
+		this.modifiers = modifiers;
+		this.type = type;
 		this.name = name;
 		this.parameters = parameters;
 		this.body = body;
@@ -283,7 +336,7 @@ public class				ConfigurationParameters
 	/** identification uid of the equipment and its control interface		*/
 	protected long 				identificationUid;
 	/** identification offered of the equipment and its control interface	*/
-	protected String			identificationOffered;
+	protected ArrayList<String>			identificationOffered;
 	/** experimentally minimum measured energy consumption					*/
 	protected double			consumptionMin;
 	/** experimentally nominal measured energy consumption					*/
@@ -293,19 +346,11 @@ public class				ConfigurationParameters
 	/** classes required to compile the code 								*/
 	protected String			required;
 	/** Instance variables to be defined in the connector class				*/
-	protected InstanceVar[]		instanceVars;
+	protected ArrayList<InstanceVar> 	instanceVars;
 	/** Operations to be defined on the connector class						*/
-	protected Operation[]		operations;
+	protected ArrayList<Operation> 	operations;
 	/** modifiers (public/private..., static, ...)							*/
-	protected String		internalModifiers;
-	/** type of the variable												*/
-	protected String		internalType;
-	/** name of the variable												*/
-	protected String		internalName;
-	/** static Java expression to initialise the variable					*/
-	protected Parameter		internalParameter;
-	/** number of modes.													*/
-	protected Body			internalEquipmentRef;
+	protected Internal			internal;
 	/** number of modes.													*/
 	//protected Operation		maxMode;
 	/** forcing the equipment to the next more consuming mode				*/
@@ -344,24 +389,20 @@ public class				ConfigurationParameters
 	 * @param consumptionNominal
 	 * @param consumptionMax
 	 * @param required
-	 * @param  
 	 * @param instanceVar
 	 * @param operations
+	 * @param internal
 	 */
 	public	ConfigurationParameters(
-			long			identificationUid,
-			String			identificationOffered,
-			double			consumptionMin,
-			double			consumptionNominal,
-			double			consumptionMax,
-			String			required,
-			InstanceVar[]	instanceVars,
-			Operation[]		operations,
-			String			internalModifiers,
-			String			internalType,
-			String			internalName,
-			Parameter		internalParameter,
-			Body			internalEquipmentRef
+			long					identificationUid,
+			ArrayList<String>		identificationOffered,
+			double					consumptionMin,
+			double					consumptionNominal,
+			double					consumptionMax,
+			String					required,
+			ArrayList<InstanceVar> 	instanceVars,
+			ArrayList<Operation> 	operations,
+			Internal				internal
 			)
 	{
 		super();
@@ -373,11 +414,7 @@ public class				ConfigurationParameters
 		this.required = required;
 		this.instanceVars = instanceVars;
 		this.operations = operations;
-		this.internalModifiers = internalModifiers;
-		this.internalType = internalType;
-		this.internalName = internalName;
-		this.internalParameter = internalParameter;
-		this.internalEquipmentRef = internalEquipmentRef;
+		this.internal = internal;
 	}
 
 	/**
@@ -386,11 +423,19 @@ public class				ConfigurationParameters
 	public long		getIdentificationUid() {
 		return this.identificationUid;
 	}
+	
+	/**
+	 * @return the identificationUid
+	 * TODO
+	 */
+	public String	getClassFromUid() {
+		return "todo";
+	}
 
 	/**
 	 * @return the identificationOffered
 	 */
-	public String		getIdentificationOffered() {
+	public ArrayList<String>	getIdentificationOffered() {
 		return this.identificationOffered;
 	}
 
@@ -425,49 +470,21 @@ public class				ConfigurationParameters
 	/**
 	 * @return the instanceVars;
 	 */
-	public InstanceVar[]	getInstanceVars() {
+	public ArrayList<InstanceVar> 	getInstanceVars() {
 		return this.instanceVars;
 	}
 	
 	/**
 	 * @return the getInternalModifiers;
 	 */
-	public String		getInternalModifiers() {
-		return this.internalModifiers;
-	}
-	
-	/**
-	 * @return the internalType;
-	 */
-	public String		getInternalType() {
-		return this.internalType;
-	}
-	
-	/**
-	 * @return the internalName;
-	 */
-	public String		getInternalName() {
-		return this.internalName;
-	}
-	
-	/**
-	 * @return the internalParameter;
-	 */
-	public Parameter		getInternalParameter() {
-		return this.internalParameter;
-	}
-	
-	/**
-	 * @return the internalEquipmentRef;
-	 */
-	public Body		getInternalEquipmentRef() {
-		return this.internalEquipmentRef;
+	public Internal		getInternal() {
+		return this.internal;
 	}
 	
 	/**
 	 * @return the operations;
 	 */
-	public Operation[]		getOperations() {
+	public ArrayList<Operation> 	getOperations() {
 		return this.operations;
 	}
 	
@@ -534,10 +551,70 @@ public class				ConfigurationParameters
 //		return this.emergency;
 //	}
 //	
-//	@Override
-//	public String		toString() {
-//		return "nada";
-//
-//	}
+	
+	@Override
+	public String		toString() {
+		StringBuilder	strParsed = new StringBuilder("");
+		strParsed.append("package equipments.HEM;");
+
+		/** Parsing import			*/
+		for(int i=0; i < this.identificationOffered.size() ; i++) {
+			strParsed.append("import "+ this.identificationOffered.get(i)+";") ;
+		}
+		strParsed.append("fr.sorbonne_u.components.connectors.AbstractConnector;");
+		String className = internal.body.equipmentRef + "Connector";
+		strParsed.append("public class " + className);
+		strParsed.append("extends AbstractConnector");
+		strParsed.append("implements AdjustableCI {");
+		
+		/** Parsing class variables			*/
+		for(int i=0; i < this.instanceVars.size() ; i++) {
+			strParsed.append(this.instanceVars.get(i).modifiers + " ");
+			strParsed.append(this.instanceVars.get(i).type + " ");
+			strParsed.append(this.instanceVars.get(i).name);
+			if(!this.instanceVars.get(i).modifiers.contains("static")) {
+				strParsed.append(";");
+			} else {
+				strParsed.append(" = " + this.instanceVars.get(i).staticInit + ";");	
+			}
+		}
+
+		/** Parsing constructor			*/
+		strParsed.append("public " + className + "() { super()");
+		for(int i=0; i < this.instanceVars.size() ; i++) {
+			if(!this.instanceVars.get(i).modifiers.contains("static")) {
+				strParsed.append("this." + this.instanceVars.get(i).name + " = " + this.instanceVars.get(i).staticInit);
+			}
+		}
+
+		/** Parsing internal			*/
+		strParsed.append(this.internal.modifiers + " " + this.internal.type + " " + this.internal.name);
+		strParsed.append("exception " + internal.thrown);
+		for(int j=0; j<this.internal.parameters.size(); j++) {
+			strParsed.append(this.internal.parameters.get(j) + " " + this.internal.parameters.get(j));
+		}
+		strParsed.append("{");
+		String offering = "(("+ this.internal.body.equipmentRef + "ExternalControlCI)this.offering)";
+		strParsed.append(this.internal.body.text.replace(offering, this.internal.body.equipmentRef));
+		strParsed.append("}");
+		
+		/** Parsing operations			*/
+		for(int i=0; i < this.operations.size() ; i++) {
+			Operation op = operations.get(i);
+			strParsed.append("@Override ");
+			strParsed.append("public " + op.type + " " + op.name + "(");
+			for(int j=0; j<op.parameters.size(); j++) {
+				strParsed.append(op.parameters.get(j) + " " + op.parameters.get(j));
+			}
+			strParsed.append(")" + "throws Exception {");
+			strParsed.append(op.body);
+			strParsed.append("}");
+		}
+		
+		strParsed.append("}");
+		
+		return strParsed.toString();
+
+	}
 }
 // -----------------------------------------------------------------------------

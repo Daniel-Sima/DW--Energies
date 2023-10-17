@@ -35,6 +35,7 @@ package equipments.config;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
@@ -195,18 +196,14 @@ public class			ConfigurationFileParser
 			throws	ConfigurationException, XPathExpressionException
 	{
 		long			identificationUid = -1;
-		String			identificationOffered = null;
+		ArrayList<String>		identificationOffered = new ArrayList<String>();
 		double			consumptionMin = -1;
 		double			consumptionNominal = -1;
 		double			consumptionMax = -1;
 		String			required = null;
-		InstanceVar[]	instanceVars = null;
-		Operation[]		operations = null;
-		String			internalModifiers = null;
-		String			internalType = null;
-		String			internalName = null;
-		Parameter		internalParameter = null;
-		Body			internalEquipmentRef = null;
+		ArrayList<InstanceVar>	instanceVars = new ArrayList<InstanceVar>();
+		ArrayList<Operation>		operations = new ArrayList<Operation>();
+		Internal		internal = null;
 
 		Document doc = null;
 		try {
@@ -248,19 +245,17 @@ public class			ConfigurationFileParser
 				throw new ConfigurationException(
 						"error fetching the identification uid node", e) ;
 			}
-			try {
-				identificationOffered =
-						((Node)xpathEvaluator.evaluate(
-								"@offered",
-								identificationNode,
-								XPathConstants.NODE)).getNodeValue();
-			} catch (DOMException e) {
-				throw new ConfigurationException(
-						"node access error for the identification offered node",
-						e) ;
-			} catch (XPathExpressionException e) {
-				throw new ConfigurationException(
-						"error fetching the identification offered node", e) ;
+			NodeList offeredList = doc.getElementsByTagName("offered");
+			for (int i = 0; i < offeredList.getLength(); i++) {
+				Node offered = (Node) offeredList.item(i);
+
+				try {
+					identificationOffered.add(offered.getNodeValue());
+				} catch (DOMException e) {
+					throw new ConfigurationException(
+							"node access error for the identification offered node",
+							e) ;
+				}
 			}
 		}
 
@@ -333,7 +328,7 @@ public class			ConfigurationFileParser
 		NodeList varsList = doc.getElementsByTagName("instance-var");
 		for (int i = 0; i < varsList.getLength(); i++) {
 			Node instanceVar = (Node) varsList.item(i);
-			String modifiers;
+			String modifiers = null;
 			try {
 				modifiers = ((Node)xpathEvaluator.evaluate(
 						"@modifiers", instanceVar,
@@ -346,7 +341,7 @@ public class			ConfigurationFileParser
 				throw new ConfigurationException(
 						"error fetching the setMode body node", e) ;
 			}
-			String type;
+			String type = null;
 			try {
 				type = ((Node)xpathEvaluator.evaluate(
 						"@type", instanceVar,
@@ -359,7 +354,7 @@ public class			ConfigurationFileParser
 				throw new ConfigurationException(
 						"error fetching the setMode body node", e) ;
 			}
-			String name;
+			String name = null;
 			try {
 				name = ((Node)xpathEvaluator.evaluate(
 						"@name", instanceVar,
@@ -372,7 +367,7 @@ public class			ConfigurationFileParser
 				throw new ConfigurationException(
 						"error fetching the setMode body node", e) ;
 			}
-			String staticInit;
+			String staticInit = null;
 			try {
 				staticInit = ((Node)xpathEvaluator.evaluate(
 						"@static-init", instanceVar,
@@ -385,10 +380,17 @@ public class			ConfigurationFileParser
 				throw new ConfigurationException(
 						"error fetching the setMode body node", e) ;
 			}
-			instanceVars[i] = new InstanceVar(modifiers, type, name, staticInit);
+			instanceVars.add(new InstanceVar(modifiers, type, name, staticInit));
 		}
 
 		Node internalNode;
+		String internalModifiers = null;
+		String internalType = null;
+		String internalName = null;
+		ArrayList<Parameter> internalParameters = new ArrayList<Parameter>();
+		String thrownException = null;
+		String equipmentRef = null;
+		String body = null;
 		try{
 			internalNode = ((Node)xpathEvaluator.evaluate(
 					"/control-adapter/internal",
@@ -438,58 +440,86 @@ public class			ConfigurationFileParser
 				throw new ConfigurationException(
 						"error fetching the internal name node", e) ;
 			}
-			try {
-				String thrownException = null;
-				String equipmentRef = null;
-				String text = null;
-				try {
-					Node thrownNode = ((Node)xpathEvaluator.evaluate(
-							"@thrown",
-							internalNode,
-							XPathConstants.NODE));
-					thrownException = thrownNode.getNodeValue();
-				} catch (DOMException e) {
-					throw new ConfigurationException(
-							"node access error for the thrown node",
-							e) ;
-				} catch (XPathExpressionException e) {
-					throw new ConfigurationException(
-							"error fetching the thrown node", e) ;
-				}
-				try {
-					Node bodyNode = ((Node)xpathEvaluator.evaluate(
-							"@body",
-							internalNode,
-							XPathConstants.NODE));
+			for(int h=0; h<internalNode.getAttributes().getLength(); h++) {
+				if(internalNode.getAttributes().item(h).getNodeValue() == "parameter") {
+					Node parameterNode = internalNode.getAttributes().item(h);
+					String name = null;
+					String type = null;
 					try {
-						equipmentRef = (((Node)xpathEvaluator.evaluate(
-								"@equipmentRef",
-								bodyNode,
-								XPathConstants.NODE)).getNodeValue());
-						text = bodyNode.getNodeValue();
+						name = ((Node)xpathEvaluator.evaluate(
+								"@type",
+								parameterNode,
+								XPathConstants.NODE)).getNodeValue();
 					} catch (DOMException e) {
 						throw new ConfigurationException(
-								"node access error for the equipmentRef inside internal body node",
+								"node access error for the parameter type of the operation",
 								e) ;
 					} catch (XPathExpressionException e) {
 						throw new ConfigurationException(
-								"error fetching the equipmentRef inside internal body node", e) ;
+								"error fetching the parameter type of the operation", e) ;
 					}
+					try {
+						name = ((Node)xpathEvaluator.evaluate(
+								"@name",
+								parameterNode,
+								XPathConstants.NODE)).getNodeValue();
+					} catch (DOMException e) {
+						throw new ConfigurationException(
+								"node access error for the parameter name of the operation",
+								e) ;
+					} catch (XPathExpressionException e) {
+						throw new ConfigurationException(
+								"error fetching the parameter name of the operation", e) ;
+					}
+					internalParameters.add(new Parameter(type,name));
+				} 
+			}
+			try {
+				Node thrownNode = ((Node)xpathEvaluator.evaluate(
+						"@thrown",
+						internalNode,
+						XPathConstants.NODE));
+				thrownException = thrownNode.getNodeValue();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for the thrown node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the thrown node", e) ;
+			}
+			try {
+				Node bodyNode = ((Node)xpathEvaluator.evaluate(
+						"@body",
+						internalNode,
+						XPathConstants.NODE));
+				try {
+					equipmentRef = (((Node)xpathEvaluator.evaluate(
+							"@equipmentRef",
+							bodyNode,
+							XPathConstants.NODE)).getNodeValue());
+					body = bodyNode.getNodeValue();
 				} catch (DOMException e) {
 					throw new ConfigurationException(
-							"node access error for the internal equipmentRef node",
+							"node access error for the equipmentRef inside internal body node",
 							e) ;
 				} catch (XPathExpressionException e) {
 					throw new ConfigurationException(
-							"error fetching the internal equipmentRef node", e) ;
+							"error fetching the equipmentRef inside internal body node", e) ;
 				}
-
-				internalEquipmentRef = new Body(thrownException, equipmentRef, text);
 			} catch (DOMException e) {
 				throw new ConfigurationException(
-						"node access error for the internal name node",
+						"node access error for the internal equipmentRef node",
 						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the internal equipmentRef node", e) ;
 			}
+			internal = new Internal(internalModifiers, 
+					internalType, 
+					internalName,
+					internalParameters,
+					new Body(equipmentRef, thrownException, body));
 		}
 
 		/*
@@ -534,7 +564,7 @@ public class			ConfigurationFileParser
 		for (int i = 0; i < operationList.getLength(); i++) {
 			Node operation = (Node) operationList.item(i);
 			String 		opName = null;
-			Parameter[] opParameters = null;
+			ArrayList<Parameter> opParameters = new ArrayList<Parameter>();
 			Body		opBody = null;
 			if(operation.getAttributes() != null) {
 				try {
@@ -546,7 +576,21 @@ public class			ConfigurationFileParser
 				for(int h=0; h<operation.getAttributes().getLength(); h++) {
 					if(operation.getAttributes().item(h).getNodeValue() == "parameter") {
 						Node parameterNode = operation.getAttributes().item(h);
-						String name;
+						String name = null;
+						String type = null;
+						try {
+							name = ((Node)xpathEvaluator.evaluate(
+									"@type",
+									parameterNode,
+									XPathConstants.NODE)).getNodeValue();
+						} catch (DOMException e) {
+							throw new ConfigurationException(
+									"node access error for the parameter type of the operation",
+									e) ;
+						} catch (XPathExpressionException e) {
+							throw new ConfigurationException(
+									"error fetching the parameter type of the operation", e) ;
+						}
 						try {
 							name = ((Node)xpathEvaluator.evaluate(
 									"@name",
@@ -560,9 +604,9 @@ public class			ConfigurationFileParser
 							throw new ConfigurationException(
 									"error fetching the parameter name of the operation", e) ;
 						}
-						opParameters[i] = new Parameter(null,name);
+						opParameters.add(new Parameter(type,name));
 					} 
-					else if (operation.getAttributes().item(h).getNodeValue() == "body") {
+					if (operation.getAttributes().item(h).getNodeValue() == "body") {
 						Node bodyNode = operation.getAttributes().item(h);
 						String text;
 						try {
@@ -576,22 +620,18 @@ public class			ConfigurationFileParser
 					}
 				}
 			}
-			operations[i] = new Operation(opName, opParameters, opBody);
+			operations.add(new Operation(opName, opParameters, opBody));
 		}
-	return new ConfigurationParameters(identificationUid,
-			identificationOffered,
-			consumptionMin,
-			consumptionNominal,
-			consumptionMax,
-			required,
-			instanceVars,
-			operations,
-			internalModifiers,
-			internalType,
-			internalName,
-			internalParameter,
-			internalEquipmentRef
-			) ;
-}
+		return new ConfigurationParameters(identificationUid,
+				identificationOffered,
+				consumptionMin,
+				consumptionNominal,
+				consumptionMax,
+				required,
+				instanceVars,
+				operations,
+				internal
+				) ;
+	}
 }
 // -----------------------------------------------------------------------------

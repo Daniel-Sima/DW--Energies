@@ -1,6 +1,6 @@
 <control-adapter
     xmlns="http://www.sorbonne-universite.fr/alasca/control-adapter"
-    uid="1L"
+    uid="1LF"
     offered="equipments.Fridge.FridgeExternalControlCI">
   <consumption nominal="2000" min="0" max="2000"/>
   <required>java.lang.Math</required>
@@ -29,8 +29,8 @@
 	    </body>
   </internal>
   <operations>
-	  <maxMode><body>return MAX_MODE;</body></maxMode>
-	  <upMode>
+	  <maxMode type="int"><body>return MAX_MODE;</body></maxMode>
+	  <upMode type="boolean">
 	    <body>
 	      try {
 	        computeAndSetNewPowerLevel(currentMode + 1);
@@ -41,7 +41,7 @@
 	      return true;
 	    </body>
 	  </upMode>
-	  <downMode>
+	  <downMode type="boolean">
 	    <body>
 	      try {
 	        computeAndSetNewPowerLevel(currentMode - 1);
@@ -52,7 +52,7 @@
 	      return true;
 	    </body>
 	  </downMode>
-	  <setMode>
+	  <setMode type="boolean">
 	    <parameter name="modeIndex"/>
 	    <body>
 	      try {
@@ -64,7 +64,7 @@
 	      return true;
 	    </body>
 	  </setMode>
-	  <currentMode>
+	  <currentMode type="int">
 	    <body>
 	      if (suspended()) {
 	        return 0;
@@ -73,12 +73,12 @@
 	      }
 	    </body>
 	  </currentMode>
-	  <suspended>
+	  <suspended type="boolean">
 	    <body>
 	      return isSuspended;
 	    </body>
 	  </suspended>
-	  <suspend>
+	  <suspend type="boolean">
 	    <body equipmentRef="Fridge">
 	      try {
 	        Frige.setCurrentPowerLevel(0.0);
@@ -89,7 +89,7 @@
 	      return true;
 	    </body>
 	  </suspend>
-	  <resume>
+	  <resume type="boolean">
 	    <body equipmentRef="Fridge">
 	      try {
 	        computeAndSetNewPowerLevel(currentMode);
@@ -100,7 +100,7 @@
 	      return true;
 	    </body>
 	  </resume>
-	  <emergency>
+	  <emergency type="double">
 	    <body equipmentRef="Fridge">
 	      double currentFreezerTemperature = Fridge.getCurrentFreezerTemperature();
 	      double targetFreezerTemperature = Fridge.getTargetFreezerTemperature();

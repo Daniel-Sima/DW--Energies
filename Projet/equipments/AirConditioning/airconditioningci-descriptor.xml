@@ -1,7 +1,7 @@
 <control-adapter
     xmlns="http://www.sorbonne-universite.fr/alasca/control-adapter"
-    uid="1A10000"
-    offered="fr.sorbonne_u.components.hem2023e1.equipments.AirConditioning.AirConditioningExternalControlCI">
+    uid="1LA"
+    offered="equipments.AirConditioning.AirConditioningExternalControlCI">
   <consumption nominal="2000" min="0" max="2000"/>
   <required>java.lang.Math</required>
   <instance-var modifiers= "protected static" type="int" name="MAX_MODE"
@@ -25,8 +25,8 @@
 	    </body>
   </internal>
   <operations>
-	  <maxMode><body>return MAX_MODE;</body></maxMode>
-	  <upMode>
+	  <maxMode type="int"><body>return MAX_MODE;</body></maxMode>
+	  <upMode type="boolean">
 	    <body>
 	      try {
 	        computeAndSetNewPowerLevel(currentMode + 1);
@@ -37,7 +37,7 @@
 	      return true;
 	    </body>
 	  </upMode>
-	  <downMode>
+	  <downMode type="boolean">
 	    <body>
 	      try {
 	        computeAndSetNewPowerLevel(currentMode - 1);
@@ -48,8 +48,8 @@
 	      return true;
 	    </body>
 	  </downMode>
-	  <setMode>
-	    <parameter name="modeIndex"/>
+	  <setMode type="boolean">
+	    <parameter type="int" name="modeIndex"/>
 	    <body>
 	      try {
 	        computeAndSetNewPowerLevel(modeIndex);
@@ -60,7 +60,7 @@
 	      return true;
 	    </body>
 	  </setMode>
-	  <currentMode>
+	  <currentMode type="int">
 	    <body>
 	      if (suspended()) {
 	        return 0;
@@ -69,12 +69,12 @@
 	      }
 	    </body>
 	  </currentMode>
-	  <suspended>
+	  <suspended type="boolean">
 	    <body>
 	      return isSuspended;
 	    </body>
 	  </suspended>
-	  <suspend>
+	  <suspend type="boolean">
 	    <body equipmentRef="AirConditioning">
 	      try {
 	        AirConditioning.setCurrentPowerLevel(0.0);
@@ -85,7 +85,7 @@
 	      return true;
 	    </body>
 	  </suspend>
-	  <resume>
+	  <resume type="boolean">
 	    <body equipmentRef="AirConditioning">
 	      try {
 	        computeAndSetNewPowerLevel(currentMode);
@@ -96,7 +96,7 @@
 	      return true;
 	    </body>
 	  </resume>
-	  <emergency>
+	  <emergency type="double">
 	    <body equipmentRef="AirConditioning">
 	      double currentTemperature = AirConditioning.getCurrentTemperature();
 	      double targetTemperature = AirConditioning.getTargetTemperature();
