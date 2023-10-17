@@ -174,7 +174,7 @@ extends	AbstractComponent {
 		this.solarPanelMeteoControlOutboundPort.publishPort();
 
 		this.tracer.get().setTitle("Solar Panel tester component");
-		this.tracer.get().setRelativePosition(0, 1);
+		this.tracer.get().setRelativePosition(0, 3);
 		this.toggleTracing();		
 	}
 

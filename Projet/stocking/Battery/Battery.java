@@ -171,7 +171,7 @@ implements BatteryExternalControlI{
 
 		if (VERBOSE) {
 			this.tracer.get().setTitle("Battery component");
-			this.tracer.get().setRelativePosition(1, 1);
+			this.tracer.get().setRelativePosition(1, 4);
 			this.toggleTracing();		
 		}
 	}

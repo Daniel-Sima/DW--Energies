@@ -23,8 +23,8 @@ the Apache License Version 2.0.
 
 #### Files
 
-  * [Readme.html](Readme.html)
-Readme file (a longer version of this file).
+  * [README.md](README.md)
+This readme file.
 
   * [Changes.md](Changes.md)
   Release notes.

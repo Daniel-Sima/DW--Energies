@@ -155,7 +155,7 @@ implements SolarPanelExternalControlI, SolarPanelMeteoControlI {
 
 		if (VERBOSE) {
 			this.tracer.get().setTitle("Solar panel component");
-			this.tracer.get().setRelativePosition(1, 1);
+			this.tracer.get().setRelativePosition(1, 3);
 			this.toggleTracing();		
 		}
 	}

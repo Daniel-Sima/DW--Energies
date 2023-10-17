@@ -172,7 +172,7 @@ extends	AbstractComponent {
 		this.petrolGeneratorInternalControlOutboundPort.publishPort();
 
 		this.tracer.get().setTitle("Petrol Generator tester component");
-		this.tracer.get().setRelativePosition(0, 1);
+		this.tracer.get().setRelativePosition(2, 3);
 		this.toggleTracing();		
 	}
 

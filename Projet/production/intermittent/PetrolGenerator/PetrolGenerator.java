@@ -202,7 +202,7 @@ implements PetrolGeneratorExternalControlI, PetrolGeneratorInternalControlI{
 
 		if (VERBOSE) {
 			this.tracer.get().setTitle("Petrol Generator component");
-			this.tracer.get().setRelativePosition(1, 1);
+			this.tracer.get().setRelativePosition(3, 3);
 			this.toggleTracing();		
 		}
 	}

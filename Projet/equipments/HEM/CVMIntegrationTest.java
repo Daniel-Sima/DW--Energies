@@ -13,6 +13,12 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.exceptions.ContractException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import production.aleatory.SolarPanel.SolarPanel;
+import production.aleatory.SolarPanel.SolarPanelTester;
+import production.intermittent.PetrolGenerator.PetrolGenerator;
+import production.intermittent.PetrolGenerator.PetrolGeneratorTester;
+import stocking.Battery.Battery;
+import stocking.Battery.BatteryTester;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -111,6 +117,30 @@ extends	AbstractCVM {
 		AbstractComponent.createComponent(
 				FridgeTester.class.getCanonicalName(),
 				new Object[]{false});
+		
+		AbstractComponent.createComponent(
+				SolarPanel.class.getCanonicalName(),
+				new Object[]{});
+
+		AbstractComponent.createComponent(
+				SolarPanelTester.class.getCanonicalName(),
+				new Object[]{true}); // TODO a voir 
+		
+		AbstractComponent.createComponent(
+				PetrolGenerator.class.getCanonicalName(),
+				new Object[]{});
+
+		AbstractComponent.createComponent(
+				PetrolGeneratorTester.class.getCanonicalName(),
+				new Object[]{true}); // TODO a voir 
+		
+		AbstractComponent.createComponent(
+				Battery.class.getCanonicalName(),
+				new Object[]{});
+
+		AbstractComponent.createComponent(
+				BatteryTester.class.getCanonicalName(),
+				new Object[]{true}); // TODO a voir 
 
 		AbstractComponent.createComponent(
 				HEM.class.getCanonicalName(),

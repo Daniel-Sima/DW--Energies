@@ -104,7 +104,7 @@ implements	FridgeUserImplI,
 									"Fridge-EXTERNAL-CONTROL-INBOUND-PORT-URI";
 
 	/** when true, methods trace their actions.								*/
-	public static final boolean		VERBOSE = true;
+	public static boolean		VERBOSE = true;
 	/** fake current 	*/
 	public static final double		FAKE_CURRENT_COOLER_TEMPERATURE = -5.0;
 	public static final double		FAKE_CURRENT_FREEZER_TEMPERATURE = 4.0;
@@ -383,7 +383,7 @@ implements	FridgeUserImplI,
 	@Override
 	public double getCurrentFreezerTemperature() throws Exception
 	{
-		assert	this.on() : new PreconditionException("on()");
+		assert	this.currentState == FridgeState.ON  : new PreconditionException("this.currentState == FridgeState.ON");
 
 		// Temporary implementation; would need a temperature sensor.
 		double currentFreezerTemperature = FAKE_CURRENT_FREEZER_TEMPERATURE;

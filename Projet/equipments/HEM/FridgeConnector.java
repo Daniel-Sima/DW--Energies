@@ -1,5 +1,6 @@
 package equipments.HEM;
 
+import equipments.Fridge.Fridge;
 import equipments.Fridge.FridgeExternalControlCI;
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 import fr.sorbonne_u.exceptions.PostconditionException;
@@ -116,9 +117,11 @@ implements AdjustableCI {
 	protected void computeAndSetNewPowerLevel(int newMode) throws Exception {
 		assert	newMode >= 0 && newMode <= MAX_MODE :
 			new PreconditionException("newMode >= 0 && newMode <= MAX_MODE");
-
+		
+		Fridge.VERBOSE = false;
 		double maxPowerLevel =
 				((FridgeExternalControlCI)this.offering).getMaxPowerLevel();
+		Fridge.VERBOSE = true;
 		double newPowerLevel =
 				(newMode - 1) * maxPowerLevel/(MAX_MODE - 1);
 		((FridgeExternalControlCI)this.offering).
@@ -247,6 +250,7 @@ implements AdjustableCI {
 	public double emergency() throws Exception {
 		assert	this.suspended() : new PreconditionException("suspended()");
 
+		Fridge.VERBOSE = false;
 		double currentTemperatureCooler =
 				((FridgeExternalControlCI)this.offering).
 				getCurrentCoolerTemperature();
@@ -276,7 +280,8 @@ implements AdjustableCI {
 		} else {
 			retFreezer = deltaFreezer/FridgeConnector.MAX_ADMISSIBLE_DELTA;
 		}
-
+		Fridge.VERBOSE = true;
+		
 		double ret = retCooler > retFreezer ? retCooler : retFreezer;
 				
 		assert	ret >= 0.0 && ret <= 1.0 :

@@ -1,5 +1,6 @@
 package equipments.HEM;
 
+import equipments.AirConditioning.AirConditioning;
 import equipments.AirConditioning.AirConditioningExternalControlCI;
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 import fr.sorbonne_u.exceptions.PostconditionException;
@@ -113,8 +114,10 @@ implements AdjustableCI {
 		assert	newMode >= 0 && newMode <= MAX_MODE :
 			new PreconditionException("newMode >= 0 && newMode <= MAX_MODE");
 
+		AirConditioning.VERBOSE = false;
 		double maxPowerLevel =
 				((AirConditioningExternalControlCI)this.offering).getMaxPowerLevel();
+		AirConditioning.VERBOSE = true;
 		double newPowerLevel =
 				(newMode - 1) * maxPowerLevel/(MAX_MODE - 1);
 		((AirConditioningExternalControlCI)this.offering).
@@ -241,6 +244,7 @@ implements AdjustableCI {
 	public double emergency() throws Exception {
 		assert	this.suspended() : new PreconditionException("suspended()");
 
+		AirConditioning.VERBOSE = false;
 		double currentTemperature =
 				((AirConditioningExternalControlCI)this.offering).
 				getCurrentTemperature();
@@ -255,7 +259,8 @@ implements AdjustableCI {
 		} else {
 			ret = delta/AirConditioningConnector.MAX_ADMISSIBLE_DELTA;
 		}
-
+		AirConditioning.VERBOSE = true;
+		
 		assert	ret >= 0.0 && ret <= 1.0 :
 			new PostconditionException("return >= 0.0 && return <= 1.0");
 

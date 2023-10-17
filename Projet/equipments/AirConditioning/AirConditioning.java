@@ -118,7 +118,7 @@ implements	AirConditioningUserImplI,
 									"AirConditioning-EXTERNAL-CONTROL-INBOUND-PORT-URI";
 
 	/** when true, methods trace their actions.								*/
-	public static final boolean		VERBOSE = true;
+	public static boolean		VERBOSE = true;
 	/** fake current 	*/
 	public static final double		FAKE_CURRENT_TEMPERATURE = 10.0;
 
