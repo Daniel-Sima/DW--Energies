@@ -127,6 +127,15 @@ implements	CookingPlateUserCI{
 		((CookingPlateUserCI)this.getConnector()).decreaseMode();
 		
 	}
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		((CookingPlateUserCI)this.getConnector()).printSeparator(title);
+	}
 }
 /***********************************************************************************/
 /***********************************************************************************/

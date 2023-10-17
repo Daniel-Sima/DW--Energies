@@ -185,6 +185,12 @@ public interface LampImplementationI {
 	 * @throws Exception	<i>to do</i>.
 	 */
 	public void	decreaseMode() throws Exception;
+	
+	/***********************************************************************************/
+	/**
+	 * This functions prints a separator for better visualization of the traces.
+	 */
+	public void printSeparator(String title) throws Exception;
 }
 /***********************************************************************************/
 /***********************************************************************************/

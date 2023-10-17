@@ -64,7 +64,7 @@ public interface CookingPlateImplementationI {
 	 * </p>
 	 * 
 	 * <p>
-	 * The cooking plate has 7 modes, from 0 to 6, from the coldest to the hottest temperature.
+	 * The cooking plate has 8 modes, from 0 to 7, from the coldest to the hottest temperature.
 	 * </p>
 	 * 
 	 * <p>
@@ -74,7 +74,7 @@ public interface CookingPlateImplementationI {
 	 * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
 	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
-	public static int[] CookingPlateTemperature =	new int[] {50, 80, 120, 160, 200, 250, 300};
+	public static int[] CookingPlateTemperature =	new int[] {0, 50, 80, 120, 160, 200, 250, 300};
 	/***********************************************************************************/
 	// -------------------------------------------------------------------------
 	// Component services signatures
@@ -169,6 +169,12 @@ public interface CookingPlateImplementationI {
 	 * @throws Exception	<i>to do</i>.
 	 */
 	public void	decreaseMode() throws Exception;
+	
+	/***********************************************************************************/
+	/**
+	 * This functions prints a separator for better visualization of the traces.
+	 */
+	public void printSeparator(String title) throws Exception;
 }
 /***********************************************************************************/
 /***********************************************************************************/

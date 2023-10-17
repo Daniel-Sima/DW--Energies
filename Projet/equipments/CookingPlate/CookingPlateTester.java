@@ -83,8 +83,8 @@ extends AbstractComponent {
 		this.cookingPlateOutboundPort = new CookingPlateOutboundPort(this);
 		this.cookingPlateOutboundPort.publishPort();
 
-		this.tracer.get().setTitle("Cooking plate tester component");
-		this.tracer.get().setRelativePosition(0, 0);
+		this.tracer.get().setTitle("CookingPlate tester component");
+		this.tracer.get().setRelativePosition(0, 1);
 		this.toggleTracing();		
 	}
 
@@ -107,7 +107,7 @@ extends AbstractComponent {
 	{
 		this.logMessage("testGetMode()... ");
 		try {
-			assertEquals(50, this.cookingPlateOutboundPort.getTemperature());
+			assertEquals(0, this.cookingPlateOutboundPort.getTemperature());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -122,10 +122,11 @@ extends AbstractComponent {
 			assertEquals(CookingPlateState.OFF, this.cookingPlateOutboundPort.getState());
 			this.cookingPlateOutboundPort.turnOn();
 			assertEquals(CookingPlateState.ON, this.cookingPlateOutboundPort.getState());
-			assertEquals(50, this.cookingPlateOutboundPort.getTemperature());
+			assertEquals(0, this.cookingPlateOutboundPort.getTemperature());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
+		// PreconditionException raised with message this.currentState == CookingPlateState.OFF!
 		try {
 			assertThrows(ExecutionException.class,
 					() -> this.cookingPlateOutboundPort.turnOn());
@@ -138,6 +139,7 @@ extends AbstractComponent {
 		} catch (Exception e) {
 			assertTrue(false);
 		}
+		// PreconditionException raised with message currentState == CookingPlateState.ON!
 		try {
 			assertThrows(ExecutionException.class,
 					() -> this.cookingPlateOutboundPort.turnOff());
@@ -149,7 +151,7 @@ extends AbstractComponent {
 
 	/***********************************************************************************/
 	public void	testIncreaseDecrease() {
-		this.logMessage("testSetLowHigh()... ");
+		this.logMessage("testIncreaseDecrease()... ");
 		try {
 			this.cookingPlateOutboundPort.turnOn();
 			this.cookingPlateOutboundPort.increaseMode();
@@ -165,9 +167,12 @@ extends AbstractComponent {
 			assertEquals(CookingPlate.CookingPlateTemperature[5], this.cookingPlateOutboundPort.getTemperature());
 			this.cookingPlateOutboundPort.increaseMode();
 			assertEquals(CookingPlate.CookingPlateTemperature[6], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.increaseMode();
+			assertEquals(CookingPlate.CookingPlateTemperature[7], this.cookingPlateOutboundPort.getTemperature());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
+		// PreconditionException raised with message this.currentMode < 7!
 		try {
 			assertThrows(ExecutionException.class,
 					() -> this.cookingPlateOutboundPort.increaseMode());
@@ -177,6 +182,8 @@ extends AbstractComponent {
 		try {
 			this.cookingPlateOutboundPort.decreaseMode();
 			assertEquals(CookingPlateState.ON, this.cookingPlateOutboundPort.getState());
+			assertEquals(CookingPlate.CookingPlateTemperature[6], this.cookingPlateOutboundPort.getTemperature());
+			this.cookingPlateOutboundPort.decreaseMode();
 			assertEquals(CookingPlate.CookingPlateTemperature[5], this.cookingPlateOutboundPort.getTemperature());
 			this.cookingPlateOutboundPort.decreaseMode();
 			assertEquals(CookingPlate.CookingPlateTemperature[4], this.cookingPlateOutboundPort.getTemperature());
@@ -185,12 +192,13 @@ extends AbstractComponent {
 			this.cookingPlateOutboundPort.decreaseMode();
 			assertEquals(CookingPlate.CookingPlateTemperature[2], this.cookingPlateOutboundPort.getTemperature());
 			this.cookingPlateOutboundPort.decreaseMode();
-			assertEquals(CookingPlate.CookingPlateTemperature[1], this.cookingPlateOutboundPort.getTemperature());
+			assertEquals(CookingPlate.CookingPlateTemperature[1], this.cookingPlateOutboundPort.getTemperature());	
 			this.cookingPlateOutboundPort.decreaseMode();
 			assertEquals(CookingPlate.CookingPlateTemperature[0], this.cookingPlateOutboundPort.getTemperature());	
 		} catch (Exception e) {
 			assertTrue(false);
 		}
+		// PreconditionException raised with message this.currentMode > 0!
 		try {
 			assertThrows(ExecutionException.class,
 					() -> this.cookingPlateOutboundPort.decreaseMode());
@@ -205,11 +213,16 @@ extends AbstractComponent {
 		this.logMessage("...done.");
 	}
 
-	/***********************************************************************************/
-	protected void runAllTests() {
+	/**
+	 * @throws Exception *********************************************************************************/
+	protected void runAllTests() throws Exception {
+		this.cookingPlateOutboundPort.printSeparator(" testGetState() ");
 		this.testGetState();
+		this.cookingPlateOutboundPort.printSeparator(" testGetMode() ");
 		this.testGetMode();
+		this.cookingPlateOutboundPort.printSeparator(" testTurnOnOff() ");
 		this.testTurnOnOff();
+		this.cookingPlateOutboundPort.printSeparator(" testIncreaseDecrease() ");
 		this.testIncreaseDecrease();
 	}
 

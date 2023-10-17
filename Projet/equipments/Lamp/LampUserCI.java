@@ -44,6 +44,12 @@ extends OfferedCI, RequiredCI, LampImplementationI{
 	
 	@Override
 	public void	decreaseMode() throws Exception;
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	public void printSeparator(String title) throws Exception;
 }
 /***********************************************************************************/
 /***********************************************************************************/

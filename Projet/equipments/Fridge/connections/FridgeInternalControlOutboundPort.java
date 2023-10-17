@@ -232,5 +232,14 @@ implements	FridgeInternalControlCI
 	{
 		((FridgeInternalControlCI)this.getConnector()).stopCoolingCooler();
 	}
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		((FridgeInternalControlCI)this.getConnector()).printSeparator(title);
+	}
 }
 // -----------------------------------------------------------------------------

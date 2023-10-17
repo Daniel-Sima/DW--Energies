@@ -1,5 +1,6 @@
 package equipments.Lamp;
 
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -155,6 +156,15 @@ implements	LampUserCI
 	public void decreaseMode() throws Exception 
 	{
 		((LampUserCI)this.getConnector()).decreaseMode();
+	}
+
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		((LampUserCI)this.getConnector()).printSeparator(title);
 	}
 }
 // -----------------------------------------------------------------------------

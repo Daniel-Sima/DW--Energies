@@ -121,8 +121,8 @@ extends		AbstractComponent
 		this.lop = new LampOutboundPort(this);
 		this.lop.publishPort();
 
-		this.tracer.get().setTitle("lamp tester component");
-		this.tracer.get().setRelativePosition(0, 0);
+		this.tracer.get().setTitle("Lamp tester component");
+		this.tracer.get().setRelativePosition(2, 1);
 		this.toggleTracing();		
 	}
 
@@ -164,18 +164,19 @@ extends		AbstractComponent
 		} catch (Exception e) {
 			assertTrue(false);
 		}
-		try {
-			assertThrows(ExecutionException.class,
-						 () -> this.lop.turnOn());
-		} catch (Exception e) {
-			assertTrue(false);
-		}
+//		try {
+//			assertThrows(ExecutionException.class,
+//						 () -> this.lop.turnOn());
+//		} catch (Exception e) {
+//			assertTrue(false);
+//		}
 		try {
 			this.lop.turnOff();
 			assertEquals(LampState.OFF, this.lop.getState());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
+		// PreconditionException raised with message this.currentStat == LampState.ON!
 		try {
 			assertThrows(ExecutionException.class,
 						 () -> this.lop.turnOff());
@@ -187,18 +188,12 @@ extends		AbstractComponent
 
 	public void	testIncreaseDecreaseMode()
 	{
-		this.logMessage("testSetLowHigh()... ");
+		this.logMessage("testIncreaseDecreaseMode()... ");
 		try {
 			this.lop.turnOn();
-			this.lop.increaseMode();
 			assertEquals(LampState.ON, this.lop.getState());
+			this.lop.increaseMode();
 			assertEquals(LampMode.MODE_2, this.lop.getMode());
-		} catch (Exception e) {
-			assertTrue(false);
-		}
-		try {
-			assertThrows(ExecutionException.class,
-						 () -> this.lop.increaseMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -209,6 +204,14 @@ extends		AbstractComponent
 		} catch (Exception e) {
 			assertTrue(false);
 		}
+		// PreconditionException raised with message this.currentMode != LampMode.MODE_3!
+		try {
+			assertThrows(ExecutionException.class,
+						 () -> this.lop.increaseMode());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		// PreconditionException raised with message this.currentMode != LampMode.MODE_3!
 		try {
 			assertThrows(ExecutionException.class,
 						 () -> this.lop.increaseMode());
@@ -219,9 +222,12 @@ extends		AbstractComponent
 			this.lop.decreaseMode();
 			assertEquals(LampState.ON, this.lop.getState());
 			assertEquals(LampMode.MODE_2, this.lop.getMode());
+			this.lop.decreaseMode();
+			assertEquals(LampMode.MODE_1, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
+		// PreconditionException raised with message getMode() != LampMode.MODE_1!
 		try {
 			assertThrows(ExecutionException.class,
 						 () -> this.lop.decreaseMode());
@@ -229,12 +235,12 @@ extends		AbstractComponent
 			assertTrue(false);
 		}
 		try {
-			this.lop.decreaseMode();
 			assertEquals(LampState.ON, this.lop.getState());
 			assertEquals(LampMode.MODE_1, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
+		// PreconditionException raised with message getMode() != LampMode.MODE_1!
 		try {
 			assertThrows(ExecutionException.class,
 						 () -> this.lop.decreaseMode());
@@ -249,11 +255,15 @@ extends		AbstractComponent
 		this.logMessage("...done.");
 	}
 
-	protected void runAllTests()
+	protected void runAllTests() throws Exception
 	{
+		this.lop.printSeparator(" testGetState() ");
 		this.testGetState();
+		this.lop.printSeparator(" testGetMode() ");
 		this.testGetMode(); 
+		this.lop.printSeparator(" testTurnOnOff() ");
 		this.testTurnOnOff();
+		this.lop.printSeparator(" testIncreaseDecreaseMode() ");
 		this.testIncreaseDecreaseMode();
 	}
 

@@ -171,5 +171,14 @@ implements	FridgeInternalControlCI
 	{
 		((FridgeInternalControlCI)this.offering).stopCoolingFreezer();
 	}
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		((FridgeInternalControlCI)this.offering).printSeparator(title);
+	}
 }
 // -----------------------------------------------------------------------------

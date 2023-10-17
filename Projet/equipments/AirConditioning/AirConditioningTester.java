@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.jupiter.api.Test;
-
 import equipments.AirConditioning.connections.AirConditioningExternalControlConnector;
 import equipments.AirConditioning.connections.AirConditioningExternalControlOutboundPort;
 import equipments.AirConditioning.connections.AirConditioningInternalControlConnector;
@@ -77,9 +75,9 @@ import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
  * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
 @RequiredInterfaces(required={AirConditioningUserCI.class,
-							  AirConditioningInternalControlCI.class,
-							  AirConditioningExternalControlCI.class,
-							  ClocksServerCI.class})
+		AirConditioningInternalControlCI.class,
+		AirConditioningExternalControlCI.class,
+		ClocksServerCI.class})
 public class			AirConditioningTester
 extends		AbstractComponent
 {
@@ -126,9 +124,9 @@ extends		AbstractComponent
 	protected			AirConditioningTester(boolean isUnitTest) throws Exception
 	{
 		this(isUnitTest,
-			 AirConditioning.USER_INBOUND_PORT_URI,
-			 AirConditioning.INTERNAL_CONTROL_INBOUND_PORT_URI,
-			 AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI);
+				AirConditioning.USER_INBOUND_PORT_URI,
+				AirConditioning.INTERNAL_CONTROL_INBOUND_PORT_URI,
+				AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI);
 	}
 
 	/**
@@ -150,11 +148,11 @@ extends		AbstractComponent
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected			AirConditioningTester(
-		boolean isUnitTest,
-		String AirConditioningUserInboundPortURI,
-		String AirConditioningInternalControlInboundPortURI,
-		String AirConditioningExternalControlInboundPortURI
-		) throws Exception
+			boolean isUnitTest,
+			String AirConditioningUserInboundPortURI,
+			String AirConditioningInternalControlInboundPortURI,
+			String AirConditioningExternalControlInboundPortURI
+			) throws Exception
 	{
 		super(1, 1);
 		this.isUnitTest = isUnitTest;
@@ -183,18 +181,18 @@ extends		AbstractComponent
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected			AirConditioningTester(
-		boolean isUnitTest,
-		String reflectionInboundPortURI,
-		String AirConditioningUserInboundPortURI,
-		String AirConditioningInternalControlInboundPortURI,
-		String AirConditioningExternalControlInboundPortURI
-		) throws Exception
+			boolean isUnitTest,
+			String reflectionInboundPortURI,
+			String AirConditioningUserInboundPortURI,
+			String AirConditioningInternalControlInboundPortURI,
+			String AirConditioningExternalControlInboundPortURI
+			) throws Exception
 	{
 		super(reflectionInboundPortURI, 1, 1);
 		this.isUnitTest = isUnitTest;
 		this.initialise(AirConditioningUserInboundPortURI,
-						AirConditioningInternalControlInboundPortURI,
-						AirConditioningExternalControlInboundPortURI);
+				AirConditioningInternalControlInboundPortURI,
+				AirConditioningExternalControlInboundPortURI);
 	}
 
 	/**
@@ -215,25 +213,25 @@ extends		AbstractComponent
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected void		initialise(
-		String AirConditioningUserInboundPortURI,
-		String AirConditioningInternalControlInboundPortURI,
-		String AirConditioningExternalControlInboundPortURI
-		) throws Exception
+			String AirConditioningUserInboundPortURI,
+			String AirConditioningInternalControlInboundPortURI,
+			String AirConditioningExternalControlInboundPortURI
+			) throws Exception
 	{
 		this.AirConditioningUserInboundPortURI = AirConditioningUserInboundPortURI;
 		this.acop = new AirConditioningUserOutboundPort(this);
 		this.acop.publishPort();
 		this.AirConditioningInternalControlInboundPortURI =
-									AirConditioningInternalControlInboundPortURI;
+				AirConditioningInternalControlInboundPortURI;
 		this.acicop = new AirConditioningInternalControlOutboundPort(this);
 		this.acicop.publishPort();
 		this.AirConditioningExternalControlInboundPortURI =
-									AirConditioningExternalControlInboundPortURI;
+				AirConditioningExternalControlInboundPortURI;
 		this.acecop = new AirConditioningExternalControlOutboundPort(this);
 		this.acecop.publishPort();
 
-		this.tracer.get().setTitle("AirConditioning tester component");
-		this.tracer.get().setRelativePosition(0, 1);
+		this.tracer.get().setTitle("AirConditioning Tester component");
+		this.tracer.get().setRelativePosition(0, 2);
 		this.toggleTracing();		
 	}
 
@@ -259,7 +257,92 @@ extends		AbstractComponent
 		this.traceMessage("...testSwitchOnSwitchOff() done.\n");
 	}
 
-	protected void		testOn()
+	protected void		testTargetTemperature()
+	{
+		this.traceMessage("testTargetTemperature()...\n");
+		try {
+			this.acop.setTargetTemperature(10.0);
+			assertEquals(10.0, this.acop.getTargetTemperature());
+			this.acop.setTargetTemperature(AirConditioning.STANDARD_TARGET_TEMPERATURE);
+			assertEquals(AirConditioning.STANDARD_TARGET_TEMPERATURE, this.acop.getTargetTemperature());
+		} catch (Exception e) {
+			this.traceMessage("...KO.\n" + e);
+			assertTrue(false);
+		}
+		this.traceMessage("...testTargetTemperature() done.\n");
+
+	}
+
+	protected void		testCurrentTemperature()
+	{
+		this.traceMessage("testCurrentTemperature()...\n");
+		try {
+			this.acop.switchOn();
+			assertEquals(AirConditioning.FAKE_CURRENT_TEMPERATURE,
+					this.acop.getCurrentTemperature());
+			this.acop.switchOff();
+		} catch (Exception e) {
+			this.traceMessage("...KO.\n" + e);
+			assertTrue(false);
+		}
+		this.traceMessage("...testCurrentTemperature() done.\n");
+	}
+
+	protected void		testPowerLevel()
+	{
+		this.traceMessage("testPowerLevel()...\n");
+		try {
+			assertEquals(AirConditioning.MAX_POWER_LEVEL,
+					this.acop.getMaxPowerLevel());
+			this.acop.switchOn();
+			this.acop.setCurrentPowerLevel(AirConditioning.MAX_POWER_LEVEL/2.0);
+			assertEquals(AirConditioning.MAX_POWER_LEVEL/2.0, this.acop.getCurrentPowerLevel());
+			this.acop.switchOff();
+		} catch (Exception e) {
+			this.traceMessage("...KO.\n" + e);
+			assertTrue(false);
+		}
+		this.traceMessage("...testPowerLevel() done.\n");
+	}
+
+	protected void		testInternalControl()
+	{
+		this.traceMessage("testInternalControl()...\n");
+		try {
+			assertEquals(AirConditioning.STANDARD_TARGET_TEMPERATURE,
+					this.acicop.getTargetTemperature());
+			this.acop.switchOn();
+			assertEquals(true, this.acop.on());
+			assertEquals(AirConditioning.FAKE_CURRENT_TEMPERATURE,
+					this.acicop.getCurrentTemperature());
+			this.acicop.startCooling();
+			assertEquals(true, this.acicop.cooling());
+			this.acicop.stopCooling();
+			assertEquals(false, this.acicop.cooling());
+		} catch (Exception e) {
+			this.traceMessage("...KO.\n");
+			assertTrue(false);
+		}
+		this.traceMessage("...testInternalControl() done.\n");
+	}
+
+	protected void		testExternalControl()
+	{
+		this.traceMessage("testExternalControl()...\n");
+		try {
+			assertEquals(AirConditioning.MAX_POWER_LEVEL,
+					this.acecop.getMaxPowerLevel());
+			this.acecop.setCurrentPowerLevel(AirConditioning.MAX_POWER_LEVEL/2.0);
+			assertEquals(AirConditioning.MAX_POWER_LEVEL/2.0,
+					this.acecop.getCurrentPowerLevel());
+		} catch (Exception e) {
+			this.traceMessage("...KO.\n" + e);
+			assertTrue(false);
+		}
+		this.traceMessage("...testExternalControl() done.\n");
+	}
+
+	protected void testOn()
 	{
 		this.traceMessage("testOn()...\n");
 		try {
@@ -279,100 +362,22 @@ extends		AbstractComponent
 		this.traceMessage("...testOn() done.\n");
 	}
 
-	protected void		testTargetTemperature()
+	protected void		runAllTests() throws Exception
 	{
-		this.traceMessage("testTargetTemperature()...\n");
-		try {
-			this.acop.setTargetTemperature(10.0);
-			assertEquals(10.0, this.acop.getTargetTemperature());
-			this.acop.setTargetTemperature(AirConditioning.STANDARD_TARGET_TEMPERATURE);
-		} catch (Exception e) {
-			this.traceMessage("...KO.\n" + e);
-			assertTrue(false);
-		}
-		this.traceMessage("...testTargetTemperature() done.\n");
-
-	}
-
-	protected void		testCurrentTemperature()
-	{
-		this.traceMessage("testCurrentTemperature()...\n");
-		try {
-			this.acop.switchOn();
-			assertEquals(AirConditioning.FAKE_CURRENT_TEMPERATURE,
-						 this.acop.getCurrentTemperature());
-			this.acop.switchOff();
-		} catch (Exception e) {
-			this.traceMessage("...KO.\n" + e);
-			assertTrue(false);
-		}
-		this.traceMessage("...testCurrentTemperature() done.\n");
-	}
-
-	protected void		testPowerLevel()
-	{
-		this.traceMessage("testPowerLevel()...\n");
-		try {
-			assertEquals(AirConditioning.MAX_POWER_LEVEL,
-						 this.acop.getMaxPowerLevel());
-			this.acop.switchOn();
-			this.acop.setCurrentPowerLevel(AirConditioning.MAX_POWER_LEVEL/2.0);
-			assertEquals(AirConditioning.MAX_POWER_LEVEL/2.0,
-						 this.acop.getCurrentPowerLevel());
-			this.acop.switchOff();
-		} catch (Exception e) {
-			this.traceMessage("...KO.\n" + e);
-			assertTrue(false);
-		}
-		this.traceMessage("...testPowerLevel() done.\n");
-	}
-
-	protected void		testInternalControl()
-	{
-		this.traceMessage("testInternalControl()...\n");
-		try {
-			assertEquals(AirConditioning.STANDARD_TARGET_TEMPERATURE,
-						 this.acicop.getTargetTemperature());
-			this.acop.switchOn();
-			assertEquals(true, this.acop.on());
-			assertEquals(AirConditioning.FAKE_CURRENT_TEMPERATURE,
-						 this.acicop.getCurrentTemperature());
-			this.acicop.startCooling();
-			assertEquals(true, this.acicop.cooling());
-			this.acicop.stopCooling();
-			assertEquals(false, this.acicop.cooling());
-		} catch (Exception e) {
-			this.traceMessage("...KO.\n");
-			assertTrue(false);
-		}
-		this.traceMessage("...testInternalControl() done.\n");
-	}
-
-	protected void		testExternalControl()
-	{
-		this.traceMessage("testExternalControl()...\n");
-		try {
-			assertEquals(AirConditioning.MAX_POWER_LEVEL,
-						 this.acecop.getMaxPowerLevel());
-			this.acecop.setCurrentPowerLevel(AirConditioning.MAX_POWER_LEVEL/2.0);
-			assertEquals(AirConditioning.MAX_POWER_LEVEL/2.0,
-						 this.acecop.getCurrentPowerLevel());
-		} catch (Exception e) {
-			this.traceMessage("...KO.\n" + e);
-			assertTrue(false);
-		}
-		this.traceMessage("...testExternalControl() done.\n");
-	}
-
-	protected void		runAllTests()
-	{
+		this.acicop.printSeparator(" testSwitchOnSwitchOff() ");
 		this.testSwitchOnSwitchOff();
-		this.testOn();
+		this.acicop.printSeparator(" testTargetTemperature() ");
 		this.testTargetTemperature();
+		this.acicop.printSeparator(" testCurrentTemperature() ");
 		this.testCurrentTemperature();
+		this.acicop.printSeparator(" testPowerLevel() ");
 		this.testPowerLevel();
+		this.acicop.printSeparator(" testInternalControl() ");
 		this.testInternalControl();
+		this.acicop.printSeparator(" testExternalControl() ");
 		this.testExternalControl();
+		this.acicop.printSeparator(" testOn() ");
+		this.testOn();
 	}
 
 	// -------------------------------------------------------------------------
@@ -423,10 +428,10 @@ extends		AbstractComponent
 			System.out.println("AirConditioning tester gets the clock");
 			AcceleratedClock ac =
 					this.clocksServerOutboundPort.getClock(
-										CVMIntegrationTest.TEST_CLOCK_URI);
+							CVMIntegrationTest.TEST_CLOCK_URI);
 			System.out.println("AirConditioning tester waits until start");
 			this.doPortDisconnection(
-						this.clocksServerOutboundPort.getPortURI());
+					this.clocksServerOutboundPort.getPortURI());
 			this.clocksServerOutboundPort.unpublishPort();
 
 			Instant AirConditioningSwitchOn = Instant.parse("2023-09-20T15:00:02.00Z");

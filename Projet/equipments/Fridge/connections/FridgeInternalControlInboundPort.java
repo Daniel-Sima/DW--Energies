@@ -232,5 +232,17 @@ implements	FridgeInternalControlCI
 										return null;
 								});
 	}
+	
+	/***********************************************************************************/
+	/**
+	 * 
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		this.getOwner().handleRequest(
+				o -> { ((FridgeInternalControlI)o).printSeparator(title);
+						return null;
+				});
+	}
 }
 // -----------------------------------------------------------------------------

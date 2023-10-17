@@ -44,7 +44,7 @@ import fr.sorbonne_u.exceptions.PreconditionException;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>AirConditioning</code> a AirConditioning component.
+ * The class <code>AirConditioning</code> is a AirConditioning component.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -86,7 +86,7 @@ implements	AirConditioningUserImplI,
 	 * 
 	 * <p>Created on : 2021-09-10</p>
 	 * 
-	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
+	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
 	protected static enum	AirConditioningState
 	{
@@ -262,7 +262,7 @@ implements	AirConditioningUserImplI,
 
 		if (VERBOSE) {
 			this.tracer.get().setTitle("AirConditioning component");
-			this.tracer.get().setRelativePosition(1, 1);
+			this.tracer.get().setRelativePosition(1, 2);
 			this.toggleTracing();		
 		}
 	}
@@ -301,8 +301,6 @@ implements	AirConditioningUserImplI,
 			this.traceMessage("AirConditioning returns its state: " +
 											this.currentState + ".\n");
 		}
-		this.traceMessage(""+(this.currentState == AirConditioningState.ON ||
-				this.currentState == AirConditioningState.COOLING)+"\n");
 		
 		return this.currentState == AirConditioningState.ON ||
 									this.currentState == AirConditioningState.COOLING;
@@ -318,11 +316,11 @@ implements	AirConditioningUserImplI,
 			this.traceMessage("AirConditioning switches on.\n");
 		}
 
-		assert	!this.on() : new PreconditionException("!on()");
+		assert !(this.currentState == AirConditioningState.ON) : new PreconditionException("!(this.currentState == AirConditioningState.ON)");
 
 		this.currentState = AirConditioningState.ON;
 
-		assert	 this.on() : new PostconditionException("on()");
+		assert this.currentState == AirConditioningState.ON : new PostconditionException("this.currentState == AirConditioningState.ON");
 	}
 
 	/**
@@ -335,11 +333,11 @@ implements	AirConditioningUserImplI,
 			this.traceMessage("AirConditioning switches off.\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+		assert this.currentState == AirConditioningState.ON : new PreconditionException("this.currentState == AirConditioningState.ON");
 
 		this.currentState = AirConditioningState.OFF;
 
-		assert	 !this.on() : new PostconditionException("!on()");
+		assert !(this.currentState == AirConditioningState.ON) : new PostconditionException("!(this.currentState == AirConditioningState.ON)");
 	}
 
 	/**
@@ -349,8 +347,7 @@ implements	AirConditioningUserImplI,
 	public void			setTargetTemperature(double target) throws Exception
 	{
 		if (AirConditioning.VERBOSE) {
-			this.traceMessage("AirConditioning sets a new target "
-										+ "temperature: " + target + ".\n");
+			this.traceMessage("AirConditioning sets a new target temperature: " + target + "°.\n");
 		}
 
 		assert	target >= -50.0 && target <= 50.0 :
@@ -358,8 +355,8 @@ implements	AirConditioningUserImplI,
 
 		this.targetTemperature = target;
 
-		assert	this.getTargetTemperature() == target :
-				new PostconditionException("getTargetTemperature() == target");
+		assert	this.targetTemperature == target :
+				new PostconditionException("this.targetTemperature == target");
 	}
 
 	/**
@@ -369,8 +366,7 @@ implements	AirConditioningUserImplI,
 	public double		getTargetTemperature() throws Exception
 	{
 		if (AirConditioning.VERBOSE) {
-			this.traceMessage("AirConditioning returns its target"
-							+ " temperature " + this.targetTemperature + ".\n");
+			this.traceMessage("AirConditioning returns its target temperature " + this.targetTemperature + "°.\n");
 		}
 
 		double ret = this.targetTemperature;
@@ -387,13 +383,12 @@ implements	AirConditioningUserImplI,
 	@Override
 	public double		getCurrentTemperature() throws Exception
 	{
-		assert	this.on() : new PreconditionException("on()");
+		assert this.currentState == AirConditioningState.ON : new PreconditionException("this.currentState == AirConditioningState.ON");
 
 		// Temporary implementation; would need a temperature sensor.
 		double currentTemperature = FAKE_CURRENT_TEMPERATURE;
 		if (AirConditioning.VERBOSE) {
-			this.traceMessage("AirConditioning returns the current"
-							+ " temperature " + currentTemperature + ".\n");
+			this.traceMessage("AirConditioning returns the current temperature " + currentTemperature + "°.\n");
 		}
 
 		return  currentTemperature;
@@ -406,11 +401,9 @@ implements	AirConditioningUserImplI,
 	public boolean		cooling() throws Exception
 	{
 		if (AirConditioning.VERBOSE) {
-			this.traceMessage("AirConditioning returns its cooling status " + 
+			this.traceMessage("AirConditioning returns its cooling status: " + 
 						(this.currentState == AirConditioningState.COOLING) + ".\n");
 		}
-
-		assert	this.on() : new PreconditionException("on()");
 
 		return this.currentState == AirConditioningState.COOLING;
 	}
@@ -424,12 +417,12 @@ implements	AirConditioningUserImplI,
 		if (AirConditioning.VERBOSE) {
 			this.traceMessage("AirConditioning starts cooling.\n");
 		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	!this.cooling() : new PreconditionException("!cooling()");
+		assert this.currentState == AirConditioningState.ON  : new PreconditionException("this.currentState == AirConditioningState.ON ");
+		assert !(this.currentState == AirConditioningState.COOLING) : new PreconditionException("!(this.currentState == AirConditioningState.COOLING) ");
 
 		this.currentState = AirConditioningState.COOLING;
 
-		assert	this.cooling() : new PostconditionException("cooling()");
+		assert this.currentState == AirConditioningState.COOLING : new PostconditionException("this.currentState == AirConditioningState.COOLING;");
 	}
 
 	/**
@@ -439,14 +432,13 @@ implements	AirConditioningUserImplI,
 	public void			stopCooling() throws Exception
 	{
 		if (AirConditioning.VERBOSE) {
-			this.traceMessage("AirConditioning stops cooling.\\n");
+			this.traceMessage("AirConditioning stops cooling.\n");
 		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	this.cooling() : new PreconditionException("cooling()");
+		assert	this.currentState == AirConditioningState.COOLING : new PreconditionException("this.currentState == AirConditioningState.COOLING");
 
 		this.currentState = AirConditioningState.ON;
 
-		assert	!this.cooling() : new PostconditionException("!cooling()");
+		assert	!(this.currentState == AirConditioningState.COOLING) : new PostconditionException("!(this.currentState == AirConditioningState.COOLING)");
 	}
 
 	/**
@@ -457,7 +449,7 @@ implements	AirConditioningUserImplI,
 	{
 		if (AirConditioning.VERBOSE) {
 			this.traceMessage("AirConditioning returns its max power level " + 
-					MAX_POWER_LEVEL + ".\n");
+					MAX_POWER_LEVEL + "W.\n");
 		}
 
 		return MAX_POWER_LEVEL;
@@ -472,23 +464,22 @@ implements	AirConditioningUserImplI,
 	{
 		if (AirConditioning.VERBOSE) {
 			this.traceMessage("AirConditioning sets its power level to " + 
-														powerLevel + ".\n");
+														powerLevel + "W.\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+		assert	this.currentState == AirConditioningState.ON : new PreconditionException("this.currentState == AirConditioningState.ON");
 		assert	powerLevel >= 0.0 : new PreconditionException("powerLevel >= 0.0");
 
-		if (powerLevel <= getMaxPowerLevel()) {
+		if (powerLevel <= MAX_POWER_LEVEL) {
 			this.currentPowerLevel = powerLevel;
 		} else {
 			this.currentPowerLevel = MAX_POWER_LEVEL;
 		}
 
-		assert	powerLevel > getMaxPowerLevel() ||
-										getCurrentPowerLevel() == powerLevel :
+		assert	powerLevel > MAX_POWER_LEVEL || this.currentPowerLevel == powerLevel :
 				new PostconditionException(
-						"powerLevel > getMaxPowerLevel() || "
-						+ "getCurrentPowerLevel() == powerLevel");
+						"powerLevel > MAX_POWER_LEVEL || "
+						+ "this.currentPowerLevel  == powerLevel");
 	}
 
 	/**
@@ -499,18 +490,26 @@ implements	AirConditioningUserImplI,
 	{
 		if (AirConditioning.VERBOSE) {
 			this.traceMessage("AirConditioning returns its current power level " + 
-					this.currentPowerLevel + ".\n");
+					this.currentPowerLevel + "W.\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+		assert	this.currentState == AirConditioningState.ON : new PreconditionException("this.currentState == AirConditioningState.ON");
 
 		double ret = this.currentPowerLevel;
 
-		assert	ret >= 0.0 && ret <= getMaxPowerLevel() :
+		assert	ret >= 0.0 && ret <= MAX_POWER_LEVEL :
 				new PostconditionException(
-							"return >= 0.0 && return <= getMaxPowerLevel()");
+							"return >= 0.0 && return <= MAX_POWER_LEVEL");
 
 		return this.currentPowerLevel;
+	}
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	public void printSeparator(String title) throws Exception {
+		this.traceMessage("**********"+ title +"**********\n");
 	}
 }
 // -----------------------------------------------------------------------------

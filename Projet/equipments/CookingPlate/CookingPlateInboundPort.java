@@ -146,6 +146,18 @@ implements CookingPlateUserCI{
 					return null;
 				});
 	}
+	
+	/***********************************************************************************/
+	/**
+	 * 
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		this.getOwner().handleRequest(
+				o -> { ((CookingPlateImplementationI)o).printSeparator(title);
+						return null;
+				});
+	}
 }
 /***********************************************************************************/
 /***********************************************************************************/

@@ -3,6 +3,9 @@ package equipments.Lamp;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
+
+import java.util.HashMap;
+
 import equipments.Lamp.Lamp;
 import fr.sorbonne_u.exceptions.PreconditionException;
 
@@ -58,7 +61,7 @@ public class Lamp extends AbstractComponent implements LampImplementationI {
 	// -------------------------------------------------------------------------
 
 	/** URI of lamp inbound port used in tests. */
-	public static final String INBOUND_PORT_URI = "COOKING-PLATE-INBOUND-PORT-URI";
+	public static final String INBOUND_PORT_URI = "LAMP-INBOUND-PORT-URI";
 
 	/** when true, methods trace their actions. */
 	public static final boolean VERBOSE = true;
@@ -69,6 +72,8 @@ public class Lamp extends AbstractComponent implements LampImplementationI {
 	protected LampState currentState;
 	/** current mode of operation (1 to 3) of the cooking plate. */
 	protected LampMode currentMode;
+	/** map helping finding the percentage of the current mode*/
+	protected HashMap<LampMode, Integer> findMode;
 	/** inbound port offering the <code>LampCI</code> interface.		*/
 	protected LampInboundPort lip;
 
@@ -178,10 +183,14 @@ public class Lamp extends AbstractComponent implements LampImplementationI {
 		this.currentMode = INITIAL_MODE;
 		this.lip = new LampInboundPort(LampInboundPortURI, this);
 		this.lip.publishPort();
+		this.findMode = new HashMap<>();
+		this.findMode.put(LampMode.MODE_1, 10);
+		this.findMode.put(LampMode.MODE_2, 50);
+		this.findMode.put(LampMode.MODE_3, 100);
 
 		if (Lamp.VERBOSE) {
-			this.tracer.get().setTitle("lamp component");
-			this.tracer.get().setRelativePosition(1, 0);
+			this.tracer.get().setTitle("Lamp component");
+			this.tracer.get().setRelativePosition(3, 1);
 			this.toggleTracing();
 		}
 	}
@@ -226,7 +235,7 @@ public class Lamp extends AbstractComponent implements LampImplementationI {
 	{
 		if (Lamp.VERBOSE) {
 			this.traceMessage("Lamp returns its mode : " +
-													this.currentMode + ".\n");
+													this.currentMode + " (" + findMode.get(this.currentMode)+"%).\n");
 		}
 
 		return this.currentMode;
@@ -242,8 +251,8 @@ public class Lamp extends AbstractComponent implements LampImplementationI {
 			this.traceMessage("Lamp is turned on.\n");
 		}
 
-		assert	this.getState() == LampState.OFF :
-				new PreconditionException("getState() == LampState.OFF");
+		assert	this.currentState == LampState.OFF :
+				new PreconditionException("this.currentState == LampState.OFF");
 
 		this.currentState = LampState.ON;
 		this.currentMode = LampMode.MODE_1;
@@ -259,8 +268,8 @@ public class Lamp extends AbstractComponent implements LampImplementationI {
 			this.traceMessage("Lamp is turned off.\n");
 		}
 
-		assert	this.getState() == LampState.ON :
-				new PreconditionException("getState() == LampState.ON");
+		assert	this.currentState == LampState.ON :
+				new PreconditionException("this.currentStat == LampState.ON");
 
 		this.currentState = LampState.OFF;
 	}
@@ -268,19 +277,21 @@ public class Lamp extends AbstractComponent implements LampImplementationI {
 	@Override
 	public void increaseMode() throws Exception 
 	{
+		assert	this.currentMode != LampMode.MODE_3 : new PreconditionException("this.currentMode != LampMode.MODE_3");
+		
 		if (Lamp.VERBOSE) {
-			this.traceMessage("Lamp mode is increase.\n");
+			this.traceMessage("Lamp mode is increasing mode.\n");
 		}
 		
 		switch (this.currentMode) {
 		case MODE_1:
-			assert	this.getMode() == LampMode.MODE_1 :
-				new PreconditionException("getMode() == LampMode.MODE_1");
+			assert	this.currentMode == LampMode.MODE_1 :
+				new PreconditionException("this.currentMode== LampMode.MODE_1");
 			this.currentMode = LampMode.MODE_2;
 			break;
 		case MODE_2:
-			assert	this.getMode() == LampMode.MODE_2 :
-				new PreconditionException("getMode() == LampMode.MODE_2");
+			assert	this.currentMode == LampMode.MODE_2 :
+				new PreconditionException("this.currentMode == LampMode.MODE_2");
 			this.currentMode = LampMode.MODE_3;
 			break;
 		default:
@@ -291,27 +302,38 @@ public class Lamp extends AbstractComponent implements LampImplementationI {
 	@Override
 	public void decreaseMode() throws Exception 
 	{
+		assert	this.currentMode != LampMode.MODE_1 :
+			new PreconditionException("getMode() != LampMode.MODE_1");
+		
 		if (Lamp.VERBOSE) {
 			this.traceMessage("Lamp mode is decrease.\n");
 		}
 		
-		assert	this.getState() == LampState.ON :
+		assert	this.currentState == LampState.ON :
 			new PreconditionException("getState() == LampState.ON");
 		
 		switch (this.currentMode) {
 		case MODE_2:
-			assert	this.getMode() == LampMode.MODE_2 :
+			assert	this.currentMode == LampMode.MODE_2 :
 				new PreconditionException("getMode() == LampMode.MODE_2");
 			this.currentMode = LampMode.MODE_1;
 			break;
 		case MODE_3:
-			assert	this.getMode() == LampMode.MODE_3 :
+			assert	this.currentMode == LampMode.MODE_3 :
 				new PreconditionException("getMode() == LampMode.MODE_3");
 			this.currentMode = LampMode.MODE_2;
 			break;
 		default:
 			break;
 		}
+	}
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	public void printSeparator(String title) throws Exception {
+		this.traceMessage("**********"+ title +"**********\n");
 	}
 }
 /***********************************************************************************/

@@ -1,5 +1,6 @@
 package equipments.Lamp;
 
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -173,6 +174,18 @@ implements	LampUserCI
 						return null;
 				});
 		
+	}
+	
+	/***********************************************************************************/
+	/**
+	 * 
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		this.getOwner().handleRequest(
+				o -> { ((LampImplementationI)o).printSeparator(title);
+						return null;
+				});
 	}
 }
 // -----------------------------------------------------------------------------

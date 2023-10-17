@@ -98,19 +98,19 @@ extends		OfferedCI,
 	 * @see equipments.AirConditioning.AirConditioningUserAndExternalControlI#getMaxPowerLevel()
 	 */
 	@Override
-	public double		getMaxPowerLevel() throws Exception;
+	public double		getMaxPowerLevel() throws Exception; // TODO a mettre dans External ?
 
 	/**
 	 * @see equipments.AirConditioning.AirConditioningUserAndExternalControlI#setCurrentPowerLevel(double)
 	 */
 	@Override
-	public void			setCurrentPowerLevel(double powerLevel)
+	public void			setCurrentPowerLevel(double powerLevel) // TODO a mettre dans External ?
 	throws Exception;
 
 	/**
 	 * @see equipments.AirConditioning.AirConditioningUserAndExternalControlI#getCurrentPowerLevel()
 	 */
 	@Override
-	public double		getCurrentPowerLevel() throws Exception;
+	public double		getCurrentPowerLevel() throws Exception; // TODO a mettre dans External ?
 }
 // -----------------------------------------------------------------------------

@@ -77,6 +77,15 @@ implements	CookingPlateUserCI{
 	public void decreaseMode() throws Exception {
 		((CookingPlateUserCI)this.offering).decreaseMode();	
 	}
+
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		((CookingPlateUserCI)this.offering).printSeparator(title);
+	}
 }
 /***********************************************************************************/
 /***********************************************************************************/

@@ -57,6 +57,8 @@ implements CookingPlateImplementationI{
 	protected CookingPlateState currentState;
 	/** current mode of operation (1 (50°) to 7 (300°)) of the cooking plate.			*/
 	protected int currentMode;
+	/** number modes of the Cooking Plate */
+	protected int MAX_MODES;
 
 	/** inbound port offering the <code>CookingPlateUserCI</code> interface.		*/
 	protected CookingPlateInboundPort cookingPlateInboudPort;
@@ -155,13 +157,14 @@ implements CookingPlateImplementationI{
 		assert	!cookingPlateInboundPortURI.isEmpty() : new PreconditionException("!cookingPlateInboundPortURI.isEmpty()");
 
 		this.currentState = INITIAL_STATE;
-		this.currentMode = 0; // 50°
+		this.currentMode = 0; // 0°
+		this.MAX_MODES = 7;
 		this.cookingPlateInboudPort  = new CookingPlateInboundPort(cookingPlateInboundPortURI, this);
 		this.cookingPlateInboudPort.publishPort();
 
 		if (CookingPlate.VERBOSE) {
-			this.tracer.get().setTitle("Cooking plate component");
-			this.tracer.get().setRelativePosition(1, 0);
+			this.tracer.get().setTitle("CookingPlate component");
+			this.tracer.get().setRelativePosition(1, 1);
 			this.toggleTracing();
 		}
 	}
@@ -205,7 +208,7 @@ implements CookingPlateImplementationI{
 	@Override
 	public int getTemperature() throws Exception {
 		if (CookingPlate.VERBOSE) { 
-			this.traceMessage("Cooking plate returns its temperature : " + CookingPlateTemperature[this.currentMode] + " corresponding mode "+this.currentMode+".\n");
+			this.traceMessage("Cooking plate returns its temperature : " + CookingPlateTemperature[this.currentMode] + "° corresponding mode n°"+this.currentMode+".\n");
 		}
 
 		return CookingPlateTemperature[this.currentMode];
@@ -218,10 +221,10 @@ implements CookingPlateImplementationI{
 	@Override
 	public void turnOn() throws Exception {
 		if (CookingPlate.VERBOSE) {
-			this.traceMessage("Cooking plate is turned on.\n");
+			this.traceMessage("Cooking plate is turned ON.\n");
 		}
 
-		assert this.getState() == CookingPlateState.OFF : new PreconditionException("getState() == CookingPlateState.OFF");
+		assert this.currentState == CookingPlateState.OFF : new PreconditionException("this.currentState == CookingPlateState.OFF");
 
 		this.currentState = CookingPlateState.ON;
 		this.currentMode = 0;
@@ -234,10 +237,10 @@ implements CookingPlateImplementationI{
 	@Override
 	public void turnOff() throws Exception {
 		if (CookingPlate.VERBOSE) {
-			this.traceMessage("Cooking plate is turned off.\n");
+			this.traceMessage("Cooking plate is turned OFF.\n");
 		}
 
-		assert this.getState() == CookingPlateState.ON : new PreconditionException("getState() == CookingPlateState.ON");
+		assert this.currentState == CookingPlateState.ON : new PreconditionException("currentState == CookingPlateState.ON");
 
 		this.currentState = CookingPlateState.OFF;
 	}
@@ -248,14 +251,14 @@ implements CookingPlateImplementationI{
 	 */
 	@Override
 	public void increaseMode() throws Exception {
-		assert	this.getState() == CookingPlateState.ON :
-			new PreconditionException("getState() == CookingPlateState.ON");
+		assert	this.currentState == CookingPlateState.ON :
+			new PreconditionException("this.currentState == CookingPlateState.ON");
 		
-		assert this.currentMode < 6: new PreconditionException("this.currentMode < 6");
+		assert this.currentMode < MAX_MODES: new PreconditionException("this.currentMode < "+MAX_MODES);
 
 		int nextMode = this.currentMode+1; 
 		if (CookingPlate.VERBOSE) {
-			this.traceMessage("Cooking plate is increasing its mode from "+this.currentMode+" ("+CookingPlateTemperature[this.currentMode]+"°) to "+nextMode+" ("+CookingPlateTemperature[nextMode]+"°)"+"\n");
+			this.traceMessage("Cooking plate is increasing its mode from n°"+this.currentMode+" ("+CookingPlateTemperature[this.currentMode]+"°) to n°"+nextMode+" ("+CookingPlateTemperature[nextMode]+"°)"+"\n");
 		}
 
 		this.currentMode = nextMode; 
@@ -267,17 +270,24 @@ implements CookingPlateImplementationI{
 	 */
 	@Override
 	public void decreaseMode() throws Exception {
-		assert	this.getState() == CookingPlateState.ON : new PreconditionException("getState() == CookingPlateState.ON");
+		assert	this.currentState == CookingPlateState.ON : new PreconditionException("currentState == CookingPlateState.ON");
 
 		assert this.currentMode > 0: new PreconditionException("this.currentMode > 0");
 		
 		int nextMode = this.currentMode-1; 
 		if (CookingPlate.VERBOSE) {
-			this.traceMessage("Cooking plate is decrasing its mode from "+this.currentMode+" ("+CookingPlateTemperature[this.currentMode]+"°) to "+nextMode+" ("+CookingPlateTemperature[nextMode]+"°)"+"\n");
-
+			this.traceMessage("Cooking plate is decrasing its mode from n°"+this.currentMode+" ("+CookingPlateTemperature[this.currentMode]+"°) to n°"+nextMode+" ("+CookingPlateTemperature[nextMode]+"°)"+"\n");
 		}
 
 		this.currentMode = nextMode;
+	}
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	public void printSeparator(String title) throws Exception {
+		this.traceMessage("**********"+ title +"**********\n");
 	}
 }
 /***********************************************************************************/

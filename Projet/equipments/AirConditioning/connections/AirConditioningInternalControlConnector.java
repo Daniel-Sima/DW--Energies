@@ -108,5 +108,14 @@ implements	AirConditioningInternalControlCI
 	{
 		((AirConditioningInternalControlCI)this.offering).stopCooling();
 	}
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		((AirConditioningInternalControlCI)this.offering).printSeparator(title);
+	}
 }
 // -----------------------------------------------------------------------------

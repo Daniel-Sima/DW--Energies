@@ -1,5 +1,6 @@
 package equipments.Lamp;
 
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -93,14 +94,21 @@ implements	LampUserCI
 
 	@Override
 	public void increaseMode() throws Exception {
-		// TODO Auto-generated method stub
-		
+		((LampUserCI)this.offering).increaseMode();
 	}
 
 	@Override
 	public void decreaseMode() throws Exception {
-		// TODO Auto-generated method stub
-		
+		((LampUserCI)this.offering).decreaseMode();
+	}
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		((LampUserCI)this.offering).printSeparator(title);
 	}
 
 }

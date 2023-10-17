@@ -4,38 +4,6 @@ import equipments.Fridge.connections.FridgeExternalControlInboundPort;
 import equipments.Fridge.connections.FridgeInternalControlInboundPort;
 import equipments.Fridge.connections.FridgeUserInboundPort;
 
-// Copyright Jacques Malenfant, Sorbonne Universite.
-// Jacques.Malenfant@lip6.fr
-//
-// This software is a computer program whose purpose is to implement a mock-up
-// of household energy management system.
-//
-// This software is governed by the CeCILL-C license under French law and
-// abiding by the rules of distribution of free software.  You can use,
-// modify and/ or redistribute the software under the terms of the
-// CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
-// URL "http://www.cecill.info".
-//
-// As a counterpart to the access to the source code and  rights to copy,
-// modify and redistribute granted by the license, users are provided only
-// with a limited warranty  and the software's author,  the holder of the
-// economic rights,  and the successive licensors  have only  limited
-// liability. 
-//
-// In this respect, the user's attention is drawn to the risks associated
-// with loading,  using,  modifying and/or developing or reproducing the
-// software by the user in light of its specific status of free software,
-// that may mean  that it is complicated to manipulate,  and  that  also
-// therefore means  that it is reserved for developers  and  experienced
-// professionals having in-depth computer knowledge. Users are therefore
-// encouraged to load and test the software's suitability as regards their
-// requirements in conditions enabling the security of their systems and/or 
-// data to be ensured and,  more generally, to use and operate it in the 
-// same conditions as regards security. 
-//
-// The fact that you are presently reading this means that you have had
-// knowledge of the CeCILL-C license and that you accept its terms.
-
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
@@ -276,7 +244,7 @@ implements	FridgeUserImplI,
 		this.currentState = FridgeState.OFF;
 		this.currentPowerLevel = MAX_POWER_LEVEL;
 		this.targetCoolerTemperature = STANDARD_TARGET_COOLER_TEMPERATURE;
-		this.targetCoolerTemperature = STANDARD_TARGET_FREEZER_TEMPERATURE;
+		this.targetFreezerTemperature = STANDARD_TARGET_FREEZER_TEMPERATURE;
 
 		this.fip = new FridgeUserInboundPort(FridgeUserInboundPortURI, this);
 		this.fip.publishPort();
@@ -289,7 +257,7 @@ implements	FridgeUserImplI,
 
 		if (VERBOSE) {
 			this.tracer.get().setTitle("Fridge component");
-			this.tracer.get().setRelativePosition(1, 1);
+			this.tracer.get().setRelativePosition(3, 2);
 			this.toggleTracing();		
 		}
 	}
@@ -345,14 +313,14 @@ implements	FridgeUserImplI,
 	public void			switchOn() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge switches on.\n");
+			this.traceMessage("Fridge switches ON.\n");
 		}
 
-		assert	!this.on() : new PreconditionException("!on()");
+		assert	!(this.currentState == FridgeState.ON) : new PreconditionException("!(this.currentState == FridgeState.ON)");
 
 		this.currentState = FridgeState.ON;
 
-		assert	 this.on() : new PostconditionException("on()");
+		assert	 this.currentState == FridgeState.ON : new PostconditionException("this.currentState == FridgeState.ON");
 	}
 
 	/**
@@ -362,14 +330,14 @@ implements	FridgeUserImplI,
 	public void			switchOff() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge switches off.\n");
+			this.traceMessage("Fridge switches OFF.\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+		assert	this.currentState == FridgeState.ON : new PreconditionException("this.currentState == FridgeState.ON");
 
 		this.currentState = FridgeState.OFF;
 
-		assert	 !this.on() : new PostconditionException("!on()");
+		assert	 !(this.currentState == FridgeState.ON) : new PostconditionException("!(this.currentState == FridgeState.ON)");
 	}
 	
 	/**
@@ -379,8 +347,7 @@ implements	FridgeUserImplI,
 	public void	setTargetFreezerTemperature(double targetFreezer) throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge sets a new target "
-										+ "freezer temperature: " + targetFreezer + ".\n");
+			this.traceMessage("Fridge sets a new target freezer temperature: " + targetFreezer + "°.\n");
 		}
 
 		assert	targetFreezer >= -20.0 && targetFreezer <= 0.0 :
@@ -388,8 +355,8 @@ implements	FridgeUserImplI,
 
 		this.targetFreezerTemperature = targetFreezer;
 
-		assert	this.getTargetFreezerTemperature() == targetFreezer :
-				new PostconditionException("getTargetTemperature() == target");
+		assert	this.targetFreezerTemperature == targetFreezer :
+				new PostconditionException("this.targetFreezerTemperature == target");
 	}
 
 	/**
@@ -399,8 +366,7 @@ implements	FridgeUserImplI,
 	public double getTargetFreezerTemperature() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge returns its freezer target"
-							+ " temperature " + this.targetFreezerTemperature + ".\n");
+			this.traceMessage("Fridge returns its freezer target temperature " + this.targetFreezerTemperature + "°.\n");
 		}
 
 		double ret = this.targetFreezerTemperature;
@@ -422,8 +388,7 @@ implements	FridgeUserImplI,
 		// Temporary implementation; would need a temperature sensor.
 		double currentFreezerTemperature = FAKE_CURRENT_FREEZER_TEMPERATURE;
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge returns the current"
-							+ " freezer temperature " + currentFreezerTemperature + ".\n");
+			this.traceMessage("Fridge returns the current freezer temperature " + currentFreezerTemperature + "°.\n");
 		}
 
 		return  currentFreezerTemperature;
@@ -436,8 +401,7 @@ implements	FridgeUserImplI,
 	public void	setTargetCoolerTemperature(double targetCooler) throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge sets a new target "
-										+ "cooler temperature: " + targetCooler + ".\n");
+			this.traceMessage("Fridge sets a new target cooler temperature: " + targetCooler + "°.\n");
 		}
 
 		assert	targetCooler >= 0.0 && targetCooler <= 15.0 :
@@ -445,8 +409,8 @@ implements	FridgeUserImplI,
 
 		this.targetCoolerTemperature = targetCooler;
 
-		assert	this.getTargetCoolerTemperature() == targetCooler :
-				new PostconditionException("getTargetTemperature() == target");
+		assert	this.targetCoolerTemperature == targetCooler :
+				new PostconditionException("this.targetCoolerTemperature == target");
 	}
 
 	/**
@@ -456,8 +420,7 @@ implements	FridgeUserImplI,
 	public double getTargetCoolerTemperature() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge returns its cooler target"
-							+ " temperature " + this.targetCoolerTemperature + ".\n");
+			this.traceMessage("Fridge returns its cooler target temperature " + this.targetCoolerTemperature + "°.\n");
 		}
 
 		double ret = this.targetCoolerTemperature;
@@ -474,13 +437,12 @@ implements	FridgeUserImplI,
 	@Override
 	public double		getCurrentCoolerTemperature() throws Exception
 	{
-		assert	this.on() : new PreconditionException("on()");
+		assert	this.currentState == FridgeState.ON : new PreconditionException("this.currentState == FridgeState.ON");
 
 		// Temporary implementation; would need a temperature sensor.
 		double currentCoolerTemperature = FAKE_CURRENT_COOLER_TEMPERATURE;
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge returns the current"
-							+ " cooler temperature " + currentCoolerTemperature + ".\n");
+			this.traceMessage("Fridge returns the current cooler temperature " + currentCoolerTemperature + "°.\n");
 		}
 
 		return  currentCoolerTemperature;
@@ -493,11 +455,11 @@ implements	FridgeUserImplI,
 	public boolean		coolingCooler() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Cooler returns its cooling status " + 
+			this.traceMessage("Cooler returns its cooling status: " + 
 						(this.currentState == FridgeState.COOLER_COOLING) + ".\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+		assert	this.currentState == FridgeState.ON : new PreconditionException("this.currentState == FridgeState.ON");
 
 		return this.currentState == FridgeState.COOLER_COOLING;
 	}
@@ -509,11 +471,11 @@ implements	FridgeUserImplI,
 	public boolean		coolingFreezer() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Freezer returns its cooling status " + 
+			this.traceMessage("Freezer returns its cooling status: " + 
 						(this.currentState == FridgeState.FREEZER_COOLING) + ".\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+		assert	this.currentState == FridgeState.ON : new PreconditionException("this.currentState == FridgeState.ON");
 
 		return this.currentState == FridgeState.FREEZER_COOLING;
 	}
@@ -528,12 +490,12 @@ implements	FridgeUserImplI,
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge cooler starts cooling.\n");
 		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	!this.coolingCooler() : new PreconditionException("!coolingCooler()");
+		assert	this.currentState == FridgeState.ON : new PreconditionException("this.currentState == FridgeState.ON");
+		assert	!(this.currentState == FridgeState.COOLER_COOLING) : new PreconditionException("!(this.currentState == FridgeState.COOLER_COOLING)");
 
 		this.currentState = FridgeState.COOLER_COOLING;
 
-		assert	this.coolingCooler() : new PostconditionException("coolingCooler()");
+		assert	this.currentState == FridgeState.COOLER_COOLING : new PostconditionException("this.currentState == FridgeState.COOLER_COOLING");
 	}
 
 	/**
@@ -543,14 +505,14 @@ implements	FridgeUserImplI,
 	public void			stopCoolingCooler() throws Exception
 	{
 		if (Fridge.VERBOSE) {
-			this.traceMessage("Fridge cooler stops cooling.\\n");
+			this.traceMessage("Fridge cooler stops cooling.\n");
 		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	this.coolingCooler() : new PreconditionException("coolingCooler()");
+		assert	this.currentState == FridgeState.ON : new PreconditionException("this.currentState == FridgeState.ON");
+		assert	this.currentState == FridgeState.COOLER_COOLING  : new PreconditionException("this.currentState == FridgeState.COOLER_COOLING ");
 
 		this.currentState = FridgeState.ON;
 
-		assert	!this.coolingCooler() : new PostconditionException("!coolingCooler()");
+		assert	!(this.currentState == FridgeState.COOLER_COOLING ) : new PostconditionException("!(this.currentState == FridgeState.COOLER_COOLING )");
 	}
 	
 	/**
@@ -562,12 +524,12 @@ implements	FridgeUserImplI,
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge freezer starts cooling.\n");
 		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	!this.coolingFreezer() : new PreconditionException("!coolingFreezer()");
+		assert	this.currentState == FridgeState.ON : new PreconditionException("this.currentState == FridgeState.ON");
+		assert	!(this.currentState == FridgeState.FREEZER_COOLING) : new PreconditionException("!(this.currentState == FridgeState.FREEZER_COOLING)");
 
 		this.currentState = FridgeState.FREEZER_COOLING;
 
-		assert	this.coolingFreezer() : new PostconditionException("coolingFreezer()");
+		assert	this.currentState == FridgeState.FREEZER_COOLING : new PostconditionException("this.currentState == FridgeState.FREEZER_COOLING");
 	}
 
 	/**
@@ -579,12 +541,12 @@ implements	FridgeUserImplI,
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge Freezer stops cooling.\\n");
 		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	this.coolingFreezer() : new PreconditionException("coolingFreezer()");
-
+		assert	this.currentState == FridgeState.ON : new PreconditionException("this.currentState == FridgeState.ON");
+		assert	this.currentState == FridgeState.FREEZER_COOLING : new PreconditionException("coolingFreezer()this.currentState == FridgeState.FREEZER_COOLING");
+		
 		this.currentState = FridgeState.ON;
 
-		assert	!this.coolingFreezer() : new PostconditionException("!coolingFreezer()");
+		assert	!(this.currentState == FridgeState.FREEZER_COOLING) : new PostconditionException("!(this.currentState == FridgeState.FREEZER_COOLING)");
 	}
 
 	/**
@@ -595,7 +557,7 @@ implements	FridgeUserImplI,
 	{
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge returns its max power level " + 
-					MAX_POWER_LEVEL + ".\n");
+					MAX_POWER_LEVEL + "W.\n");
 		}
 
 		return MAX_POWER_LEVEL;
@@ -610,23 +572,23 @@ implements	FridgeUserImplI,
 	{
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge sets its power level to " + 
-														powerLevel + ".\n");
+														powerLevel + "W.\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+		assert	this.currentState == FridgeState.ON : new PreconditionException("this.currentState == FridgeState.ON");
 		assert	powerLevel >= 0.0 : new PreconditionException("powerLevel >= 0.0");
 
-		if (powerLevel <= getMaxPowerLevel()) {
+		if (powerLevel <= MAX_POWER_LEVEL) {
 			this.currentPowerLevel = powerLevel;
 		} else {
 			this.currentPowerLevel = MAX_POWER_LEVEL;
 		}
 
-		assert	powerLevel > getMaxPowerLevel() ||
-										getCurrentPowerLevel() == powerLevel :
+		assert	powerLevel > MAX_POWER_LEVEL ||
+										this.currentPowerLevel == powerLevel :
 				new PostconditionException(
-						"powerLevel > getMaxPowerLevel() || "
-						+ "getCurrentPowerLevel() == powerLevel");
+						"powerLevel > MAX_POWER_LEVEL || "
+						+ "this.currentPowerLevel == powerLevel");
 	}
 
 	/**
@@ -637,18 +599,26 @@ implements	FridgeUserImplI,
 	{
 		if (Fridge.VERBOSE) {
 			this.traceMessage("Fridge returns its current power level " + 
-					this.currentPowerLevel + ".\n");
+					this.currentPowerLevel + "W.\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+		assert	this.currentState == FridgeState.ON : new PreconditionException("on()");
 
 		double ret = this.currentPowerLevel;
 
-		assert	ret >= 0.0 && ret <= getMaxPowerLevel() :
+		assert	ret >= 0.0 && ret <= MAX_POWER_LEVEL :
 				new PostconditionException(
-							"return >= 0.0 && return <= getMaxPowerLevel()");
+							"return >= 0.0 && return <= MAX_POWER_LEVEL");
 
 		return this.currentPowerLevel;
+	}
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	public void printSeparator(String title) throws Exception {
+		this.traceMessage("**********"+ title +"**********\n");
 	}
 }
 // -----------------------------------------------------------------------------

@@ -89,5 +89,11 @@ extends		OfferedCI,
 	 */
 	@Override
 	public void			stopCooling() throws Exception;
+	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	public void printSeparator(String title) throws Exception;
 }
 // -----------------------------------------------------------------------------

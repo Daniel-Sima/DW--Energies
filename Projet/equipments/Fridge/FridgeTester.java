@@ -233,7 +233,7 @@ extends		AbstractComponent
 		this.acecop.publishPort();
 
 		this.tracer.get().setTitle("Fridge tester component");
-		this.tracer.get().setRelativePosition(0, 1);
+		this.tracer.get().setRelativePosition(2, 2);
 		this.toggleTracing();		
 	}
 
@@ -418,17 +418,27 @@ extends		AbstractComponent
 		this.traceMessage("...testExternalControl() done.\n");
 	}
 
-	protected void		runAllTests()
+	protected void		runAllTests() throws Exception
 	{
+		this.acicop.printSeparator(" testSwitchOnSwitchOff() ");
 		this.testSwitchOnSwitchOff();
+		this.acicop.printSeparator(" testOn() ");
 		this.testOn();
+		this.acicop.printSeparator(" testTargetCoolerTemperature() ");
 		this.testTargetCoolerTemperature();
+		this.acicop.printSeparator(" testCurrentCoolerTemperature() ");
 		this.testCurrentCoolerTemperature();
+		this.acicop.printSeparator(" testTargetFreezerTemperature() ");
 		this.testTargetFreezerTemperature();
+		this.acicop.printSeparator(" testCurrentFreezerTemperature() ");
 		this.testCurrentFreezerTemperature();
+		this.acicop.printSeparator(" testPowerLevel() ");
 		this.testPowerLevel();
+		this.acicop.printSeparator(" testInternalControlForCooler() ");
 		this.testInternalControlForCooler();
+		this.acicop.printSeparator(" testInternalControlForFreezer() ");
 		this.testInternalControlForFreezer();
+		this.acicop.printSeparator(" testExternalControl() ");
 		this.testExternalControl();
 	}
 

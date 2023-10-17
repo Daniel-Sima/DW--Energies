@@ -112,5 +112,11 @@ extends		FridgeUserAndControlI
 	 */
 	void stopCoolingCooler() throws Exception;
 	
+	/***********************************************************************************/
+	/**
+	 * This functions prints a separator for better visualization of the traces.
+	 */
+	public void printSeparator(String title) throws Exception;
+	
 }
 // -----------------------------------------------------------------------------

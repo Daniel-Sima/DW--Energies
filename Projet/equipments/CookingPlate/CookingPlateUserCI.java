@@ -25,25 +25,53 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
  */
 public interface CookingPlateUserCI 
 extends OfferedCI, RequiredCI, CookingPlateImplementationI{
-	
-	// TODO voir pour les @see
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
 	@Override
 	public CookingPlateState getState() throws Exception;
 	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
 	@Override
 	public int	getTemperature() throws Exception;
 	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
 	@Override
 	public void turnOn() throws Exception;
 	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
 	@Override
 	public void	turnOff() throws Exception;
 	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
 	@Override
 	public void	increaseMode() throws Exception;
 	
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
 	@Override
 	public void	decreaseMode() throws Exception;
+
+	/***********************************************************************************/
+	/**
+	 * @see
+	 */
+	public void printSeparator(String title) throws Exception;
 }
 /***********************************************************************************/
 /***********************************************************************************/

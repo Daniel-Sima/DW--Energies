@@ -147,5 +147,17 @@ implements	AirConditioningInternalControlCI
 										return null;
 								});
 	}
+	
+	/***********************************************************************************/
+	/**
+	 * 
+	 */
+	@Override
+	public void printSeparator(String title) throws Exception {
+		this.getOwner().handleRequest(
+				o -> { ((AirConditioningInternalControlI)o).printSeparator(title);
+						return null;
+				});
+	}
 }
 // -----------------------------------------------------------------------------
