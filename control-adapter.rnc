@@ -81,7 +81,7 @@ name = attribute name { xsd:NMTOKEN }
 
 # Relate operations in the required interface to the corresponding operations
 # in the offered one
-operations =
+operations = 
   internal*,           # internal auxiliary methods
   maxMode,             # number of modes
   upMode,              # forcing the equipment to the next more consuming mode

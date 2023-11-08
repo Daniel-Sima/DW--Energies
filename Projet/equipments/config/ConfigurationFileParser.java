@@ -37,7 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Set;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -91,8 +91,7 @@ public class			ConfigurationFileParser
 {
 	/** standard file name for the schema file used to validate the
 	 *  XML configuration file.												*/
-	public static String	SCHEMA_FILENAME = "config" + File.separatorChar +
-			"control-adapter.rnc" ;
+	public static String	SCHEMA_FILENAME = "control-adapter.rnc" ;
 	/** the XML document builder used to parse the configuration file.		*/
 	protected DocumentBuilder db ;
 
@@ -195,15 +194,18 @@ public class			ConfigurationFileParser
 	public ConfigurationParameters	parseConfigurationFile(File configFile)
 			throws	ConfigurationException, XPathExpressionException
 	{
-		long			identificationUid = -1;
-		ArrayList<String>		identificationOffered = new ArrayList<String>();
+		String			identificationUid = null;
+		String			identificationOffered = null;
 		double			consumptionMin = -1;
 		double			consumptionNominal = -1;
 		double			consumptionMax = -1;
 		String			required = null;
 		ArrayList<InstanceVar>	instanceVars = new ArrayList<InstanceVar>();
-		ArrayList<Operation>		operations = new ArrayList<Operation>();
+		ArrayList<Operation>	operations = new ArrayList<Operation>();
 		Internal		internal = null;
+		String 			thrownException = null;
+		String 			equipmentRef = null;
+		String 			body = null;
 
 		Document doc = null;
 		try {
@@ -219,45 +221,19 @@ public class			ConfigurationFileParser
 
 		XPath xpathEvaluator = XPathFactory.newInstance().newXPath();
 
-		Node identificationNode;
+		Node controlAdapterNode;
 		try {
-			identificationNode = ((Node)xpathEvaluator.evaluate(
-					"/control-adapter/identification",
+			controlAdapterNode = ((Node)xpathEvaluator.evaluate(
+					"control-adapter",
 					doc,
 					XPathConstants.NODE));
 		} catch (XPathExpressionException e) {
 			throw new ConfigurationException(
 					"error fetching the identification node", e) ;
 		}
-
-		if (identificationNode != null) {
-			try {
-				identificationUid =
-						Long.parseLong(((Node)xpathEvaluator.evaluate(
-								"@uid",
-								identificationNode,
-								XPathConstants.NODE)).getNodeValue());
-			} catch (DOMException e) {
-				throw new ConfigurationException(
-						"node access error for the identification uid node",
-						e) ;
-			} catch (XPathExpressionException e) {
-				throw new ConfigurationException(
-						"error fetching the identification uid node", e) ;
-			}
-			NodeList offeredList = doc.getElementsByTagName("offered");
-			for (int i = 0; i < offeredList.getLength(); i++) {
-				Node offered = (Node) offeredList.item(i);
-
-				try {
-					identificationOffered.add(offered.getNodeValue());
-				} catch (DOMException e) {
-					throw new ConfigurationException(
-							"node access error for the identification offered node",
-							e) ;
-				}
-			}
-		}
+		
+		identificationUid = controlAdapterNode.getAttributes().item(1).getNodeValue();
+		identificationOffered = controlAdapterNode.getAttributes().item(0).getNodeValue();
 
 		Node consumptionNode;
 		try{
@@ -269,51 +245,10 @@ public class			ConfigurationFileParser
 			throw new ConfigurationException(
 					"error fetching the consumption node", e) ;
 		}
-
-		if (consumptionNode != null) {
-			try {
-				consumptionMin =
-						Double.parseDouble(((Node)xpathEvaluator.evaluate(
-								"@consumptionMin",
-								consumptionNode,
-								XPathConstants.NODE)).getNodeValue());
-			} catch (DOMException e) {
-				throw new ConfigurationException(
-						"node access error for the consumption min node",
-						e) ;
-			} catch (XPathExpressionException e) {
-				throw new ConfigurationException(
-						"error fetching the consumption min node", e) ;
-			}
-			try {
-				consumptionNominal =
-						Double.parseDouble(((Node)xpathEvaluator.evaluate(
-								"@consumptionNominal",
-								consumptionNode,
-								XPathConstants.NODE)).getNodeValue());
-			} catch (DOMException e) {
-				throw new ConfigurationException(
-						"node access error for the consumption nominal node",
-						e) ;
-			} catch (XPathExpressionException e) {
-				throw new ConfigurationException(
-						"error fetching the consumption nominal node", e) ;
-			}
-			try {
-				consumptionMax =
-						Double.parseDouble(((Node)xpathEvaluator.evaluate(
-								"@consumptionMax",
-								consumptionNode,
-								XPathConstants.NODE)).getNodeValue());
-			} catch (DOMException e) {
-				throw new ConfigurationException(
-						"node access error for the consumption max node",
-						e) ;
-			} catch (XPathExpressionException e) {
-				throw new ConfigurationException(
-						"error fetching the consumption max node", e) ;
-			}
-		}
+		consumptionMin = Double.parseDouble(consumptionNode.getAttributes().item(1).getNodeValue());
+		consumptionNominal = Double.parseDouble(consumptionNode.getAttributes().item(2).getNodeValue());
+		consumptionMax = Double.parseDouble(consumptionNode.getAttributes().item(0).getNodeValue());
+		
 
 		try{
 			required = ((Node)xpathEvaluator.evaluate(
@@ -382,15 +317,15 @@ public class			ConfigurationFileParser
 			}
 			instanceVars.add(new InstanceVar(modifiers, type, name, staticInit));
 		}
+//		for(int i=0;i<instanceVars.size();i++)
+//			System.out.println(instanceVars.get(i).modifiers + " " + instanceVars.get(i).type + " " +instanceVars.get(i).name+ " = " + instanceVars.get(i).staticInit);
 
 		Node internalNode;
 		String internalModifiers = null;
 		String internalType = null;
 		String internalName = null;
-		ArrayList<Parameter> internalParameters = new ArrayList<Parameter>();
-		String thrownException = null;
-		String equipmentRef = null;
-		String body = null;
+		Parameter internalParameter = null;
+		
 		try{
 			internalNode = ((Node)xpathEvaluator.evaluate(
 					"/control-adapter/internal",
@@ -440,46 +375,27 @@ public class			ConfigurationFileParser
 				throw new ConfigurationException(
 						"error fetching the internal name node", e) ;
 			}
-			for(int h=0; h<internalNode.getAttributes().getLength(); h++) {
-				if(internalNode.getAttributes().item(h).getNodeValue() == "parameter") {
-					Node parameterNode = internalNode.getAttributes().item(h);
-					String name = null;
-					String type = null;
-					try {
-						name = ((Node)xpathEvaluator.evaluate(
-								"@type",
-								parameterNode,
-								XPathConstants.NODE)).getNodeValue();
-					} catch (DOMException e) {
-						throw new ConfigurationException(
-								"node access error for the parameter type of the operation",
-								e) ;
-					} catch (XPathExpressionException e) {
-						throw new ConfigurationException(
-								"error fetching the parameter type of the operation", e) ;
-					}
-					try {
-						name = ((Node)xpathEvaluator.evaluate(
-								"@name",
-								parameterNode,
-								XPathConstants.NODE)).getNodeValue();
-					} catch (DOMException e) {
-						throw new ConfigurationException(
-								"node access error for the parameter name of the operation",
-								e) ;
-					} catch (XPathExpressionException e) {
-						throw new ConfigurationException(
-								"error fetching the parameter name of the operation", e) ;
-					}
-					internalParameters.add(new Parameter(type,name));
-				} 
-			}
-			try {
-				Node thrownNode = ((Node)xpathEvaluator.evaluate(
-						"@thrown",
+			Node parameterNode;
+			try{
+				parameterNode = ((Node)xpathEvaluator.evaluate(
+						"parameter",
 						internalNode,
 						XPathConstants.NODE));
-				thrownException = thrownNode.getNodeValue();
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the internal node", e) ;
+			}
+			String name = parameterNode.getAttributes().item(0).getNodeValue();
+			String type = parameterNode.getAttributes().item(1).getNodeValue();
+			internalParameter = new Parameter(type,name);
+
+			Node thrownNode;
+			try {
+				thrownNode = ((Node)xpathEvaluator.evaluate(
+						"thrown",
+						internalNode,
+						XPathConstants.NODE));
+				thrownException = thrownNode.getTextContent();
 			} catch (DOMException e) {
 				throw new ConfigurationException(
 						"node access error for the thrown node",
@@ -488,9 +404,11 @@ public class			ConfigurationFileParser
 				throw new ConfigurationException(
 						"error fetching the thrown node", e) ;
 			}
+			
+			Node bodyNode;
 			try {
-				Node bodyNode = ((Node)xpathEvaluator.evaluate(
-						"@body",
+				bodyNode = ((Node)xpathEvaluator.evaluate(
+						"body",
 						internalNode,
 						XPathConstants.NODE));
 				try {
@@ -498,7 +416,7 @@ public class			ConfigurationFileParser
 							"@equipmentRef",
 							bodyNode,
 							XPathConstants.NODE)).getNodeValue());
-					body = bodyNode.getNodeValue();
+					body = bodyNode.getTextContent();
 				} catch (DOMException e) {
 					throw new ConfigurationException(
 							"node access error for the equipmentRef inside internal body node",
@@ -518,11 +436,14 @@ public class			ConfigurationFileParser
 			internal = new Internal(internalModifiers, 
 					internalType, 
 					internalName,
-					internalParameters,
-					new Body(equipmentRef, thrownException, body));
+					internalParameter,
+					thrownException,
+					equipmentRef,
+					body);
 		}
-
-		/*
+		
+		//System.out.println(internal.equipmentRef);
+		
 		Node maxModeNode;
 		try{
 			maxModeNode = ((Node)xpathEvaluator.evaluate(
@@ -534,12 +455,12 @@ public class			ConfigurationFileParser
 					"error fetching the maxMode node", e) ;
 		}
 		if (maxModeNode != null) {
+			String maxModeBody;
 			try {
-				String text = ((Node)xpathEvaluator.evaluate(
-						"@body",
-						maxModeNode,
-						XPathConstants.NODE)).getNodeValue();
-				maxMode = new Operation("maxMode",null,new Body(null,null,text));
+				maxModeBody = ((Node)xpathEvaluator.evaluate(
+								"body",
+								maxModeNode,
+								XPathConstants.NODE)).getTextContent();
 			} catch (DOMException e) {
 				throw new ConfigurationException(
 						"node access error for maxMode body node",
@@ -548,80 +469,303 @@ public class			ConfigurationFileParser
 				throw new ConfigurationException(
 						"error fetching the maxMode body node", e) ;
 			}
+			 operations.add(new Operation("maxMode","int",null,new Body(null,null,maxModeBody)));
 		}
-		 */
-
-		NodeList operationList;
+		//System.out.println(operations.get("maxMode"));
+		
+		Node upModeNode;
 		try{
-			operationList = ((Node)xpathEvaluator.evaluate(
-					"/control-adapter/operations",
+			upModeNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/upMode",
 					doc,
-					XPathConstants.NODE)).getChildNodes();
+					XPathConstants.NODE));
 		} catch (XPathExpressionException e) {
 			throw new ConfigurationException(
-					"error fetching the operations node", e) ;
+					"error fetching the upMode node", e) ;
 		}
-		for (int i = 0; i < operationList.getLength(); i++) {
-			Node operation = (Node) operationList.item(i);
-			String 		opName = null;
-			ArrayList<Parameter> opParameters = new ArrayList<Parameter>();
-			Body		opBody = null;
-			if(operation.getAttributes() != null) {
+		if (upModeNode != null) {
+			String upModeBody;
+			try {
+				upModeBody = ((Node)xpathEvaluator.evaluate(
+								"body",
+								upModeNode,
+								XPathConstants.NODE)).getTextContent();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for upMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the upMode body node", e) ;
+			}
+			 operations.add(new Operation("upMode","boolean",null,new Body(null,null,upModeBody)));
+		}
+		//System.out.println(operations.get("upMode"));
+
+		Node downModeNode;
+		try{
+			downModeNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/downMode",
+					doc,
+					XPathConstants.NODE));
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the downMode node", e) ;
+		}
+		if (downModeNode != null) {
+			String downModeBody;
+			try {
+				downModeBody = ((Node)xpathEvaluator.evaluate(
+								"body",
+								downModeNode,
+								XPathConstants.NODE)).getTextContent();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for downMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the downMode body node", e) ;
+			}
+			 operations.add(new Operation("downMode","boolean",null,new Body(null,null,downModeBody)));
+		}
+		//System.out.println(operations.get("downMode"));
+		
+		Node setModeNode;
+		try{
+			setModeNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/setMode",
+					doc,
+					XPathConstants.NODE));
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the setMode node", e) ;
+		}
+		if (setModeNode != null) {
+			String setModeBody;
+			Parameter opParameter;
+			try {
+				opParameter = 
+					new Parameter(
+						((Node)xpathEvaluator.evaluate
+							("parameter",setModeNode,
+								XPathConstants.NODE)).getAttributes().item(1).getNodeValue(),
+						((Node)xpathEvaluator.evaluate
+							("parameter",setModeNode,
+								XPathConstants.NODE)).getAttributes().item(0).getNodeValue());
+								
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for setMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the setMode body node", e) ;
+			}
+			try {
+				setModeBody = ((Node)xpathEvaluator.evaluate(
+								"body",
+								setModeNode,
+								XPathConstants.NODE)).getTextContent();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for setMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the setMode body node", e) ;
+			}
+			 operations.add(new Operation("setMode","boolean", opParameter ,new Body(null,null,setModeBody)));
+		}
+		//System.out.println(operations.get("setMode"));
+		
+		Node currentModeNode;
+		try{
+			currentModeNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/currentMode",
+					doc,
+					XPathConstants.NODE));
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the currentMode node", e) ;
+		}
+		if (currentModeNode != null) {
+			String currentModeBody;
+			try {
+				currentModeBody = ((Node)xpathEvaluator.evaluate(
+								"body",
+								currentModeNode,
+								XPathConstants.NODE)).getTextContent();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for currentMode body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the currentMode body node", e) ;
+			}
+			 operations.add(new Operation("currentMode","int",null,new Body(null,null,currentModeBody)));
+		}
+		//System.out.println(operations.get("currentMode"));
+		
+		Node suspendedNode;
+		try{
+			suspendedNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/suspended",
+					doc,
+					XPathConstants.NODE));
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the suspended node", e) ;
+		}
+		if (suspendedNode != null) {
+			String suspendedBody;
+			try {
+				suspendedBody = ((Node)xpathEvaluator.evaluate(
+								"body",
+								suspendedNode,
+								XPathConstants.NODE)).getTextContent();
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for suspended body node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the suspended body node", e) ;
+			}
+			 operations.add(new Operation("suspended","boolean",null,new Body(null,null,suspendedBody)));
+		}
+		//System.out.println(operations.get("suspended"));
+		
+		Node suspendNode;
+		try{
+			suspendNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/suspend",
+					doc,
+					XPathConstants.NODE));
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the suspend node", e) ;
+		}
+		if (suspendNode != null) {
+			Node bodyNode;
+			try {
+				bodyNode = ((Node)xpathEvaluator.evaluate(
+						"body",
+						suspendNode,
+						XPathConstants.NODE));
 				try {
-					opName = operation.getNodeValue();
+					equipmentRef = (((Node)xpathEvaluator.evaluate(
+							"@equipmentRef",
+							bodyNode,
+							XPathConstants.NODE)).getNodeValue());
+					body = bodyNode.getTextContent();
 				} catch (DOMException e) {
 					throw new ConfigurationException(
-							"node access error for node (operation) name", e) ;
+							"node access error for the equipmentRef inside suspend body node",
+							e) ;
+				} catch (XPathExpressionException e) {
+					throw new ConfigurationException(
+							"error fetching the equipmentRef inside suspend body node", e) ;
 				}
-				for(int h=0; h<operation.getAttributes().getLength(); h++) {
-					if(operation.getAttributes().item(h).getNodeValue() == "parameter") {
-						Node parameterNode = operation.getAttributes().item(h);
-						String name = null;
-						String type = null;
-						try {
-							name = ((Node)xpathEvaluator.evaluate(
-									"@type",
-									parameterNode,
-									XPathConstants.NODE)).getNodeValue();
-						} catch (DOMException e) {
-							throw new ConfigurationException(
-									"node access error for the parameter type of the operation",
-									e) ;
-						} catch (XPathExpressionException e) {
-							throw new ConfigurationException(
-									"error fetching the parameter type of the operation", e) ;
-						}
-						try {
-							name = ((Node)xpathEvaluator.evaluate(
-									"@name",
-									parameterNode,
-									XPathConstants.NODE)).getNodeValue();
-						} catch (DOMException e) {
-							throw new ConfigurationException(
-									"node access error for the parameter name of the operation",
-									e) ;
-						} catch (XPathExpressionException e) {
-							throw new ConfigurationException(
-									"error fetching the parameter name of the operation", e) ;
-						}
-						opParameters.add(new Parameter(type,name));
-					} 
-					if (operation.getAttributes().item(h).getNodeValue() == "body") {
-						Node bodyNode = operation.getAttributes().item(h);
-						String text;
-						try {
-							text = bodyNode.getNodeValue();
-						} catch (DOMException e) {
-							throw new ConfigurationException(
-									"node access error for " + opName + " body node",
-									e) ;
-						}
-						opBody = new Body(null,null,text);
-					}
-				}
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for the suspend node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the suspend node", e) ;
 			}
-			operations.add(new Operation(opName, opParameters, opBody));
+			 operations.add(new Operation("suspend","boolean",null,new Body(null,equipmentRef,body)));
 		}
+		//System.out.println(operations.get("suspend"));
+		
+		Node resumeNode;
+		try{
+			resumeNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/resume",
+					doc,
+					XPathConstants.NODE));
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the resume node", e) ;
+		}
+		if (resumeNode != null) {
+			Node bodyNode;
+			try {
+				bodyNode = ((Node)xpathEvaluator.evaluate(
+						"body",
+						resumeNode,
+						XPathConstants.NODE));
+				try {
+					equipmentRef = (((Node)xpathEvaluator.evaluate(
+							"@equipmentRef",
+							bodyNode,
+							XPathConstants.NODE)).getNodeValue());
+					body = bodyNode.getTextContent();
+				} catch (DOMException e) {
+					throw new ConfigurationException(
+							"node access error for the equipmentRef inside resume body node",
+							e) ;
+				} catch (XPathExpressionException e) {
+					throw new ConfigurationException(
+							"error fetching the equipmentRef inside resume body node", e) ;
+				}
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for the resume node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the resume node", e) ;
+			}
+			 operations.add(new Operation("resume","boolean",null,new Body(null,equipmentRef,body)));
+		}
+		//System.out.println(operations.get("resume"));
+		
+		Node emergencyNode;
+		try{
+			emergencyNode = ((Node)xpathEvaluator.evaluate(
+					"/control-adapter/emergency",
+					doc,
+					XPathConstants.NODE));
+		} catch (XPathExpressionException e) {
+			throw new ConfigurationException(
+					"error fetching the emergency node", e) ;
+		}
+		if (emergencyNode != null) {
+			Node bodyNode;
+			try {
+				bodyNode = ((Node)xpathEvaluator.evaluate(
+						"body",
+						emergencyNode,
+						XPathConstants.NODE));
+				try {
+					equipmentRef = (((Node)xpathEvaluator.evaluate(
+							"@equipmentRef",
+							bodyNode,
+							XPathConstants.NODE)).getNodeValue());
+					body = bodyNode.getTextContent();
+				} catch (DOMException e) {
+					throw new ConfigurationException(
+							"node access error for the equipmentRef inside emergency body node",
+							e) ;
+				} catch (XPathExpressionException e) {
+					throw new ConfigurationException(
+							"error fetching the equipmentRef inside emergency body node", e) ;
+				}
+			} catch (DOMException e) {
+				throw new ConfigurationException(
+						"node access error for the emergency node",
+						e) ;
+			} catch (XPathExpressionException e) {
+				throw new ConfigurationException(
+						"error fetching the emergency node", e) ;
+			}
+			operations.add(new Operation("emergency","double",null,new Body(null,equipmentRef,body)));
+		}
+		//System.out.println(operations.get(8).body.equipmentRef);
+		
 		return new ConfigurationParameters(identificationUid,
 				identificationOffered,
 				consumptionMin,

@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="commons-math3-3.6.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="lib" path="javassist/javassist.jar"/>
+	<classpathentry kind="lib" path="C:/Users/walte/Desktop/openlogic-openjdk-jre-8u382-b05-windows-32/jre/lib/jfxswt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

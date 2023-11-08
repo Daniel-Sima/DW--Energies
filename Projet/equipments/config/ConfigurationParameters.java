@@ -1,6 +1,7 @@
 package equipments.config;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 //Copyright Jacques Malenfant, Sorbonne Universite.
 //
@@ -242,8 +243,8 @@ class Body {
 			String text
 			) 
 	{
-		this.equipmentRef = equipmentRef;
 		this.thrownException = thrownException;
+		this.equipmentRef = equipmentRef;
 		this.text = text;
 	}
 }
@@ -259,19 +260,20 @@ class Operation {
 	/** operation return type			*/
 	protected String type;
 	/** parameters of the operation		*/
-	protected ArrayList<Parameter> parameters;
+	protected Parameter parameter;
 	/** body of the operation			*/
 	protected Body		  	body;
 	
 	/**
 	 * 
 	 * @param name
-	 * @param opParameters
+	 * @param parameter
 	 * @param body
 	 */
-	public Operation(String name, ArrayList<Parameter> opParameters, Body body) {
+	public Operation(String name, String type, Parameter parameter, Body body) {
 		this.name = name;
-		this.parameters = opParameters;
+		this.type = type;
+		this.parameter = parameter;
 		this.body = body;
 	}
 }
@@ -286,8 +288,9 @@ class Internal {
 	protected String type;
 	protected String name;
 	protected String thrown;
-	protected ArrayList<Parameter> parameters;
-	protected Body body;
+	protected String equipmentRef;
+	protected Parameter parameter;
+	protected String body;
 	
 	/**
 	 * 
@@ -295,19 +298,25 @@ class Internal {
 	 * @param type
 	 * @param name
 	 * @param parameter
+	 * @param thrown
+	 * @param equipmentRef
 	 * @param body
 	 */
 	public Internal(
 			String modifiers, 
 			String type, 
 			String name,
-			ArrayList<Parameter> parameters,
-			Body body) 
+			Parameter parameter,
+			String thrown,
+			String equipmentRef,
+			String body) 
 	{
 		this.modifiers = modifiers;
 		this.type = type;
 		this.name = name;
-		this.parameters = parameters;
+		this.thrown = thrown;
+		this.equipmentRef = equipmentRef;
+		this.parameter = parameter;
 		this.body = body;
 	}
 }
@@ -334,9 +343,9 @@ class Internal {
 public class				ConfigurationParameters
 {	
 	/** identification uid of the equipment and its control interface		*/
-	protected long 				identificationUid;
+	protected String 			identificationUid;
 	/** identification offered of the equipment and its control interface	*/
-	protected ArrayList<String>			identificationOffered;
+	protected String			identificationOffered;
 	/** experimentally minimum measured energy consumption					*/
 	protected double			consumptionMin;
 	/** experimentally nominal measured energy consumption					*/
@@ -348,30 +357,9 @@ public class				ConfigurationParameters
 	/** Instance variables to be defined in the connector class				*/
 	protected ArrayList<InstanceVar> 	instanceVars;
 	/** Operations to be defined on the connector class						*/
-	protected ArrayList<Operation> 	operations;
+	protected ArrayList<Operation>  	operations;
 	/** modifiers (public/private..., static, ...)							*/
 	protected Internal			internal;
-	/** number of modes.													*/
-	//protected Operation		maxMode;
-	/** forcing the equipment to the next more consuming mode				*/
-	//protected Operation		upMode;  
-	/** forcing the equipment to the next less consuming mode				*/
-	//protected Operation		downMode;   
-	/** set the current mode, take [1, numberOfModes]						*/
-	//protected Operation 		setMode;
-	/** get the current mode, return [1, numberOfModes]						*/
-	//protected Operation 		currentMode;
-	/** is the equipment currently suspended, return boolean				*/
-	//protected Operation 		suspended;
-	/** suspend the equipment												*/
-	//protected Operation 		suspend;
-	/** resume normal operation for the equipment							*/
-	//protected Operation 		resume;
-	/** degree of emergency of a resumption [0, 1];
-	 * 	the higher is this degree, the more it should be
-	 *  allowed to resume (e.g., the water temperature of
-	 *   the boiler becomes too cold to be useful)							*/
-	//protected Operation 		emergency;
 
 	/**
 	 * create a configuration parameters holder.
@@ -394,14 +382,14 @@ public class				ConfigurationParameters
 	 * @param internal
 	 */
 	public	ConfigurationParameters(
-			long					identificationUid,
-			ArrayList<String>		identificationOffered,
+			String					identificationUid,
+			String					identificationOffered,
 			double					consumptionMin,
 			double					consumptionNominal,
 			double					consumptionMax,
 			String					required,
 			ArrayList<InstanceVar> 	instanceVars,
-			ArrayList<Operation> 	operations,
+			ArrayList<Operation>	operations,
 			Internal				internal
 			)
 	{
@@ -420,7 +408,7 @@ public class				ConfigurationParameters
 	/**
 	 * @return the identificationUid
 	 */
-	public long		getIdentificationUid() {
+	public String	getIdentificationUid() {
 		return this.identificationUid;
 	}
 	
@@ -435,7 +423,7 @@ public class				ConfigurationParameters
 	/**
 	 * @return the identificationOffered
 	 */
-	public ArrayList<String>	getIdentificationOffered() {
+	public String	getIdentificationOffered() {
 		return this.identificationOffered;
 	}
 
@@ -484,7 +472,7 @@ public class				ConfigurationParameters
 	/**
 	 * @return the operations;
 	 */
-	public ArrayList<Operation> 	getOperations() {
+	public ArrayList<Operation> getOperations() {
 		return this.operations;
 	}
 	
@@ -556,13 +544,10 @@ public class				ConfigurationParameters
 	public String		toString() {
 		StringBuilder	strParsed = new StringBuilder("");
 		strParsed.append("package equipments.HEM;");
+		strParsed.append("import "+ this.identificationOffered+";") ;
 
-		/** Parsing import			*/
-		for(int i=0; i < this.identificationOffered.size() ; i++) {
-			strParsed.append("import "+ this.identificationOffered.get(i)+";") ;
-		}
 		strParsed.append("fr.sorbonne_u.components.connectors.AbstractConnector;");
-		String className = internal.body.equipmentRef + "Connector";
+		String className = internal.equipmentRef + "Connector";
 		strParsed.append("public class " + className);
 		strParsed.append("extends AbstractConnector");
 		strParsed.append("implements AdjustableCI {");
@@ -590,26 +575,12 @@ public class				ConfigurationParameters
 		/** Parsing internal			*/
 		strParsed.append(this.internal.modifiers + " " + this.internal.type + " " + this.internal.name);
 		strParsed.append("exception " + internal.thrown);
-		for(int j=0; j<this.internal.parameters.size(); j++) {
-			strParsed.append(this.internal.parameters.get(j) + " " + this.internal.parameters.get(j));
-		}
+		strParsed.append(this.internal.parameter + " " + this.internal.parameter);
 		strParsed.append("{");
-		String offering = "(("+ this.internal.body.equipmentRef + "ExternalControlCI)this.offering)";
-		strParsed.append(this.internal.body.text.replace(offering, this.internal.body.equipmentRef));
+		String offering = "(("+ this.internal.equipmentRef + "ExternalControlCI)this.offering)";
+		strParsed.append(this.internal.body.replace(offering, this.internal.equipmentRef));
 		strParsed.append("}");
 		
-		/** Parsing operations			*/
-		for(int i=0; i < this.operations.size() ; i++) {
-			Operation op = operations.get(i);
-			strParsed.append("@Override ");
-			strParsed.append("public " + op.type + " " + op.name + "(");
-			for(int j=0; j<op.parameters.size(); j++) {
-				strParsed.append(op.parameters.get(j) + " " + op.parameters.get(j));
-			}
-			strParsed.append(")" + "throws Exception {");
-			strParsed.append(op.body);
-			strParsed.append("}");
-		}
 		
 		strParsed.append("}");
 		
