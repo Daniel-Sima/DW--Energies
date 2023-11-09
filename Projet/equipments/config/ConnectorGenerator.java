@@ -16,19 +16,21 @@ import fr.sorbonne_u.components.cvm.config.exceptions.InvalidConfigurationFileFo
 import fr.sorbonne_u.components.interfaces.OfferedCI;
 import javassist.*;
 
+/**
+ * 
+ * @author walte
+ * Class that generates a connector from an XML descriptor with MakeConnectors class
+ * the connector implements AbstractConnector and uses AdjustableCI as interface
+ * along with the configuration parsed
+ */
 public class ConnectorGenerator {
+	/**
+	 * 
+	 * @param descriptor
+	 * @return
+	 * @throws ClassNotFoundException
+	 */
 	public static Class<?> generate(String descriptor) throws ClassNotFoundException {
-//		TestJavassist res = new TestJavassist();
-//
-//		Class<?> loadedClass = res.getInstanceClass();
-//		
-//		try {
-//			Object instance = loadedClass.getDeclaredConstructor().newInstance();
-//			loadedClass.getMethod("printPong").invoke(instance);
-//			 loadedClass.getMethod("printHelloWorld").invoke(instance);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
 		String configFileName = "Projet/equipments/HEM/"+descriptor;
 		File configFile = new File(configFileName);
 		try {
@@ -52,15 +54,15 @@ public class ConnectorGenerator {
 			}
 			Class<?> adjustableCI = null;
 			try {
-				adjustableCI = Class.forName("fr.sorbonne_u.components.hem2023.bases.AdjustableCI");
+				adjustableCI = Class.forName("equipments.HEM.AdjustableCI");
 			} catch(ClassNotFoundException e) {
 				System.out.println("La classe AdjustableCI n’est pas trouvable.");
 				throw e;
 			}
-			Class<?> test = null;
+			Class<?> connector = null;
 			try {
-				test = MakeConnectors.makeConnectorClassJavassist(
-									"equipements.config."+className+"Connector",
+				connector = MakeConnectors.makeConnectorClassJavassist(
+									"equipments.HEM."+className+"Connector",
 									AbstractConnector.class,
 									adjustableCI,
 									controlCI,
@@ -68,34 +70,7 @@ public class ConnectorGenerator {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-			return test;
-//			// Créez une instance de la classe chargée en mémoire
-//            Object instance = null;
-//			try {
-//				instance = test.getDeclaredConstructor().newInstance();
-//				System.out.println(instance.getClass().getMethod("emergency").getName());
-//			} catch (InstantiationException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (IllegalAccessException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (IllegalArgumentException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (InvocationTargetException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (NoSuchMethodException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (SecurityException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//            System.out.println(instance.toString());
-			
+			return connector;
 			
 		} catch (ConfigurationException | XPathExpressionException e) {
 			// TODO Auto-generated catch block

@@ -1,14 +1,26 @@
 package equipments.config;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import javassist.*;
 import javassist.Modifier;
 
-import java.lang.reflect.*;
-
+/**
+ * 
+ * @author walte
+ * Class that makes a connector from a configuration obtained by parsing an XML file
+ */
 public class MakeConnectors {
+	
+	/**
+	 * 
+	 * @param connectorCanonicalClassName
+	 * @param connectorSuperclass
+	 * @param connectorImplementedInterface
+	 * @param offeredInterface
+	 * @param cfp
+	 * @return
+	 * @throws Exception
+	 */
 	public static Class<?> makeConnectorClassJavassist(String connectorCanonicalClassName,
 			Class<?> connectorSuperclass,
 			Class<?> connectorImplementedInterface,
@@ -26,21 +38,27 @@ public class MakeConnectors {
 		ArrayList<Operation> cfpOps = cfp.getOperations();
 		ArrayList<InstanceVar> instanceVars = cfp.getInstanceVars();
 		
-		for(int i=0; i<instanceVars.size(); i++) {
+		for(int i=0; i<instanceVars.size()-2; i++) {
+			CtField field = new CtField(toType(instanceVars.get(i).type),
+												instanceVars.get(i).name,
+												connectorCtClass);
+			field.setModifiers(Modifier.PROTECTED);
+			connectorCtClass.addField(field, instanceVars.get(i).staticInit);
+		}
+		for(int i=instanceVars.size()-2; i<instanceVars.size(); i++) {
 			CtField field = new CtField(toType(instanceVars.get(i).type),
 												instanceVars.get(i).name,
 												connectorCtClass);
 			field.setModifiers(Modifier.PROTECTED);
 			connectorCtClass.addField(field);
 		}
+		
 		String internal = "public " ;
 		internal += cfp.getInternal().type + " " ;
 		internal += cfp.getInternal().name + "(" ;
 		Parameter pt = cfp.getInternal().parameter ;
-//		String callParam = "" ;
 		if(pt != null) {
 			internal += pt.type + " " + pt.name ;
-//			callParam += pt.name ;
 		}
 		internal += ") throws java.lang.Exception";
 		internal += "\n{" ;
@@ -48,20 +66,16 @@ public class MakeConnectors {
 		String n = internal.replace(
 				cfp.getInternal().equipmentRef,
 				"(("+offeredInterface.getCanonicalName() + ")this.offering)");
-		//internal += "(" + callParam + ") ;\n}" ;
 		n += "\n}";
 		connectorCtClass.addMethod(CtMethod.make(n, connectorCtClass)) ;
 		
-//		Method[] methodsToImplement = connectorImplementedInterface.getDeclaredMethods() ;
-		for (int i = cfpOps.size()-1 ; i > 0; i--) {
+		for (int i = cfpOps.size()-1 ; i >= 0; i--) {
 			String source = "public " ;
 			source += cfpOps.get(i).type + " " ;
 			source += cfpOps.get(i).name + "(" ;
 			pt = cfpOps.get(i).parameter ;
-//			String callParam = "" ;
 			if(pt != null) {
 				source += pt.type + " " + pt.name ;
-//				callParam += pt.name ;
 			}
 			source += ") throws java.lang.Exception";
 			source += "\n{" ;
@@ -85,15 +99,22 @@ public class MakeConnectors {
 		connectorCtClass.addConstructor(c);
 		cii.detach() ; cs.detach() ; oi.detach() ;
 		
-//		for(int i=0;i<connectorCtClass.getMethods().length; i++) {
-//			System.out.println(connectorCtClass.getMethods()[i].getName());
+//		for(int i=0;i<connectorCtClass.getFields().length; i++) {
+//			System.out.println(connectorCtClass.getFields()[i]);
+//			System.out.println(connectorCtClass.getFields()[i].getConstantValue());
 //		}
+//		System.out.println(connectorCtClass.getFields().length);
 		
 		Class<?> ret = connectorCtClass.toClass() ;
 		connectorCtClass.detach() ;
 		return ret ;
 	}
 	
+	/**
+	 * Returns CtClass type matching with entry type
+	 * @param type
+	 * @return CtClass type
+	 */
 	public static CtClass toType( String type ) {
 	    if( type.equals("int") ) return CtClass.intType;
 	    if( type.equals("double") ) return CtClass.doubleType;
@@ -101,18 +122,5 @@ public class MakeConnectors {
 	    if( type.equals("void") ) return CtClass.voidType;
 	    else return null;
 	}
-
-//	HashMap<String, String> methodNamesMap = new HashMap<String, String>() ;
-//	methodNamesMap.put("sum", "add") ;
-//	Class<?> connectorClass =
-//			this.makeConnectorClassJavassist(
-//					"fr.upmc.alasca.summing.assembly.GeneratedConnector",
-//					AbstractConnector.class,
-//					SummingServiceI.class,
-//					CalculatorServicesI.class,
-//					methodNamesMap) ;
-//	this.getOwner().doPortConnection(
-//			clientPortURI,
-//			serverPortURI,
-//			connectorClass.getCanonicalName()) ;
+	
 }

@@ -107,20 +107,15 @@ extends AbstractComponent {
 			try {
 				AirCondCIConnector = connector.getDeclaredConstructor().newInstance();
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
             Object FridgeCIConnector = null;
             connector = ConnectorGenerator.generate("fridgeci-descriptor.xml");
             try {
-            	FridgeCIConnector = connector.getDeclaredConstructor().newInstance();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
+            	FridgeCIConnector = connector.getDeclaredConstructor().newInstance();	
+            } catch (InstantiationException e) {
 				e.printStackTrace();
 			}
-            
-            System.out.println(AirCondCIConnector.getClass().getCanonicalName());
-            System.out.println(FridgeConnector.class.getCanonicalName());
             
 			this.clocksServerOutboundPort = new ClocksServerOutboundPort(this);
 			this.clocksServerOutboundPort.publishPort();
@@ -141,7 +136,7 @@ extends AbstractComponent {
 			this.doPortConnection(
 					this.adjustableOutboundPortAirConditioning.getPortURI(),
 					AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI,
-					AirConditioningConnector.class.getCanonicalName());
+					AirCondCIConnector.getClass().getCanonicalName());
 //			
 			this.adjustableOutboundPortFridge = new AdjustableOutboundPort(this);
 			this.adjustableOutboundPortFridge.publishPort();
@@ -149,6 +144,10 @@ extends AbstractComponent {
 					this.adjustableOutboundPortFridge.getPortURI(),
 					Fridge.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 					FridgeCIConnector.getClass().getCanonicalName());
+			
+//			System.out.println("A: "+adjustableOutboundPortAirConditioning.maxMode());
+//			System.out.println("F: "+adjustableOutboundPortFridge.maxMode());
+			
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;
 		}
@@ -201,40 +200,40 @@ extends AbstractComponent {
 					@Override
 					public void run() {
 						try {
-//							o.traceMessage("------------- Air Conditioning -------------\n");
-//							o.traceMessage("Air Conditioning maxMode index? " +
-//									adjustableOutboundPortAirConditioning.maxMode() + "\n");
-//							o.traceMessage("Air Conditioning current mode index? " +
-//									adjustableOutboundPortAirConditioning.currentMode() + "\n");
-//							o.traceMessage("Air Conditioning going down one mode? " +
-//									adjustableOutboundPortAirConditioning.downMode() + "\n");
-//							o.traceMessage("Air Conditioning current mode is? " +
-//									adjustableOutboundPortAirConditioning.currentMode() + "\n");
-//							o.traceMessage("Air Conditioning going up one mode? " +
-//									adjustableOutboundPortAirConditioning.upMode() + "\n");
-//							o.traceMessage("Air Conditioning current mode is? " +
-//									adjustableOutboundPortAirConditioning.currentMode() + "\n");
-//							o.traceMessage("Air Conditioning setting current mode? " +
-//									adjustableOutboundPortAirConditioning.setMode(2) + "\n");
-//							o.traceMessage("Air Conditioning current mode is? " +
-//									adjustableOutboundPortAirConditioning.currentMode() + "\n");
-//							o.traceMessage("Air Conditioning is suspended? " +
-//									adjustableOutboundPortAirConditioning.suspended() + "\n");
-//							o.traceMessage("Air Conditioning suspends? " +
-//									adjustableOutboundPortAirConditioning.suspend() + "\n");
-//							o.traceMessage("Air Conditioning is suspended? " +
-//									adjustableOutboundPortAirConditioning.suspended() + "\n");
-//							o.traceMessage("Air Conditioning emergency? " +
-//									adjustableOutboundPortAirConditioning.emergency() + "\n");
-//							Thread.sleep(1000);
-//							o.traceMessage("Air Conditioning emergency? " +
-//									adjustableOutboundPortAirConditioning.emergency() + "\n");
-//							o.traceMessage("Air Conditioning resumes? " +
-//									adjustableOutboundPortAirConditioning.resume() + "\n");
-//							o.traceMessage("Air Conditioning is suspended? " +
-//									adjustableOutboundPortAirConditioning.suspended() + "\n");
-//							o.traceMessage("Air Conditioning current mode is? " +
-//									adjustableOutboundPortAirConditioning.currentMode() + "\n");
+							o.traceMessage("------------- Air Conditioning -------------\n");
+							o.traceMessage("Air Conditioning maxMode index? " +
+									adjustableOutboundPortAirConditioning.maxMode() + "\n");
+							o.traceMessage("Air Conditioning current mode index? " +
+									adjustableOutboundPortAirConditioning.currentMode() + "\n");
+							o.traceMessage("Air Conditioning going down one mode? " +
+									adjustableOutboundPortAirConditioning.downMode() + "\n");
+							o.traceMessage("Air Conditioning current mode is? " +
+									adjustableOutboundPortAirConditioning.currentMode() + "\n");
+							o.traceMessage("Air Conditioning going up one mode? " +
+									adjustableOutboundPortAirConditioning.upMode() + "\n");
+							o.traceMessage("Air Conditioning current mode is? " +
+									adjustableOutboundPortAirConditioning.currentMode() + "\n");
+							o.traceMessage("Air Conditioning setting current mode? " +
+									adjustableOutboundPortAirConditioning.setMode(2) + "\n");
+							o.traceMessage("Air Conditioning current mode is? " +
+									adjustableOutboundPortAirConditioning.currentMode() + "\n");
+							o.traceMessage("Air Conditioning is suspended? " +
+									adjustableOutboundPortAirConditioning.suspended() + "\n");
+							o.traceMessage("Air Conditioning suspends? " +
+									adjustableOutboundPortAirConditioning.suspend() + "\n");
+							o.traceMessage("Air Conditioning is suspended? " +
+									adjustableOutboundPortAirConditioning.suspended() + "\n");
+							o.traceMessage("Air Conditioning emergency? " +
+									adjustableOutboundPortAirConditioning.emergency() + "\n");
+							Thread.sleep(1000);
+							o.traceMessage("Air Conditioning emergency? " +
+									adjustableOutboundPortAirConditioning.emergency() + "\n");
+							o.traceMessage("Air Conditioning resumes? " +
+									adjustableOutboundPortAirConditioning.resume() + "\n");
+							o.traceMessage("Air Conditioning is suspended? " +
+									adjustableOutboundPortAirConditioning.suspended() + "\n");
+							o.traceMessage("Air Conditioning current mode is? " +
+									adjustableOutboundPortAirConditioning.currentMode() + "\n");
 							
 							o.traceMessage("------------- Fridge  -------------\n");
 							o.traceMessage("Fridge maxMode index? " +
