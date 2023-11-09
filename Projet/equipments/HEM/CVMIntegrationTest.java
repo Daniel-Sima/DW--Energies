@@ -143,7 +143,7 @@ extends	AbstractCVM {
 				new Object[]{true}); // TODO a voir 
 
 		AbstractComponent.createComponent(
-				HEM.class.getCanonicalName(),
+				HEM_descriptors.class.getCanonicalName(),
 				new Object[]{});
 
 		super.deploy();
@@ -153,8 +153,8 @@ extends	AbstractCVM {
 	public static void	main(String[] args) {
 		try {
 			CVMIntegrationTest cvm = new CVMIntegrationTest();
-			cvm.startStandardLifeCycle(120000L);
-			Thread.sleep(300000L);
+			cvm.startStandardLifeCycle(12000L);
+			Thread.sleep(30000L);
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();

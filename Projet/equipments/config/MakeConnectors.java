@@ -45,15 +45,11 @@ public class MakeConnectors {
 		internal += ") throws java.lang.Exception";
 		internal += "\n{" ;
 		internal += cfp.getInternal().body;
-		System.out.println(cfp.getInternal().equipmentRef);
-		System.out.println(internal);
 		String n = internal.replace(
 				cfp.getInternal().equipmentRef,
 				"(("+offeredInterface.getCanonicalName() + ")this.offering)");
-		System.out.println("(("+offeredInterface.getCanonicalName() + ")this.offering)");
 		//internal += "(" + callParam + ") ;\n}" ;
 		n += "\n}";
-		System.out.println(n);
 		connectorCtClass.addMethod(CtMethod.make(n, connectorCtClass)) ;
 		
 //		Method[] methodsToImplement = connectorImplementedInterface.getDeclaredMethods() ;
@@ -77,7 +73,6 @@ public class MakeConnectors {
 			}
 			//source += "(" + callParam + ") ;\n}" ;
 			source += "\n}";
-			System.out.println(source);
 			CtMethod theCtMethod = CtMethod.make(source, connectorCtClass) ;
 			connectorCtClass.addMethod(theCtMethod) ;
 		}
@@ -90,9 +85,9 @@ public class MakeConnectors {
 		connectorCtClass.addConstructor(c);
 		cii.detach() ; cs.detach() ; oi.detach() ;
 		
-		for(int i=0;i<connectorCtClass.getMethods().length; i++) {
-			System.out.println(connectorCtClass.getMethods()[i].getName());
-		}
+//		for(int i=0;i<connectorCtClass.getMethods().length; i++) {
+//			System.out.println(connectorCtClass.getMethods()[i].getName());
+//		}
 		
 		Class<?> ret = connectorCtClass.toClass() ;
 		connectorCtClass.detach() ;
