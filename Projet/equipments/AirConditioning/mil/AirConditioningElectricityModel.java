@@ -1,16 +1,18 @@
-package equipments.CookingPlate.mil;
+package equipments.AirConditioning.mil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import equipments.CookingPlate.mil.events.AbstractCookingPlateEvent;
-import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
+import equipments.AirConditioning.events.AirConditioningEventI;
+import equipments.AirConditioning.events.Cool;
+import equipments.AirConditioning.events.DoNotCool;
+import equipments.AirConditioning.events.SetPowerAirConditioning;
+import equipments.AirConditioning.events.SwitchOffAirConditioning;
+import equipments.AirConditioning.events.SwitchOnAirConditioning;
 import equipments.HEM.simulation.HEM_ReportI;
-import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
-import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
-import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
+import utils.Electricity;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ModelExportedVariable;
@@ -24,41 +26,42 @@ import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
+import fr.sorbonne_u.devs_simulation.utils.Pair;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
-import utils.Electricity;
 
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>CookingPlateElectricityModel</code> defines a MIL model
- * of the electricity consumption of a Cooking Plate.
+ * The class <code>AirConditioningElectricityModel</code> defines a simulation model
+ * for the electricity consumption of the AirConditioning.
  *
  * <p><strong>Description</strong></p>
  * 
  * <p>
- * The Cooking Plate can be switched on and off, and when switched on, it can be
- * either in 1 (50°) to 7 (300°) mode, with electricity consumption growing up with
- * the mode.
+ * The electric power consumption (in amperes) depends upon the state 'AirConditioningState' 
+ * and the current power level i.e., {@code AirConditioningState.OFF => consumption == 0.0},
+ * {@code AirConditioningState.ON => consumption == NOT_COOLING_POWER} and
+ * {@code AirConditioningState.COOLING => consumption >= NOT_COOLING_POWER && consumption <= MAX_COOLING_POWER}).
+ * The state of the AirConditioning is modified by the reception of external events
+ * ({@code SwitchOnAirConditioning}, {@code SwitchOffAirConditioning}, {@code Cool} and
+ * {@code DoNotCool}). The power level is set through the external event
+ * {@code SetPowerAirConditioning} that has a parameter defining the required power
+ * level. The electric power consumption is stored in the exported variable
+ * {@code currentIntensity}.
  * </p>
  * <p>
- * The electricity consumption is represented as a variable of type double that
- * has to be exported towards the electric meter MIL model in order to be summed
- * up to get the global electricity consumption of the house.
- * </p>
- * <p>
- * To model the user actions, four events are defined to be imported and the
- * external transitions upon the reception of these events force the Cooking Plate
- * electricity model in the corresponding mode with the corresponding
- * electricity consumption.
+ * Initially, the mode is in state {@code AirConditioningState.OFF} and the electric power
+ * consumption at 0.0.
  * </p>
  * 
  * <ul>
  * <li>Imported events:
- *   {@code SwitchOnCookingPlate},
- *   {@code SwitchOffCookingPlate},
- *   {@code IncreaseCookingPlate},
- *   {@code DecreaseCookingPlate}</li>
+ *   {@code SwitchOnAirConditioning},
+ *   {@code SwitchOffAirConditioning},
+ *   {@code SetPowerAirConditioning},
+ *   {@code Cool},
+ *   {@code DoNotCool}</li>
  * <li>Exported events: none</li>
  * <li>Imported variables: none</li>
  * <li>Exported variables:
@@ -74,25 +77,24 @@ import utils.Electricity;
  * <p><strong>Black-box Invariant</strong></p>
  * 
  * <pre>
- * invariant	{@code true}	// no more invariant
+ * invariant	{@code NOT_COOLING_POWER >= 0.0}
+ * invariant	{@code MAX_COOLING_POWER > NOT_COOLING_POWER}
+ * invariant	{@code TENSION > 0.0}
  * </pre>
  * 
- * <p>Created on : 2023-11-08</p>
+ * <p>Created on : 2023-11-11</p>
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-@ModelExternalEvents(imported = {SwitchOnCookingPlate.class,
-		SwitchOffCookingPlate.class,
-		IncreaseCookingPlate.class,
-		DecreaseCookingPlate.class
-})
+@ModelExternalEvents(imported = {SwitchOnAirConditioning.class,
+		SwitchOffAirConditioning.class,
+		SetPowerAirConditioning.class,
+		Cool.class,
+		DoNotCool.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
-public class CookingPlateElectricityModel 
-extends	AtomicHIOA {
-	// -------------------------------------------------------------------------
-	// Color for prints
-	// -------------------------------------------------------------------------
-
+@ModelExportedVariable(name = "currentCoolingPower", type = Double.class)
+public class AirConditioningElectricityModel 
+extends AtomicHIOA {
 	// Declaring ANSI_RESET so that we can reset the color 
 	public static final String ANSI_RESET = "\u001B[0m"; 
 	// Declaring colors
@@ -103,89 +105,64 @@ extends	AtomicHIOA {
 	public static final String ANSI_BLACK_BACKGROUND  = "\033[40m"; 
 	public static final String ANSI_GREY_BACKGROUND  = "\033[0;100m"; 
 	public static final String ANSI_BLUE_BACKGROUND  = "\u001B[44m"; 
+	
+	// -------------------------------------------------------------------------
+	// Inner classes and types
+	// -------------------------------------------------------------------------
 
-	// -------------------------------------------------------------------------
-	// Inner interfaces and types
-	// -------------------------------------------------------------------------
 	/**
-	 * The enumeration <code>CookingPlateState</code> describes the operation states
-	 * of the cooking plate.
+	 * The enumeration <code>AirConditioningState</code> describes the operation
+	 * states of the AirConditioning.
 	 *
-	 * <p>
-	 * <strong>Description</strong>
-	 * </p>
+	 * <p><strong>Description</strong></p>
 	 * 
-	 * <p>
-	 * Created on : 2023-10-10
-	 * </p>
-	 * 
-	 * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
 	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
-	public static enum CookingPlateState {
-		/** cooking plate is on. */
+	public static enum AirConditioningState
+	{
+		/** AirConditioning is on.													*/
 		ON,
-		/** cooking plate is off. */
+		/** AirConditioning is cooling.												*/
+		COOLING,
+		/** AirConditioning is off.													*/
 		OFF
 	}
-
-	/***********************************************************************************/
-	/**
-	 * Array of <code>CookingPlateMode</code> describes the operation modes
-	 * of the cooking plate.
-	 *
-	 * <p>
-	 * <strong>Description</strong>
-	 * </p>
-	 * 
-	 * <p>
-	 * The cooking plate has 8 modes, from 0 to 7, from the coldest to the hottest temperature.
-	 * </p>
-	 * 
-	 * <p>
-	 * Created on : 2023-10-10
-	 * </p>
-	 * 
-	 * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
-	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
-	 */
-	public static int[] CookingPlateTemperature = new int[] {0, 50, 80, 120, 160, 200, 250, 300};
 
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+	private static final long	serialVersionUID = 1L;
+	/** URI for a model; works when only one instance is created.					*/
+	public static final String	URI = AirConditioningElectricityModel.class.getSimpleName();
 
-	/** URI for an instance model; works as long as only one instance is
-	 *  created.																	*/
-	public static final String URI = CookingPlateElectricityModel.class.getSimpleName();
+	/** power of the AirConditioning in watts.										*/
+	public static double NOT_COOLING_POWER = 5.0;
+	/** max power of the AirConditioning in watts.									*/
+	public static double MAX_COOLING_POWER = 2000.0;
+	/** nominal tension (in Volts) of the AirConditioning.							*/
+	public static double TENSION = 220.0;
 
-	/** energy consumption (in Watts) of the Cooking Plate depending the mode.		*/
-	public static double[] CookingPlateEnergyConsumption = new double[] {4.0, 500.0, 800.0, 1000.0, 1200.0, 1500.0, 1800.0, 2000.0};
-
-	/** nominal tension (in Volts) in Europe										*/
-	public static double TENSION = 220.0; // Volts
-
-	/** current mode of operation (1 (50°) to 7 (300°)) of the cooking plate.			*/
-	protected int currentMode = 0; // turned off 
-
-	/** current state (ON, OFF) of the Cooking Plate.								*/
-	protected CookingPlateState	currentState = CookingPlateState.OFF;
-
-	/** true when the electricity consumption of the Cooking Plate has changed
+	/** current state of the AirConditioning.												*/
+	protected AirConditioningState currentState = AirConditioningState.OFF;
+	/** true when the electricity consumption of the AirConditioning has changed
 	 *  after executing an external event; the external event changes the
 	 *  value of <code>currentState</code> and then an internal transition
 	 *  will be triggered by putting through in this variable which will
 	 *  update the variable <code>currentIntensity</code>.							*/
 	protected boolean consumptionHasChanged = false;
 
-	/** total consumption of the Cooking Plate during the simulation in kwh.		*/
+	/** total consumption of the AirConditioning during the simulation in kwh.		*/
 	protected double totalConsumption;
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
 	// -------------------------------------------------------------------------
+
+	/** the current AirConditioning power between 0 and
+	 *  {@code AirConditioningElectricityModel.MAX_COOLING_POWER}.					*/
+	@ExportedVariable(type = Double.class)
+	protected final Value<Double> currentCoolingPower = new Value<Double>(this);
 	/** current intensity in amperes; intensity is power/tension.					*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double> currentIntensity = new Value<Double>(this);
@@ -193,8 +170,9 @@ extends	AtomicHIOA {
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
+
 	/**
-	 * create a Cooking PlateMIL model instance.
+	 * create a AirConditioning MIL model instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -208,11 +186,12 @@ extends	AtomicHIOA {
 	 * @param simulationEngine	simulation engine to which the model is attached.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public CookingPlateElectricityModel(
+	public AirConditioningElectricityModel(
 			String uri,
 			TimeUnit simulatedTimeUnit,
 			AtomicSimulatorI simulationEngine
-			) throws Exception {
+			) throws Exception
+	{
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.getSimulationEngine().setLogger(new StandardLogger());
 	}
@@ -220,42 +199,31 @@ extends	AtomicHIOA {
 	// -------------------------------------------------------------------------
 	// Methods
 	// -------------------------------------------------------------------------
+
 	/**
-	 * set the state of the Cooking Plate.
+	 * set the state of the AirConditioning.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
 	 * pre	{@code s != null}
-	 * post	{@code getState() == s}
+	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param s		the new state.
+	 * @param t		time at which the state {@code s} is set.
 	 */
-	public void setState(CookingPlateState s) {
+	public void setState(AirConditioningState s, Time t) {
+		AirConditioningState old = this.currentState;
 		this.currentState = s;
+		if (old != s) {
+			this.consumptionHasChanged = true;					
+		}
 	}
 
 	/***********************************************************************************/
 	/**
-	 * set the mode of the Cooking Plate.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code s != null}
-	 * post	{@code getState() == s}
-	 * </pre>
-	 *
-	 * @param m		the new mode.
-	 */
-	public void setMode(int m) {
-		this.currentMode = m;
-	}
-
-	/***********************************************************************************/
-	/**
-	 * return the state of the Cooking Plate.
+	 * return the state of the AirConditioning.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -264,48 +232,39 @@ extends	AtomicHIOA {
 	 * post	{@code ret != null}
 	 * </pre>
 	 *
-	 * @return	the state of the Cooking Plate.
+	 * @return	the current state.
 	 */
-	public CookingPlateState getState() {
+	public AirConditioningState getState() {
 		return this.currentState;
 	}
 
 	/***********************************************************************************/
 	/**
-	 * return the mode of the Cooking Plate.
+	 * set the current cooling power of the AirConditioning to {@code newPower}.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code true}	// no precondition.
-	 * post	{@code ret != null}
+	 * pre	{@code newPower >= 0.0 && newPower <= MAX_COOLING_POWER}
+	 * post	{@code getCurrentPowerLevel() == newPower}
 	 * </pre>
 	 *
-	 * @return	the mode of the Cooking Plate.
+	 * @param newPower	the new power in watts to be set on the AirConditioning.
+	 * @param t			time at which the new power is set.
 	 */
-	public int getMode() {
-		return this.currentMode;
-	}
+	public void setCurrentCoolingPower(double newPower, Time t) {
+		System.err.println("newPower: "+newPower);
+		System.err.println("AirConditioningElectricityModel.MAX_COOLING_POWER: "+AirConditioningElectricityModel.MAX_COOLING_POWER);
+		assert	newPower >= 0.0 &&
+				newPower <= AirConditioningElectricityModel.MAX_COOLING_POWER :
+					new AssertionError(
+							"Precondition violation: newPower >= 0.0 && "
+									+ "newPower <= AirConditioningElectricityModel.MAX_COOLING_POWER,"
+									+ " but newPower = " + newPower);
 
-	/***********************************************************************************/
-	/**
-	 * toggle the value of the state of the model telling whether the
-	 * electricity consumption level has just changed or not; when it changes
-	 * after receiving an external event, an immediate internal transition
-	 * is triggered to update the level of electricity consumption.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code true}	// no precondition.
-	 * post	{@code true}	// no postcondition.
-	 * </pre>
-	 *
-	 */
-	public void	toggleConsumptionHasChanged() {
-		if (this.consumptionHasChanged) {
-			this.consumptionHasChanged = false;
-		} else {
+		double oldPower = this.currentCoolingPower.getValue();
+		this.currentCoolingPower.setNewValue(newPower, t);
+		if (newPower != oldPower) {
 			this.consumptionHasChanged = true;
 		}
 	}
@@ -313,16 +272,15 @@ extends	AtomicHIOA {
 	// -------------------------------------------------------------------------
 	// DEVS simulation protocol
 	// -------------------------------------------------------------------------
+
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA#initialiseState(fr.sorbonne_u.devs_simulation.models.time.Time)
 	 */
 	@Override
-	public void	initialiseState(Time startTime) {
-		super.initialiseState(startTime);
+	public void initialiseState(Time initialTime) {
+		super.initialiseState(initialTime);
 
-		// initially the Cooking Plate is off and its electricity consumption is
-		// not about to change.
-		this.currentState = CookingPlateState.OFF;
+		this.currentState = AirConditioningState.OFF;
 		this.consumptionHasChanged = false;
 		this.totalConsumption = 0.0;
 
@@ -332,14 +290,35 @@ extends	AtomicHIOA {
 
 	/***********************************************************************************/
 	/**
-	 * @see fr.sorbonne_u.devs_simulation.hioa.models.interfaces.VariableInitialisationI#initialiseVariables()
+	 * @see fr.sorbonne_u.devs_simulation.hioa.models.interfaces.VariableInitialisationI#useFixpointInitialiseVariables()
 	 */
 	@Override
-	public void initialiseVariables() {
-		super.initialiseVariables();
+	public boolean useFixpointInitialiseVariables() {
+		return true;
+	}
 
-		// initially, the Cooking Plate is off, so its consumption is zero.
-		this.currentIntensity.initialise(0.0);
+	/***********************************************************************************/
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.hioa.models.interfaces.VariableInitialisationI#fixpointInitialiseVariables()
+	 */
+	@Override
+	public Pair<Integer, Integer> fixpointInitialiseVariables() {
+		if (!this.currentIntensity.isInitialised() ||
+				!this.currentCoolingPower.isInitialised()) {
+			// initially, the AirConditioning is off, so its consumption is zero.
+			this.currentIntensity.initialise(0.0);
+			this.currentCoolingPower.initialise((double) 1200); // TODO AR
+
+			StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "new consumption: ");
+			sb.append(this.currentIntensity.getValue());
+			sb.append(" amperes at ");
+			sb.append(this.currentIntensity.getTime());
+			sb.append(" seconds.\n" + ANSI_RESET);
+			this.logMessage(sb.toString());
+			return new Pair<>(2, 0);
+		} else {
+			return new Pair<>(0, 0);
+		}
 	}
 
 	/***********************************************************************************/
@@ -348,7 +327,6 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public ArrayList<EventI> output() {
-		// the model does not export events.
 		return null;
 	}
 
@@ -357,17 +335,16 @@ extends	AtomicHIOA {
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#timeAdvance()
 	 */
 	@Override
-	public Duration	timeAdvance() {
-		// to trigger an internal transition after an external transition, the
-		// variable consumptionHasChanged is set to true, hence when it is true
-		// return a zero delay otherwise return an infinite delay (no internal
-		// transition expected)
+	public Duration timeAdvance() {
 		if (this.consumptionHasChanged) {
-			// after triggering the internal transition, toggle the boolean
-			// to prepare for the next internal transition.
-			this.toggleConsumptionHasChanged();
-			return new Duration(0.0, this.getSimulatedTimeUnit());
+			// When the consumption has changed, an immediate (delay = 0.0)
+			// internal transition must be made to update the electricity
+			// consumption.
+			this.consumptionHasChanged = false;
+			return Duration.zero(this.getSimulatedTimeUnit());
 		} else {
+			// As long as the state does not change, no internal transition
+			// is made (delay = infinity).
 			return Duration.INFINITY;
 		}
 	}
@@ -380,60 +357,64 @@ extends	AtomicHIOA {
 	public void userDefinedInternalTransition(Duration elapsedTime) {
 		super.userDefinedInternalTransition(elapsedTime);
 
-		// set the current electricity consumption from the current state
 		Time t = this.getCurrentStateTime();
-		switch (this.currentState) {
-		case OFF : this.currentIntensity.setNewValue(0.0, t); break;
-		case ON : switch (this.currentMode) {
-		case 0 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[0]/TENSION, t); break;			
-		case 1 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[1]/TENSION, t); break;
-		case 2 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[2]/TENSION, t); break;
-		case 3 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[3]/TENSION, t); break;
-		case 4 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[4]/TENSION, t); break;
-		case 5 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[5]/TENSION, t); break;
-		case 6 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[6]/TENSION, t); break;
-		case 7 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[7]/TENSION, t); break;
+		if (this.currentState == AirConditioningState.ON) {
+			this.currentIntensity.setNewValue(
+					AirConditioningElectricityModel.NOT_COOLING_POWER/
+					AirConditioningElectricityModel.TENSION,
+					t);
+		} else if (this.currentState == AirConditioningState.COOLING) {
+			this.currentIntensity.setNewValue(
+					this.currentCoolingPower.getValue()/
+					AirConditioningElectricityModel.TENSION,
+					t);
+		} else {
+			assert this.currentState == AirConditioningState.OFF;
+			this.currentIntensity.setNewValue(0.0, t);
 		}
-		}
-		// Tracing
-		StringBuffer message = new StringBuffer(ANSI_GREY_BACKGROUND + "executes an internal transition with current consumption " + 
-										this.currentIntensity.getValue() + " A" +
-										" at " + this.currentIntensity.getTime() + ".\n" +
-										ANSI_RESET);
-		this.logMessage(message.toString());
+
+		StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "new consumption: ");
+		sb.append(this.currentIntensity.getValue());
+		sb.append(" amperes at ");
+		sb.append(this.currentIntensity.getTime());
+		sb.append(" seconds.\n" + ANSI_RESET);
+		this.logMessage(sb.toString());
 	}
 
 	/***********************************************************************************/
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedExternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
-	 */ // TODO AR
+	 */
 	@Override
-	public void	userDefinedExternalTransition(Duration elapsedTime) {
+	public void userDefinedExternalTransition(Duration elapsedTime) {
 		super.userDefinedExternalTransition(elapsedTime);
 
-		// get the vector of currently received external events
+		// get the vector of current external events
 		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 		// when this method is called, there is at least one external event,
-		// and for the current Cooking Plate model, there must be exactly one by
+		// and for the AirConditioning model, there will be exactly one by
 		// construction.
 		assert	currentEvents != null && currentEvents.size() == 1;
 
 		Event ce = (Event) currentEvents.get(0);
+		assert ce instanceof AirConditioningEventI;
 
-		// compute the total consumption (in kwh) for the simulation report.
+		// compute the total consumption for the simulation report.
 		this.totalConsumption +=
 				Electricity.computeConsumption(
 						elapsedTime,
 						TENSION*this.currentIntensity.getValue());
 
-		// Tracing
-		StringBuffer message =
-				new StringBuffer(ANSI_BLACK_BACKGROUND + "executes an external transition " + ce.toString() + ")\n" + ANSI_RESET);
-		this.logMessage(message.toString());
+		StringBuffer sb = new StringBuffer(ANSI_BLACK_BACKGROUND + "execute the external event: ");
+		sb.append(ce.eventAsString());
+		sb.append(".\n" + ANSI_RESET);
+		this.logMessage(sb.toString());
 
-		assert	ce instanceof AbstractCookingPlateEvent;
-		// events have a method execute on to perform their effect on this
-		// model
+		// the next call will update the current state of the AirConditioning and if
+		// this state has changed, it put the boolean consumptionHasChanged
+		// at true, which in turn will trigger an immediate internal transition
+		// to update the current intensity of the AirConditioning electricity
+		// consumption.
 		ce.executeOn(this);
 	}
 
@@ -456,10 +437,13 @@ extends	AtomicHIOA {
 	// -------------------------------------------------------------------------
 	// Optional DEVS simulation protocol: simulation run parameters
 	// -------------------------------------------------------------------------
-	/** run parameter name for {@code MODE_CONSUMPTION}.				*/
-	public static final String MODE_CONSUMPTION_RPNAME = URI + ":MODE_CONSUMPTION";
-	/** run parameter name for {@code TENSION}.								*/
-	public static final String TENSION_RPNAME = URI + ":TENSION";
+
+	/** power of the AirConditioning in watts.										*/
+	public static final String	NOT_COOLING_POWER_RUNPNAME = "NOT_COOLING_POWER";
+	/** power of the AirConditioning in watts.										*/
+	public static final String	MAX_COOLING_POWER_RUNPNAME = "MAX_COOLING_POWER";
+	/** nominal tension (in Volts) of the AirConditioning.							*/
+	public static final String	TENSION_RUNPNAME = "TENSION";
 
 	/***********************************************************************************/
 	/**
@@ -468,20 +452,20 @@ extends	AtomicHIOA {
 	@Override
 	public void setSimulationRunParameters(
 			Map<String, Serializable> simParams
-			) throws MissingRunParameterException {
+			) throws MissingRunParameterException
+	{
 		super.setSimulationRunParameters(simParams);
 
-		// Setting for each mode
-		for (int i=0; i<CookingPlateTemperature.length; i++) {
-			String modeName = ModelI.createRunParameterName(getURI(), "" + i + MODE_CONSUMPTION_RPNAME);
-			System.out.println("==> "+"" + i + MODE_CONSUMPTION_RPNAME);
-			if (simParams.containsKey(modeName)) {
-				CookingPlateTemperature[i] = (int) simParams.get(modeName);
-			}
+		String notCoolingName = ModelI.createRunParameterName(getURI(), NOT_COOLING_POWER_RUNPNAME);
+		if (simParams.containsKey(notCoolingName)) {
+			NOT_COOLING_POWER = (double) simParams.get(notCoolingName);
+		}
+		String coolingName = ModelI.createRunParameterName(getURI(), MAX_COOLING_POWER_RUNPNAME);
+		if (simParams.containsKey(coolingName)) {
+			MAX_COOLING_POWER = (double) simParams.get(coolingName);
 		}
 
-		String tensionName =
-				ModelI.createRunParameterName(getURI(), TENSION_RPNAME);
+		String tensionName = ModelI.createRunParameterName(getURI(), TENSION_RUNPNAME);
 		if (simParams.containsKey(tensionName)) {
 			TENSION = (double) simParams.get(tensionName);
 		}
@@ -490,9 +474,10 @@ extends	AtomicHIOA {
 	// -------------------------------------------------------------------------
 	// Optional DEVS simulation protocol: simulation report
 	// -------------------------------------------------------------------------
+
 	/**
-	 * The class <code>CookingPlateElectricityReport</code> implements the
-	 * simulation report for the <code>CookingPlateElectricityModel</code>.
+	 * The class <code>AirConditioningElectricityReport</code> implements the
+	 * simulation report for the <code>AirConditioningElectricityModel</code>.
 	 *
 	 * <p><strong>Description</strong></p>
 	 * 
@@ -512,18 +497,17 @@ extends	AtomicHIOA {
 	 * 
 	 * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
 	 */
-	public static class CookingPlateElectricityReport
+	public static class AirConditioningElectricityReport
 	implements	SimulationReportI, HEM_ReportI {
 		private static final long serialVersionUID = 1L;
 		protected String modelURI;
 		protected double totalConsumption; // in kwh
 
 		/***********************************************************************************/
-		public CookingPlateElectricityReport(
+		public AirConditioningElectricityReport(
 				String modelURI,
 				double totalConsumption
-				)
-		{
+				) {
 			super();
 			this.modelURI = modelURI;
 			this.totalConsumption = totalConsumption;
@@ -532,13 +516,12 @@ extends	AtomicHIOA {
 		/***********************************************************************************/
 		@Override
 		public String getModelURI() {
-			return null;
+			return this.modelURI;
 		}
 
 		/***********************************************************************************/
 		@Override
-		public String printout(String indent)
-		{
+		public String printout(String indent) {
 			StringBuffer ret = new StringBuffer(indent);
 			ret.append("---\n");
 			ret.append(indent);
@@ -553,16 +536,16 @@ extends	AtomicHIOA {
 			ret.append(indent);
 			ret.append("---\n");
 			return ret.toString();
-		}
+		}		
 	}
 
 	/***********************************************************************************/
 	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.Model#getFinalReport()
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#getFinalReport()
 	 */
 	@Override
 	public SimulationReportI getFinalReport() {
-		return new CookingPlateElectricityReport(URI, this.totalConsumption);
+		return new AirConditioningElectricityReport(URI, this.totalConsumption);
 	}
 
 }

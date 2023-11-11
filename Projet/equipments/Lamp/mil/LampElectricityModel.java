@@ -36,13 +36,12 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import fr.sorbonne_u.components.hem2023e2.HEM_ReportI;
+import equipments.HEM.simulation.HEM_ReportI;
 import equipments.Lamp.mil.events.AbstractLampEvent;
 import equipments.Lamp.mil.events.SetHighLamp;
 import equipments.Lamp.mil.events.SetLowLamp;
 import equipments.Lamp.mil.events.SwitchOffLamp;
 import equipments.Lamp.mil.events.SwitchOnLamp;
-import fr.sorbonne_u.components.hem2023e2.utils.Electricity;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ModelExportedVariable;
@@ -57,6 +56,8 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
+import utils.Electricity;
+
 import java.io.Serializable;
 
 // -----------------------------------------------------------------------------

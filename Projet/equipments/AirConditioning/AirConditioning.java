@@ -88,7 +88,7 @@ implements	AirConditioningUserImplI,
 	 * 
 	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
-	protected static enum	AirConditioningState
+	protected static enum AirConditioningState
 	{
 		/** AirConditioning is on.													*/
 		ON,
@@ -103,7 +103,7 @@ implements	AirConditioningUserImplI,
 	// -------------------------------------------------------------------------
 
 	/** max power level of the AirConditioning, in watts.							*/
-	protected static final double	MAX_POWER_LEVEL = 2000.0;
+	protected static final double	MAX_POWER_LEVEL = 1200.0;
 	/** standard target temperature for the AirConditioning.							*/
 	protected static final double	STANDARD_TARGET_TEMPERATURE = 19.0;
 

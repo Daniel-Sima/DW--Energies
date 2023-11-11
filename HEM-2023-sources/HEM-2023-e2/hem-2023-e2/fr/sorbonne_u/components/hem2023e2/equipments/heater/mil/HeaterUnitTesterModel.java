@@ -153,7 +153,7 @@ extends		AtomicModel
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI#output()
 	 */
 	@Override
-	public ArrayList<EventI>	output()
+	public ArrayList<EventI> output()
 	{
 		// Simple way to implement a test scenario. Here each step generates
 		// an event sent to the other models in the standard order.
