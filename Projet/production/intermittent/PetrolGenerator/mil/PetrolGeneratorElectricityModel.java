@@ -137,7 +137,7 @@ extends AtomicHIOA {
 	protected static final double MAX_FUEL_TANK_LEVEL = 5.0; // 5L
 	/** fuel consumed in 1h of producing */
 	protected static final double MAX_CONSOMATION_FUEL = 1.9; // 1.9L
-	
+
 	/** current state of the PetrolGenerator.								*/
 	protected GeneratorState currentState = GeneratorState.OFF;
 	/** true when the electricity production of the PetrolGenerator has changed
@@ -362,7 +362,9 @@ extends AtomicHIOA {
 		} else if (this.currentState == GeneratorState.PRODUCING) {
 			this.currentPowerProducedPetrolGenerator.setNewValue(
 					MAX_PRODUCING_POWER, t); // 2000Wh  // TODO AR qd pas par heure
-			
+			// compute the total consumption for the simulation report.
+			this.totalProduction += this.currentPowerProducedPetrolGenerator.getValue(); 
+
 		} else {
 			assert this.currentState == GeneratorState.OFF;
 			this.currentPowerProducedPetrolGenerator.setNewValue(0.0, t);
@@ -394,22 +396,20 @@ extends AtomicHIOA {
 		Event ce = (Event) currentEvents.get(0);
 		assert ce instanceof PetrolGeneratorEventI;
 
-		// compute the total consumption for the simulation report.
-		this.totalProduction += this.currentPowerProducedPetrolGenerator.getValue(); 
 		// TODO AV qd on produit sur une periode plus courte (pas juste 1h)
 		if (this.currentPowerProducedPetrolGenerator.getValue()  > 0) {
 			this.currentFuelTankLevel.setNewValue(this.currentFuelTankLevel.getValue().doubleValue()-MAX_CONSOMATION_FUEL, this.getCurrentStateTime());
 		}
 
 
-		
+
 		StringBuffer st = new StringBuffer(ANSI_BLUE_BACKGROUND + "Total production: ");
 		st.append(this.totalProduction);
 		st.append(" Wh at ");
 		st.append(this.currentPowerProducedPetrolGenerator.getTime());
 		st.append("\n" + ANSI_RESET);
 		this.logMessage(st.toString());
-		
+
 		StringBuffer stt = new StringBuffer(ANSI_GREY_BACKGROUND + "Total fuel level: ");
 		stt.append(Math.round(this.currentFuelTankLevel.getValue() * 100.0) / 100.0);
 		stt.append(" L at ");
@@ -437,9 +437,9 @@ extends AtomicHIOA {
 	 */
 	@Override
 	public void endSimulation(Time endTime) {
-		this.totalProduction += this.currentPowerProducedPetrolGenerator.getValue(); // TODO AR si ici
-		
-		this.logMessage((new PetrolGeneratorElectricityReport(URI, this.totalProduction).printout("-e")));
+		//		this.totalProduction += this.currentPowerProducedPetrolGenerator.getValue(); // TODO AR si ici
+
+		this.logMessage((new PetrolGeneratorElectricityReport(URI, this.totalProduction).printout("-")));
 
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
