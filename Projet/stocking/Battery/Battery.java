@@ -11,9 +11,9 @@ import stocking.Battery.connections.BatteryExternalControlInboundPort;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>Battery</code> is a battry component.
+ * The class <code>Battery</code> is a battery component.
  *
- * <p><strong>Husehold battery</strong> whit 5kW capacity.</p>
+ * <p><strong>Husehold battery</strong> whit 5kWh capacity.</p>
  * 
  * <p><strong>White-box Invariant</strong></p>
  * 

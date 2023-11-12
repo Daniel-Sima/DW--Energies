@@ -90,7 +90,7 @@ extends	AtomicHIOA {
 	public static final double PERIOD = 24.0;
 
 	/** evaluation step for the equation (assumed in hours).				*/
-	protected static final double STEP = 60.0/3600.0;	// 60 seconds
+	protected static double	STEP = (10* 60.0)/3600.0;	// 60 seconds * 10 = 10 min
 	/** evaluation step as a duration, including the time unit.				*/
 	protected final Duration evaluationStep;
 

@@ -1,4 +1,4 @@
-package production.aleatory.SolarPanel.mil;
+package stocking.Battery.mil;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -18,9 +18,9 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.CoordinatorI;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>SolarPanelCoupledModel</code> defines a simple coupled
- * model used to assemble the models defined for the Solar Panel in order to
- * execute unit tests on the Solar Panel simulator.
+ * The class <code>BatteryCoupledModel</code> defines a simple coupled
+ * model used to assemble the models defined for the Battery in order to
+ * execute unit tests on the Battery simulator.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -36,11 +36,11 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.CoordinatorI;
  * invariant	{@code true}	// no more invariant
  * </pre>
  * 
- * <p>Created on : 2023-11-11</p>
+ * <p>Created on : 2023-11-12</p>
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class SolarPanelCoupledModel 
+public class BatteryCoupledModel 
 extends	CoupledModel {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -48,7 +48,7 @@ extends	CoupledModel {
 
 	private static final long serialVersionUID = 1L;
 	/** URI for a model; works when only one instance is created.			*/
-	public static final String	URI = SolarPanelCoupledModel.class.getSimpleName();
+	public static final String	URI = BatteryCoupledModel.class.getSimpleName();
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -73,7 +73,7 @@ extends	CoupledModel {
 	 * @param connections		map connecting event sources to arrays of event sinks among submodels.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public	SolarPanelCoupledModel(
+	public	BatteryCoupledModel(
 			String uri,
 			TimeUnit simulatedTimeUnit,
 			CoordinatorI simulationEngine,
@@ -113,7 +113,7 @@ extends	CoupledModel {
 	 * @param bindings			bindings between exported and imported variables among submodels.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public SolarPanelCoupledModel(
+	public BatteryCoupledModel(
 			String uri,
 			TimeUnit simulatedTimeUnit,
 			CoordinatorI simulationEngine,
@@ -130,6 +130,7 @@ extends	CoupledModel {
 				imported, reexported, connections,
 				importedVars, reexportedVars, bindings);
 	}
+
 }
 /***********************************************************************************/
 /***********************************************************************************/

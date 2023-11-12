@@ -57,7 +57,7 @@ import production.intermittent.PetrolGenerator.mil.events.SwitchOnPetrolGenerato
  * <li>Exported events: none</li>
  * <li>Imported variables: none</li>
  * <li>Exported variables:
- *   name = {@code currentPowerProduced}, type = {@code Double}</li> // TODO total?
+ *   name = {@code currentPowerProducedPetrolGenerator}, type = {@code Double}</li> // TODO total?
  * </ul>
  * 
  * <p><strong>White-box Invariant</strong></p>
@@ -83,7 +83,7 @@ import production.intermittent.PetrolGenerator.mil.events.SwitchOnPetrolGenerato
 		Producing.class,
 		DoNotProduce.class,
 		FillFuelTank.class})
-@ModelExportedVariable(name = "currentPowerProduced", type = Double.class)
+@ModelExportedVariable(name = "currentPowerProducedPetrolGenerator", type = Double.class)
 @ModelExportedVariable(name = "currentFuelTankLevel", type = Double.class)
 public class PetrolGeneratorElectricityModel 
 extends AtomicHIOA {
@@ -144,7 +144,7 @@ extends AtomicHIOA {
 	 *  after executing an external event; the external event changes the
 	 *  value of <code>currentState</code> and then an internal transition
 	 *  will be triggered by putting through in this variable which will
-	 *  update the variable <code>currentPowerProduced</code>.				*/
+	 *  update the variable <code>currentPowerProducedPetrolGenerator</code>.				*/
 	protected boolean productionHasChanged = false;
 
 	/** total production of the PetrolGenerator during the simulation in Wh.*/
@@ -157,7 +157,7 @@ extends AtomicHIOA {
 	/** the current power produced between 0 and
 	 *  {@code PetrolGeneratorElectricityModel.MAX_PRODUCING_POWER}.					*/
 	@ExportedVariable(type = Double.class)
-	protected final Value<Double> currentPowerProduced = new Value<Double>(this);
+	protected final Value<Double> currentPowerProducedPetrolGenerator = new Value<Double>(this);
 
 	/** the current level of fuel in the fuel tank */
 	@ExportedVariable(type = Double.class)
@@ -299,18 +299,18 @@ extends AtomicHIOA {
 	 */
 	@Override
 	public Pair<Integer, Integer> fixpointInitialiseVariables() {
-		if (!this.currentPowerProduced.isInitialised() ||
+		if (!this.currentPowerProducedPetrolGenerator.isInitialised() ||
 				!this.currentFuelTankLevel.isInitialised()) {
 			// initially, the PetrolGenerator is off, so its consumption is zero.
-			this.currentPowerProduced.initialise(0.0);
+			this.currentPowerProducedPetrolGenerator.initialise(0.0);
 			// Initially filled
 			this.currentFuelTankLevel.initialise(MAX_FUEL_TANK_LEVEL); 
 
 			StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "New production: ");
-			sb.append(this.currentPowerProduced.getValue());
+			sb.append(this.currentPowerProducedPetrolGenerator.getValue());
 			sb.append(" Wh at ");
-			sb.append(this.currentPowerProduced.getTime());
-			sb.append(ANSI_RESET);
+			sb.append(this.currentPowerProducedPetrolGenerator.getTime());
+			sb.append("\n" + ANSI_RESET);
 			this.logMessage(sb.toString());
 			return new Pair<>(2, 0);
 		} else {
@@ -357,21 +357,21 @@ extends AtomicHIOA {
 
 		Time t = this.getCurrentStateTime();
 		if (this.currentState == GeneratorState.ON) {
-			this.currentPowerProduced.setNewValue(
+			this.currentPowerProducedPetrolGenerator.setNewValue(
 					PetrolGeneratorElectricityModel.NOT_PRODUCING_POWER, t);
 		} else if (this.currentState == GeneratorState.PRODUCING) {
-			this.currentPowerProduced.setNewValue(
+			this.currentPowerProducedPetrolGenerator.setNewValue(
 					MAX_PRODUCING_POWER, t); // 2000Wh  // TODO AR qd pas par heure
 			
 		} else {
 			assert this.currentState == GeneratorState.OFF;
-			this.currentPowerProduced.setNewValue(0.0, t);
+			this.currentPowerProducedPetrolGenerator.setNewValue(0.0, t);
 		}
 
 		StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "Current production: ");
-		sb.append(this.currentPowerProduced.getValue());
+		sb.append(this.currentPowerProducedPetrolGenerator.getValue());
 		sb.append(" Wh at ");
-		sb.append(this.currentPowerProduced.getTime());
+		sb.append(this.currentPowerProducedPetrolGenerator.getTime());
 		sb.append("\n" + ANSI_RESET);
 		this.logMessage(sb.toString());
 	}
@@ -395,9 +395,9 @@ extends AtomicHIOA {
 		assert ce instanceof PetrolGeneratorEventI;
 
 		// compute the total consumption for the simulation report.
-		this.totalProduction += this.currentPowerProduced.getValue(); 
+		this.totalProduction += this.currentPowerProducedPetrolGenerator.getValue(); 
 		// TODO AV qd on produit sur une periode plus courte (pas juste 1h)
-		if (this.currentPowerProduced.getValue()  > 0) {
+		if (this.currentPowerProducedPetrolGenerator.getValue()  > 0) {
 			this.currentFuelTankLevel.setNewValue(this.currentFuelTankLevel.getValue().doubleValue()-MAX_CONSOMATION_FUEL, this.getCurrentStateTime());
 		}
 
@@ -406,7 +406,7 @@ extends AtomicHIOA {
 		StringBuffer st = new StringBuffer(ANSI_BLUE_BACKGROUND + "Total production: ");
 		st.append(this.totalProduction);
 		st.append(" Wh at ");
-		st.append(this.currentPowerProduced.getTime());
+		st.append(this.currentPowerProducedPetrolGenerator.getTime());
 		st.append("\n" + ANSI_RESET);
 		this.logMessage(st.toString());
 		
@@ -437,7 +437,7 @@ extends AtomicHIOA {
 	 */
 	@Override
 	public void endSimulation(Time endTime) {
-		this.totalProduction += this.currentPowerProduced.getValue(); // TODO AR si ici
+		this.totalProduction += this.currentPowerProducedPetrolGenerator.getValue(); // TODO AR si ici
 		
 		this.logMessage((new PetrolGeneratorElectricityReport(URI, this.totalProduction).printout("-e")));
 
@@ -536,7 +536,7 @@ extends AtomicHIOA {
 			ret.append(" report\n");
 			ret.append(indent);
 			ret.append('|');
-			ret.append("total production in kWh = ");
+			ret.append("total production in Wh = ");
 			ret.append(this.totalProduction);
 			ret.append(".\n");
 			ret.append(indent);
