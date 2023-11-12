@@ -20,6 +20,5 @@
 	<classpathentry kind="lib" path="javassist/javassist.jar"/>
 	<classpathentry kind="lib" path="NeoSim4Java-17102023.jar"/>
 	<classpathentry kind="lib" path="HEM-2023-sources/HEM-2023-e2/jfreechart-1.6.0-snapshot.jar"/>
-	<classpathentry kind="lib" path="HEM-2023-sources/HEM-2023-e2/commons-math3-3.6.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

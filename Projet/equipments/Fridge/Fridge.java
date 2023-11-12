@@ -19,8 +19,7 @@ import fr.sorbonne_u.exceptions.PreconditionException;
  * <p><strong>White-box Invariant</strong></p>
  * 
  * <pre>
- * invariant	{@code targetTemperature >= -20.0 && targetTemperature <= 50.0}
- * invariant	{@code currentPowerLevel >= 0.0 && currentPowerLevel <= MAX_POWER_LEVEL}
+ * TODO
  * </pre>
  * 
  * <p><strong>Black-box Invariant</strong></p>
@@ -351,7 +350,7 @@ implements	FridgeUserImplI,
 		}
 
 		assert	targetFreezer >= -20.0 && targetFreezer <= 0.0 :
-				new PreconditionException("target >= -25.0 && target <= 0.0");
+				new PreconditionException("target >= -20.0 && target <= 0.0");
 
 		this.targetFreezerTemperature = targetFreezer;
 
@@ -372,7 +371,7 @@ implements	FridgeUserImplI,
 		double ret = this.targetFreezerTemperature;
 
 		assert	ret >= -20.0 && ret <= 0.0 :
-				new PostconditionException("return >= -25.0 && return <= 0.0");
+				new PostconditionException("return >= -20.0 && return <= 0.0");
 
 		return ret;
 	}

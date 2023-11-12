@@ -1,8 +1,8 @@
-package equipments.AirConditioning.events;
+package equipments.AirConditioning.mil.events;
 
 import equipments.AirConditioning.mil.AirConditioningElectricityModel;
 import equipments.AirConditioning.mil.AirConditioningTemperatureModel;
-import fr.sorbonne_u.devs_simulation.models.events.Event;
+import fr.sorbonne_u.devs_simulation.es.events.ES_Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
@@ -11,8 +11,8 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>Cool</code> defines the simulation event of the AirConditioning
- * starting to cool.
+ * The class <code>SwitchOffAirConditioning</code> defines the simulation event of the
+ * AirConditioning being switched off.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -32,8 +32,7 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class Cool 
-extends Event
+public class SwitchOffAirConditioning extends ES_Event
 implements AirConditioningEventI {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -41,12 +40,8 @@ implements AirConditioningEventI {
 
 	private static final long serialVersionUID = 1L;
 
-	// -------------------------------------------------------------------------
-	// Constructors
-	// -------------------------------------------------------------------------
-
 	/**
-	 * create a <code>Cool</code> event.
+	 * create a <code>SwitchOffAirConditioning</code> event.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -57,7 +52,7 @@ implements AirConditioningEventI {
 	 *
 	 * @param timeOfOccurrence	time of occurrence of the event.
 	 */
-	public Cool(Time timeOfOccurrence) {
+	public SwitchOffAirConditioning(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
 
@@ -66,18 +61,13 @@ implements AirConditioningEventI {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see fr.sorbonne_u.devs_simulation.models.events.Event#hasPriorityOver(fr.sorbonne_u.devs_simulation.models.events.EventI)
+	 * @see fr.sorbonne_u.devs_simulation.es.events.ES_Event#hasPriorityOver(fr.sorbonne_u.devs_simulation.models.events.EventI)
 	 */
 	@Override
 	public boolean hasPriorityOver(EventI e) {
-		// if many AirConditioning events occur at the same time, the Cool one will be
-		// executed after SwitchOnAirConditioning and DoNotCool ones but before
-		// SwitchOffAirConditioning.
-		if (e instanceof SwitchOnAirConditioning || e instanceof DoNotCool) {
-			return false;
-		} else {
-			return true;
-		}
+		// if many AirConditioning events occur at the same time, the
+		// SwitchOffAirConditioning one will be executed after all others.
+		return false;
 	}
 
 	/***********************************************************************************/
@@ -86,30 +76,25 @@ implements AirConditioningEventI {
 	 */
 	@Override
 	public void executeOn(AtomicModelI model) {
-		assert	model instanceof AirConditioningElectricityModel ||
+		assert model instanceof AirConditioningElectricityModel ||
 		model instanceof AirConditioningTemperatureModel;
 
 		if (model instanceof AirConditioningElectricityModel) {
 			AirConditioningElectricityModel m = (AirConditioningElectricityModel)model;
-			assert	m.getState() == AirConditioningElectricityModel.AirConditioningState.ON:
+			assert	m.getState() != AirConditioningElectricityModel.AirConditioningState.ON :
 				new AssertionError(
-						"model not in the right state, should be "
+						"model not in the right state, should not be "
 								+ "AirConditioningElectricityModel.AirConditioningState.ON but is "
 								+ m.getState());
-			m.setState(AirConditioningElectricityModel.AirConditioningState.COOLING,
+			m.setState(AirConditioningElectricityModel.AirConditioningState.OFF,
 					this.getTimeOfOccurrence());
 		} else {
 			AirConditioningTemperatureModel m = (AirConditioningTemperatureModel)model;
-			assert	m.getState() == AirConditioningTemperatureModel.State.NOT_COOLING:
-				new AssertionError(
-						"model not in the right state, should be "
-								+ "AirConditioningTemperatureModel.State.NOT_COOLING but is "
-								+ m.getState());
-			m.setState(AirConditioningTemperatureModel.State.COOLING);
+			m.setState(AirConditioningTemperatureModel.State.NOT_COOLING);
 		}
 	}
+
 }
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
-

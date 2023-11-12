@@ -1,4 +1,4 @@
-package equipments.AirConditioning.mil;
+package equipments.Fridge.mil;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import equipments.AirConditioning.mil.events.Cool;
-import equipments.AirConditioning.mil.events.DoNotCool;
-import equipments.AirConditioning.mil.events.SetPowerAirConditioning;
-import equipments.AirConditioning.mil.events.SwitchOffAirConditioning;
-import equipments.AirConditioning.mil.events.SwitchOnAirConditioning;
+import equipments.Fridge.mil.events.Cool;
+import equipments.Fridge.mil.events.DoNotCool;
+import equipments.Fridge.mil.events.SetPowerFridge;
+import equipments.Fridge.mil.events.SwitchOffFridge;
+import equipments.Fridge.mil.events.SwitchOnFridge;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
@@ -29,8 +29,8 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>RunAirConditioningUnitarySimulation</code> creates a simulator
- * for the AirConditioning and then runs a typical simulation.
+ * The class <code>RunFridgeUnitarySimulation</code> creates a simulator
+ * for the Fridge and then runs a typical simulation.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -75,8 +75,9 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
  * <p>Created on : 2023-11-11</p>
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
+ * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-public class RunAirConditioningUnitarySimulation {
+public class RunFridgeUnitarySimulation {
 	public static void main(String[] args)
 	{
 		try {
@@ -84,37 +85,37 @@ public class RunAirConditioningUnitarySimulation {
 			// the simulation architecture
 			Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
 
-			// the AirConditioning models simulating its electricity consumption, its
-			// temperatures and the external temperature are atomic HIOA models
+			// the Fridge models simulating its electricity consumption, its
+			// temperatures and the internal temperature are atomic HIOA models
 			// hence we use an AtomicHIOA_Descriptor(s)
 			atomicModelDescriptors.put(
-					AirConditioningElectricityModel.URI,
+					FridgeElectricityModel.URI,
 					AtomicHIOA_Descriptor.create(
-							AirConditioningElectricityModel.class,
-							AirConditioningElectricityModel.URI,
+							FridgeElectricityModel.class,
+							FridgeElectricityModel.URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					AirConditioningTemperatureModel.URI,
+					FridgeTemperatureModel.URI,
 					AtomicHIOA_Descriptor.create(
-							AirConditioningTemperatureModel.class,
-							AirConditioningTemperatureModel.URI,
+							FridgeTemperatureModel.class,
+							FridgeTemperatureModel.URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					ExternalTemperatureModel.URI,
+					InternalTemperatureModel.URI,
 					AtomicHIOA_Descriptor.create(
-							ExternalTemperatureModel.class,
-							ExternalTemperatureModel.URI,
+							InternalTemperatureModel.class,
+							InternalTemperatureModel.URI,
 							TimeUnit.HOURS,
 							null));
-			// the AirConditioning unit tester model only exchanges event, an
+			// the Fridge unit tester model only exchanges event, an
 			// atomic model hence we use an AtomicModelDescriptor
 			atomicModelDescriptors.put(
-					AirConditioningUnitTesterModel.URI,
+					FridgeUnitTesterModel.URI,
 					AtomicModelDescriptor.create(
-							AirConditioningUnitTesterModel.class,
-							AirConditioningUnitTesterModel.URI,
+							FridgeUnitTesterModel.class,
+							FridgeUnitTesterModel.URI,
 							TimeUnit.HOURS,
 							null));
 
@@ -124,10 +125,10 @@ public class RunAirConditioningUnitarySimulation {
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
-			submodels.add(AirConditioningElectricityModel.URI);
-			submodels.add(AirConditioningTemperatureModel.URI);
-			submodels.add(ExternalTemperatureModel.URI);
-			submodels.add(AirConditioningUnitTesterModel.URI);
+			submodels.add(FridgeElectricityModel.URI);
+			submodels.add(FridgeTemperatureModel.URI);
+			submodels.add(InternalTemperatureModel.URI);
+			submodels.add(FridgeUnitTesterModel.URI);
 
 			// event exchanging connections between exporting and importing
 			// models
@@ -135,42 +136,42 @@ public class RunAirConditioningUnitarySimulation {
 					new HashMap<EventSource,EventSink[]>();
 
 					connections.put(
-							new EventSource(AirConditioningUnitTesterModel.URI,
-									SetPowerAirConditioning.class),
+							new EventSource(FridgeUnitTesterModel.URI,
+									SetPowerFridge.class),
 							new EventSink[] {
-									new EventSink(AirConditioningElectricityModel.URI,
-											SetPowerAirConditioning.class)
+									new EventSink(FridgeElectricityModel.URI,
+											SetPowerFridge.class)
 							});
 					connections.put(
-							new EventSource(AirConditioningUnitTesterModel.URI,
-									SwitchOnAirConditioning.class),
+							new EventSource(FridgeUnitTesterModel.URI,
+									SwitchOnFridge.class),
 							new EventSink[] {
-									new EventSink(AirConditioningElectricityModel.URI,
-											SwitchOnAirConditioning.class)
+									new EventSink(FridgeElectricityModel.URI,
+											SwitchOnFridge.class)
 							});
 					connections.put(
-							new EventSource(AirConditioningUnitTesterModel.URI,
-									SwitchOffAirConditioning.class),
+							new EventSource(FridgeUnitTesterModel.URI,
+									SwitchOffFridge.class),
 							new EventSink[] {
-									new EventSink(AirConditioningElectricityModel.URI,
-											SwitchOffAirConditioning.class),
-									new EventSink(AirConditioningTemperatureModel.URI,
-											SwitchOffAirConditioning.class)
+									new EventSink(FridgeElectricityModel.URI,
+											SwitchOffFridge.class),
+									new EventSink(FridgeTemperatureModel.URI,
+											SwitchOffFridge.class)
 							});
 					connections.put(
-							new EventSource(AirConditioningUnitTesterModel.URI, Cool.class),
+							new EventSource(FridgeUnitTesterModel.URI, Cool.class),
 							new EventSink[] {
-									new EventSink(AirConditioningElectricityModel.URI,
+									new EventSink(FridgeElectricityModel.URI,
 											Cool.class),
-									new EventSink(AirConditioningTemperatureModel.URI,
+									new EventSink(FridgeTemperatureModel.URI,
 											Cool.class)
 							});
 					connections.put(
-							new EventSource(AirConditioningUnitTesterModel.URI, DoNotCool.class),
+							new EventSource(FridgeUnitTesterModel.URI, DoNotCool.class),
 							new EventSink[] {
-									new EventSink(AirConditioningElectricityModel.URI,
+									new EventSink(FridgeElectricityModel.URI,
 											DoNotCool.class),
-									new EventSink(AirConditioningTemperatureModel.URI,
+									new EventSink(FridgeTemperatureModel.URI,
 											DoNotCool.class)
 							});
 
@@ -178,29 +179,29 @@ public class RunAirConditioningUnitarySimulation {
 					Map<VariableSource,VariableSink[]> bindings =
 							new HashMap<VariableSource,VariableSink[]>();
 
-							bindings.put(new VariableSource("externalTemperature",
+							bindings.put(new VariableSource("internalTemperature",
 									Double.class,
-									ExternalTemperatureModel.URI),
+									InternalTemperatureModel.URI),
 									new VariableSink[] {
-											new VariableSink("externalTemperature",
+											new VariableSink("internalTemperature",
 													Double.class,
-													AirConditioningTemperatureModel.URI)
+													FridgeTemperatureModel.URI)
 							});
 							bindings.put(new VariableSource("currentCoolingPower",
 									Double.class,
-									AirConditioningElectricityModel.URI),
+									FridgeElectricityModel.URI),
 									new VariableSink[] {
 											new VariableSink("currentCoolingPower",
 													Double.class,
-													AirConditioningTemperatureModel.URI)
+													FridgeTemperatureModel.URI)
 							});
 
 							// coupled model descriptor
 							coupledModelDescriptors.put(
-									AirConditioningCoupledModel.URI,
+									FridgeCoupledModel.URI,
 									new CoupledHIOA_Descriptor(
-											AirConditioningCoupledModel.class,
-											AirConditioningCoupledModel.URI,
+											FridgeCoupledModel.class,
+											FridgeCoupledModel.URI,
 											submodels,
 											null,
 											null,
@@ -213,7 +214,7 @@ public class RunAirConditioningUnitarySimulation {
 							// simulation architecture
 							ArchitectureI architecture =
 									new Architecture(
-											AirConditioningCoupledModel.URI,
+											FridgeCoupledModel.URI,
 											atomicModelDescriptors,
 											coupledModelDescriptors,
 											TimeUnit.HOURS);

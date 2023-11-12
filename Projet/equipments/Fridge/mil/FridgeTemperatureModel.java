@@ -1,15 +1,16 @@
-package equipments.AirConditioning.mil;
+package equipments.Fridge.mil;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import equipments.AirConditioning.mil.events.AirConditioningEventI;
-import equipments.AirConditioning.mil.events.Cool;
-import equipments.AirConditioning.mil.events.DoNotCool;
-import equipments.AirConditioning.mil.events.SwitchOffAirConditioning;
+import equipments.Fridge.mil.events.FridgeEventI;
+import equipments.Fridge.mil.events.Cool;
+import equipments.Fridge.mil.events.DoNotCool;
+import equipments.Fridge.mil.events.SwitchOffFridge;
 import equipments.HEM.simulation.HEM_ReportI;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.InternalVariable;
+import fr.sorbonne_u.devs_simulation.hioa.annotations.ModelExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ModelImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.DerivableValue;
@@ -28,30 +29,26 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>AirConditioningTemperatureModel</code> defines a simulation model
- * for the temperature inside a room equipped with a AirConditioning.
+ * The class <code>FridgeTemperatureModel</code> defines a simulation model
+ * for the temperature inside the fridge.
  *
  * <p><strong>Description</strong></p>
  * 
  * <p>
  * The model is implemented as an atomic HIOA model. A differential equation
- * defines the temperature variation over time. It uses a very simple
- * mathematical model where the derivative is proportional to the difference
- * between the current temperature and the temperature that influences the
- * current one. In fact, there are two temperatures that influences the current
- * temperature of the room:
+ * defines the temperature variation over time. 
  * </p>
  * <ol>
- * <li>the temperature outside the house (room) where the coefficient
+ * <li>the temperature outside the fridge where the coefficient
  *   applied to the difference between the outside temperature and the
  *   current temperature models the thermal insulation of the walls
  *   ({@code INSULATION_TRANSFER_CONSTANT});</li>
  * <li>the temperature of the AirConditionnin when it cools where the coefficient
- *   applied to the difference between the AirConditioning temperature
+ *   applied to the difference between the Fridge temperature
  *   ({@code STANDARD_COOLING_TEMP}) and the current temperature models the
- *   cool diffusion over the house (room)
+ *   cool diffusion over the fridge
  *   ({@code COOLING_TRANSFER_CONSTANT}); the cooling diffusion is not constant
- *   but rather proportional to the current power level of the AirConditioning.</li>
+ *   but rather proportional to the current power level of the Fridge.</li>
  * </ol>
  * <p>
  * The resulting differential equation is integrated using the Euler method
@@ -63,7 +60,7 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
  * Whether the current temperature evolves under the influence of the outside
  * temperature only or also the cooling temperature depends upon the state,
  * which in turn is modified through the reception of imported events
- * {@code Cool} and {@code DoNotCool}. The external temperature is imported
+ * {@code Cool} and {@code DoNotCool}. The internal temperature is imported
  * from another model simulating the environment. The current temperature is
  * exported to be used by other models.
  * </p>
@@ -71,12 +68,14 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
  * <ul>
  * <li>Imported events:
  *   {@code SwitchOffAirConditionning},
- *   {@code Cool},
- *   {@code DoNotCool}</li>
+ *   {@code CoolCooler},
+ *   {@code CoolFreezer},
+ *   {@code DoNotCoolCooler},
+ *   {@code DoNotCoolFreezer}</li>
  * <li>Exported events: none</li>
  * <li>Imported variables: none</li>
  * <li>Exported variables:
- *   name = {@code externalTemperature}, type = {@code Double}</li>
+ *   name = {@code internalTemperature}, type = {@code Double}</li>
  * </ul>
  * 
  * <p><strong>White-box Invariant</strong></p>
@@ -93,14 +92,15 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
  * 
  * <p>Created on : 2023-09-29</p>
  * 
- * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
+ * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-@ModelExternalEvents(imported = {SwitchOffAirConditioning.class,
+@ModelExternalEvents(imported = {SwitchOffFridge.class,
 		Cool.class,
 		DoNotCool.class})
-@ModelImportedVariable(name = "externalTemperature", type = Double.class)
+@ModelImportedVariable(name = "internalTemperature", type = Double.class)
 @ModelImportedVariable(name = "currentCoolingPower", type = Double.class)
-public class AirConditioningTemperatureModel 
+@ModelExportedVariable(name = "fridgeTemperature", type = Double.class)
+public class FridgeTemperatureModel 
 extends AtomicHIOA {
 
 	// Declaring ANSI_RESET so that we can reset the color 
@@ -120,14 +120,14 @@ extends AtomicHIOA {
 
 	/**
 	 * The enumeration <code>State</code> defines the state in which the
-	 * AirConditioning can be from the temperature perspective.
+	 * Fridge can be from the temperature perspective.
 	 *
 	 */
 	public static enum State {
-		/** AirConditioning is not cooling.									*/
+		/** Fridge is not cooling.									*/
 		NOT_COOLING,
-		/** AirConditioning is on and cooling.								*/
-		COOLING
+		/** Fridge is on and cooling.						*/
+		COOLING,
 	}
 
 	// -------------------------------------------------------------------------
@@ -141,16 +141,16 @@ extends AtomicHIOA {
 	// scenario.
 
 	/** URI for a model; works when only one instance is created.			*/
-	public static String URI = AirConditioningTemperatureModel.class. getSimpleName();
-	/** temperature of the room (house) when the simulation begins.			*/
-	public static double INITIAL_TEMPERATURE = 19.005;
-	/** wall insulation heat transfer constant in the differential equation.*/
-	protected static double INSULATION_TRANSFER_CONSTANT = 12.5;
+	public static String URI = FridgeTemperatureModel.class. getSimpleName();
+	/** temperature of the fridge when the simulation begins.			*/
+	public static double INITIAL_TEMPERATURE = 10.005;
+	/** fridge wall insulation heat transfer constant in the differential equation.*/
+	protected static double INSULATION_TRANSFER_CONSTANT = 20;
 	/** cooling transfer constant in the differential equation when the
 	 *  cooling power is maximal.											*/
-	protected static double MIN_COOLING_TRANSFER_CONSTANT = 40.0;
-	/** temperature of the cooling in the AirConditioning.					*/
-	protected static double STANDARD_COOLING_TEMP = -100.0; // TODO AR
+	protected static double MIN_COOLING_TRANSFER_CONSTANT = 30.0;
+	/** temperature of the cooling in the Fridge.					*/
+	protected static double STANDARD_COOLING_TEMP = -150.0; // TODO AR
 	/** update tolerance for the temperature <i>i.e.</i>, shortest elapsed
 	 *  time since the last update under which the temperature is not
 	 *  changed by the update to avoid too large computation errors.		*/
@@ -160,14 +160,14 @@ extends AtomicHIOA {
 	/** integration step for the differential equation(assumed in hours).	*/
 	protected static double	STEP = 60.0/3600.0;	// 60 seconds
 
-	/** current state of the AirConditioning.								*/
+	/** current state of the Fridge.								*/
 	protected State currentState = State.NOT_COOLING;
 
 	// Simulation run variables
 
 	/** integration step as a duration, including the time unit.			*/
 	protected final Duration integrationStep;
-	/** accumulator to compute the mean external temperature for the
+	/** accumulator to compute the mean internal temperature for the
 	 *  simulation report.													*/
 	protected double temperatureAcc;
 	/** the simulation time of start used to compute the mean temperature.	*/
@@ -180,14 +180,14 @@ extends AtomicHIOA {
 	// HIOA model variables
 	// -------------------------------------------------------------------------
 
-	/** current external temperature in Celsius.							*/
+	/** current internal temperature in Celsius.							*/
 	@ImportedVariable(type = Double.class)
-	protected Value<Double>	externalTemperature;
+	protected Value<Double>	internalTemperature;
 	/** the current cooling power between 0 and
-	 *  {@code AirConditioningElectricityModel.MAX_COOLING_POWER}.			*/
+	 *  {@code FridgeElectricityModel.MAX_COOLING_POWER}.			*/
 	@ImportedVariable(type = Double.class)
 	protected Value<Double>	currentCoolingPower;
-	/** current temperature in the room.									*/
+	/** current temperature in the fridge.									*/
 	@InternalVariable(type = Double.class)
 	protected final DerivableValue<Double> currentTemperature = new DerivableValue<Double>(this);
 
@@ -196,7 +196,7 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a <code>AirConditioningTemperatureModel</code> instance.
+	 * create a <code>FridgeTemperatureModel</code> instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -210,7 +210,7 @@ extends AtomicHIOA {
 	 * @param simulationEngine	simulation engine to which the model is attached.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public AirConditioningTemperatureModel(
+	public FridgeTemperatureModel(
 			String uri,
 			TimeUnit simulatedTimeUnit,
 			AtomicSimulatorI simulationEngine
@@ -226,7 +226,7 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * set the state of the AirConditioning.
+	 * set the state of the Fridge.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -243,7 +243,7 @@ extends AtomicHIOA {
 
 	/***********************************************************************************/
 	/**
-	 * return the state of the AirConditioning.
+	 * return the state of the Fridge.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -261,7 +261,7 @@ extends AtomicHIOA {
 	/***********************************************************************************/
 	/**
 	 * compute the current heat transfer constant given the current cooling
-	 * power of the AirConditioning.
+	 * power of the Fridge.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -277,13 +277,13 @@ extends AtomicHIOA {
 		// transfer constant that grows as the power gets lower, hence the
 		// derivative given by the differential equation will be lower when
 		// the power gets **higher**, what is physically awaited.
-		double c = MIN_COOLING_TRANSFER_CONSTANT * AirConditioningElectricityModel.MAX_COOLING_POWER;
+		double c = MIN_COOLING_TRANSFER_CONSTANT * FridgeElectricityModel.MAX_COOLING_POWER;
 		return c/this.currentCoolingPower.getValue();
 	}
 
 	/***********************************************************************************/
 	/**
-	 * compute the current derivative of the room temperature.
+	 * compute the current derivative of the fridge temperature.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -292,28 +292,28 @@ extends AtomicHIOA {
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param current	current temperature of the room.
+	 * @param current	current temperature of the fridge.
 	 * @return			the current derivative.
 	 */
 	protected double computeDerivatives(Double current) {
 		double currentTempDerivative = 0.0;
 		if (this.currentState == State.COOLING) {
 			// the cooling contribution: temperature difference between the
-			// cooling temperature and the room temperature divided by the
+			// cooling temperature and the fridge temperature divided by the
 			// heat transfer constant taking into account the size of the
-			// room
+			// fridge
 			if (this.currentCoolingPower.getValue() > POWER_HEAT_TRANSFER_TOLERANCE) {
 				currentTempDerivative = (STANDARD_COOLING_TEMP - current)/this.currentHeatTransfertConstant();
 			}
 		}
 
-		// the heating contribution: difference between the external temperature
-		// and the temperature of the room divided by the insulation transfer
+		// the heating contribution: difference between the internal temperature
+		// and the temperature of the fridge divided by the insulation transfer
 		// constant taking into account the surface of the walls.
 		Time t = this.getCurrentStateTime();
-		currentTempDerivative +=
-				(this.externalTemperature.evaluateAt(t) - current)/
-				INSULATION_TRANSFER_CONSTANT;
+		currentTempDerivative += (this.internalTemperature.evaluateAt(t) - current)
+								/INSULATION_TRANSFER_CONSTANT;
+		
 		return currentTempDerivative;
 	}
 
@@ -338,7 +338,7 @@ extends AtomicHIOA {
 		double newTemp;
 
 		if (deltaT > TEMPERATURE_UPDATE_TOLERANCE) {
-			// update the room temperature using the Euler integration of the
+			// update the fridge temperature using the Euler integration of the
 			// differential equation
 			double derivative = this.currentTemperature.getFirstDerivative();
 			newTemp = oldTemp + derivative*deltaT;
@@ -389,17 +389,17 @@ extends AtomicHIOA {
 		int notInitialisedYet = 0;
 
 		// Only one variable must be initialised, the current temperature, and
-		// it depends upon only one variable, the external temperature.
+		// it depends upon only one variable, the internal temperature.
 		if (!this.currentTemperature.isInitialised() &&
-				this.externalTemperature.isInitialised()) {
+				this.internalTemperature.isInitialised()) {
 			// If the current temperature is not initialised yet but the
-			// external temperature is, then initialise the current temperature
+			// internal temperature is, then initialise the current temperature
 			// and say one more variable is initialised at this execution.
 			double derivative = this.computeDerivatives(INITIAL_TEMPERATURE);
 			this.currentTemperature.initialise(INITIAL_TEMPERATURE, derivative);
 			justInitialised++;
 		} else if (!this.currentTemperature.isInitialised()) {
-			// If the external temperature is not initialised and the current
+			// If the internal temperature is not initialised and the current
 			// temperature either, then say one more variable has not been
 			// initialised yet at this execution, forcing another execution
 			// to reach the fix point.
@@ -449,8 +449,7 @@ extends AtomicHIOA {
 		// Tracing
 		String mark = this.currentState == State.COOLING ? "is COOLING" : "is NOT COOLING";
 		StringBuffer message = new StringBuffer();
-		message.append(ANSI_GREY_BACKGROUND);
-		message.append((Math.round(this.currentTemperature.getValue() *100.0) / 100.0) + "° in the room and ");
+		message.append((Math.round(this.currentTemperature.getValue() *100.0) / 100.0) + "° in the fridge and ");
 		message.append(mark);
 		message.append(" at " + this.currentTemperature.getTime());
 		message.append('\n' + ANSI_RESET);
@@ -468,14 +467,14 @@ extends AtomicHIOA {
 		// get the vector of current external events
 		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 		// when this method is called, there is at least one external event,
-		// and for the AirConditioning model, there will be exactly one by
+		// and for the Fridge model, there will be exactly one by
 		// construction.
 		assert	currentEvents != null && currentEvents.size() == 1;
 
 		Event ce = (Event) currentEvents.get(0);
-		assert	ce instanceof AirConditioningEventI;
+		assert	ce instanceof FridgeEventI;
 
-		StringBuffer sb = new StringBuffer("executing the external event: ");
+		StringBuffer sb = new StringBuffer("executing the internal event: ");
 		sb.append(ce.eventAsString());
 		sb.append(".\n");
 		this.logMessage(sb.toString());
@@ -484,7 +483,7 @@ extends AtomicHIOA {
 		// variable) until the current time.
 		double newTemp =
 				this.computeNewTemperature(elapsedTime.getSimulatedDuration());
-		// Then, update the current state of the AirConditioning.
+		// Then, update the current state of the Fridge.
 		ce.executeOn(this);
 		// Next, compute the new derivative
 		double newDerivative = this.computeDerivatives(newTemp);
@@ -518,8 +517,8 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * The class <code>AirConditioningTemperatureReport</code> implements the
-	 * simulation report for the <code>AirConditioningTemperatureModel</code>.
+	 * The class <code>FridgeTemperatureReport</code> implements the
+	 * simulation report for the <code>FridgeTemperatureModel</code>.
 	 *
 	 * <p><strong>Description</strong></p>
 	 * 
@@ -538,7 +537,7 @@ extends AtomicHIOA {
 	 * <p>Created on : 2023-11-11</p>
 	 * 
 	 */
-	public static class AirConditioningTemperatureReport
+	public static class FridgeTemperatureReport
 	implements	SimulationReportI, HEM_ReportI
 	{
 		private static final long serialVersionUID = 1L;
@@ -546,7 +545,7 @@ extends AtomicHIOA {
 		protected double meanTemperature;
 
 		/***********************************************************************************/
-		public AirConditioningTemperatureReport(
+		public FridgeTemperatureReport(
 				String modelURI,
 				double meanTemperature
 				)
@@ -590,7 +589,7 @@ extends AtomicHIOA {
 	 */
 	@Override
 	public SimulationReportI getFinalReport() {
-		return new AirConditioningTemperatureReport(URI, this.meanTemperature);
+		return new FridgeTemperatureReport(URI, this.meanTemperature);
 	}
 }
 /***********************************************************************************/

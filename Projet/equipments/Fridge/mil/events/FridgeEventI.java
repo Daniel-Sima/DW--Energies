@@ -1,4 +1,4 @@
-package equipments.AirConditioning.events;
+package equipments.Fridge.mil.events;
 
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 
@@ -6,8 +6,8 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The interface <code>AirConditioningEventI</code> enforces a common type for all 
- * AirConditioning simulation events.
+ * The interface <code>FridgeEventI</code> enforces a common type for all 
+ * Fridge simulation events.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -21,7 +21,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public interface AirConditioningEventI 
+public interface FridgeEventI 
 extends EventI {}
 /***********************************************************************************/
 /***********************************************************************************/

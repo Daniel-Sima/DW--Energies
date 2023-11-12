@@ -1,7 +1,6 @@
-package equipments.AirConditioning.events;
+package equipments.AirConditioning.mil.events;
 
 import equipments.AirConditioning.mil.AirConditioningElectricityModel;
-import equipments.AirConditioning.mil.AirConditioningTemperatureModel;
 import fr.sorbonne_u.devs_simulation.es.events.ES_Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
@@ -11,8 +10,8 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>SwitchOffAirConditioning</code> defines the simulation event of the
- * AirConditioning being switched off.
+ * The class <code>SwitchOnAirConditioning</code> defines the simulation event of the
+ * AirConditioning being switched on.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -32,7 +31,8 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class SwitchOffAirConditioning extends ES_Event
+public class SwitchOnAirConditioning 
+extends ES_Event
 implements AirConditioningEventI {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -40,8 +40,11 @@ implements AirConditioningEventI {
 
 	private static final long serialVersionUID = 1L;
 
+	// -------------------------------------------------------------------------
+	// Constructors
+	// -------------------------------------------------------------------------
 	/**
-	 * create a <code>SwitchOffAirConditioning</code> event.
+	 * create a <code>SwitchOnAirConditioning</code> event.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -52,22 +55,21 @@ implements AirConditioningEventI {
 	 *
 	 * @param timeOfOccurrence	time of occurrence of the event.
 	 */
-	public SwitchOffAirConditioning(Time timeOfOccurrence) {
+	public SwitchOnAirConditioning(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
 
 	// -------------------------------------------------------------------------
 	// Methods
 	// -------------------------------------------------------------------------
-
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.es.events.ES_Event#hasPriorityOver(fr.sorbonne_u.devs_simulation.models.events.EventI)
 	 */
 	@Override
-	public boolean hasPriorityOver(EventI e) {
+	public boolean hasPriorityOver(EventI e){
 		// if many AirConditioning events occur at the same time, the
-		// SwitchOffAirConditioning one will be executed after all others.
-		return false;
+		// SwitchOnAirConditioning one will be executed first.
+		return true;
 	}
 
 	/***********************************************************************************/
@@ -76,24 +78,16 @@ implements AirConditioningEventI {
 	 */
 	@Override
 	public void executeOn(AtomicModelI model) {
-		assert model instanceof AirConditioningElectricityModel ||
-		model instanceof AirConditioningTemperatureModel;
+		assert	model instanceof AirConditioningElectricityModel;
 
-		if (model instanceof AirConditioningElectricityModel) {
-			AirConditioningElectricityModel m = (AirConditioningElectricityModel)model;
-			assert	m.getState() != AirConditioningElectricityModel.AirConditioningState.ON :
-				new AssertionError(
-						"model not in the right state, should not be "
-								+ "AirConditioningElectricityModel.AirConditioningState.ON but is "
-								+ m.getState());
-			m.setState(AirConditioningElectricityModel.AirConditioningState.OFF,
-					this.getTimeOfOccurrence());
-		} else {
-			AirConditioningTemperatureModel m = (AirConditioningTemperatureModel)model;
-			m.setState(AirConditioningTemperatureModel.State.NOT_COOLING);
-		}
+		AirConditioningElectricityModel m = (AirConditioningElectricityModel)model;
+		assert	m.getState() == AirConditioningElectricityModel.AirConditioningState.OFF :
+			new AssertionError(
+					"model not in the right state, should be "
+							+ "AirConditioningElectricityModel.AirConditioningState.OFF but is "
+							+ m.getState());
+		m.setState(AirConditioningElectricityModel.AirConditioningState.ON, this.getTimeOfOccurrence());
 	}
-
 }
 /***********************************************************************************/
 /***********************************************************************************/

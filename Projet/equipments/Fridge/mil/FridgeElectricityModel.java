@@ -1,16 +1,16 @@
-package equipments.AirConditioning.mil;
+package equipments.Fridge.mil;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import equipments.AirConditioning.mil.events.AirConditioningEventI;
-import equipments.AirConditioning.mil.events.Cool;
-import equipments.AirConditioning.mil.events.DoNotCool;
-import equipments.AirConditioning.mil.events.SetPowerAirConditioning;
-import equipments.AirConditioning.mil.events.SwitchOffAirConditioning;
-import equipments.AirConditioning.mil.events.SwitchOnAirConditioning;
+import equipments.Fridge.mil.events.FridgeEventI;
+import equipments.Fridge.mil.events.Cool;
+import equipments.Fridge.mil.events.DoNotCool;
+import equipments.Fridge.mil.events.SetPowerFridge;
+import equipments.Fridge.mil.events.SwitchOffFridge;
+import equipments.Fridge.mil.events.SwitchOnFridge;
 import equipments.HEM.simulation.HEM_ReportI;
 import utils.Electricity;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
@@ -33,33 +33,33 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>AirConditioningElectricityModel</code> defines a simulation model
- * for the electricity consumption of the AirConditioning.
+ * The class <code>FridgeElectricityModel</code> defines a simulation model
+ * for the electricity consumption of the Fridge.
  *
  * <p><strong>Description</strong></p>
  * 
  * <p>
- * The electric power consumption (in amperes) depends upon the state 'AirConditioningState' 
- * and the current power level i.e., {@code AirConditioningState.OFF => consumption == 0.0},
- * {@code AirConditioningState.ON => consumption == NOT_COOLING_POWER} and
- * {@code AirConditioningState.COOLING => consumption >= NOT_COOLING_POWER && consumption <= MAX_COOLING_POWER}).
- * The state of the AirConditioning is modified by the reception of external events
- * ({@code SwitchOnAirConditioning}, {@code SwitchOffAirConditioning}, {@code Cool} and
+ * The electric power consumption (in amperes) depends upon the state 'FridgeState' 
+ * and the current power level i.e., {@code FridgeState.OFF => consumption == 0.0},
+ * {@code FridgeState.ON => consumption == NOT_COOLING_POWER} and
+ * {@code FridgeState.COOLING => consumption >= NOT_COOLING_POWER && consumption <= MAX_COOLING_POWER}).
+ * The state of the Fridge is modified by the reception of external events
+ * ({@code SwitchOnFridge}, {@code SwitchOffFridge}, {@code Cool} and
  * {@code DoNotCool}). The power level is set through the external event
- * {@code SetPowerAirConditioning} that has a parameter defining the required power
+ * {@code SetPowerFridge} that has a parameter defining the required power
  * level. The electric power consumption is stored in the exported variable
  * {@code currentIntensity}.
  * </p>
  * <p>
- * Initially, the mode is in state {@code AirConditioningState.OFF} and the electric power
+ * Initially, the mode is in state {@code FridgeState.OFF} and the electric power
  * consumption at 0.0.
  * </p>
  * 
  * <ul>
  * <li>Imported events:
- *   {@code SwitchOnAirConditioning},
- *   {@code SwitchOffAirConditioning},
- *   {@code SetPowerAirConditioning},
+ *   {@code SwitchOnFridge},
+ *   {@code SwitchOffFridge},
+ *   {@code SetPowerFridge},
  *   {@code Cool},
  *   {@code DoNotCool}</li>
  * <li>Exported events: none</li>
@@ -85,15 +85,16 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
  * <p>Created on : 2023-11-11</p>
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
+ * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-@ModelExternalEvents(imported = {SwitchOnAirConditioning.class,
-		SwitchOffAirConditioning.class,
-		SetPowerAirConditioning.class,
+@ModelExternalEvents(imported = {SwitchOnFridge.class,
+		SwitchOffFridge.class,
+		SetPowerFridge.class,
 		Cool.class,
 		DoNotCool.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
 @ModelExportedVariable(name = "currentCoolingPower", type = Double.class)
-public class AirConditioningElectricityModel 
+public class FridgeElectricityModel 
 extends AtomicHIOA {
 	// Declaring ANSI_RESET so that we can reset the color 
 	public static final String ANSI_RESET = "\u001B[0m"; 
@@ -111,20 +112,20 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * The enumeration <code>AirConditioningState</code> describes the operation
-	 * states of the AirConditioning.
+	 * The enumeration <code>FridgeState</code> describes the operation
+	 * states of the Fridge.
 	 *
 	 * <p><strong>Description</strong></p>
 	 * 
 	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
-	public static enum AirConditioningState
+	public static enum FridgeState
 	{
-		/** AirConditioning is on.													*/
+		/** Fridge is on.													*/
 		ON,
-		/** AirConditioning is cooling.												*/
+		/** Fridge is cooling.												*/
 		COOLING,
-		/** AirConditioning is off.													*/
+		/** Fridge is off.													*/
 		OFF
 	}
 
@@ -134,33 +135,33 @@ extends AtomicHIOA {
 
 	private static final long	serialVersionUID = 1L;
 	/** URI for a model; works when only one instance is created.					*/
-	public static final String	URI = AirConditioningElectricityModel.class.getSimpleName();
+	public static final String	URI = FridgeElectricityModel.class.getSimpleName();
 
-	/** power of the AirConditioning in watts.										*/
-	public static double NOT_COOLING_POWER = 5.0;
-	/** max power of the AirConditioning in watts.									*/
-	public static double MAX_COOLING_POWER = 2000.0;
-	/** nominal tension (in Volts) of the AirConditioning.							*/
+	/** power of the Fridge in watts.										*/
+	public static double NOT_COOLING_POWER = 10.0;
+	/** max power of the Fridge in watts.									*/
+	public static double MAX_COOLING_POWER = 500.0;
+	/** nominal tension (in Volts) of the Fridge.							*/
 	public static double TENSION = 220.0;
 
-	/** current state of the AirConditioning.												*/
-	protected AirConditioningState currentState = AirConditioningState.OFF;
-	/** true when the electricity consumption of the AirConditioning has changed
+	/** current state of the Fridge.												*/
+	protected FridgeState currentState = FridgeState.OFF;
+	/** true when the electricity consumption of the Fridge has changed
 	 *  after executing an external event; the external event changes the
 	 *  value of <code>currentState</code> and then an internal transition
 	 *  will be triggered by putting through in this variable which will
 	 *  update the variable <code>currentIntensity</code>.							*/
 	protected boolean consumptionHasChanged = false;
 
-	/** total consumption of the AirConditioning during the simulation in kwh.		*/
+	/** total consumption of the Fridge during the simulation in kwh.		*/
 	protected double totalConsumption;
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
 	// -------------------------------------------------------------------------
 
-	/** the current AirConditioning power between 0 and
-	 *  {@code AirConditioningElectricityModel.MAX_COOLING_POWER}.					*/
+	/** the current Fridge power between 0 and
+	 *  {@code FridgeElectricityModel.MAX_COOLING_POWER}.					*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double> currentCoolingPower = new Value<Double>(this);
 	/** current intensity in amperes; intensity is power/tension.					*/
@@ -172,7 +173,7 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a AirConditioning MIL model instance.
+	 * create a Fridge MIL model instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -186,7 +187,7 @@ extends AtomicHIOA {
 	 * @param simulationEngine	simulation engine to which the model is attached.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public AirConditioningElectricityModel(
+	public FridgeElectricityModel(
 			String uri,
 			TimeUnit simulatedTimeUnit,
 			AtomicSimulatorI simulationEngine
@@ -201,7 +202,7 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * set the state of the AirConditioning.
+	 * set the state of the Fridge.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -213,8 +214,8 @@ extends AtomicHIOA {
 	 * @param s		the new state.
 	 * @param t		time at which the state {@code s} is set.
 	 */
-	public void setState(AirConditioningState s, Time t) {
-		AirConditioningState old = this.currentState;
+	public void setState(FridgeState s, Time t) {
+		FridgeState old = this.currentState;
 		this.currentState = s;
 		if (old != s) {
 			this.consumptionHasChanged = true;					
@@ -223,7 +224,7 @@ extends AtomicHIOA {
 
 	/***********************************************************************************/
 	/**
-	 * return the state of the AirConditioning.
+	 * return the state of the Fridge.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -234,13 +235,13 @@ extends AtomicHIOA {
 	 *
 	 * @return	the current state.
 	 */
-	public AirConditioningState getState() {
+	public FridgeState getState() {
 		return this.currentState;
 	}
 
 	/***********************************************************************************/
 	/**
-	 * set the current cooling power of the AirConditioning to {@code newPower}.
+	 * set the current cooling power of the Fridge to {@code newPower}.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -249,15 +250,15 @@ extends AtomicHIOA {
 	 * post	{@code getCurrentPowerLevel() == newPower}
 	 * </pre>
 	 *
-	 * @param newPower	the new power in watts to be set on the AirConditioning.
+	 * @param newPower	the new power in watts to be set on the Fridge.
 	 * @param t			time at which the new power is set.
 	 */
 	public void setCurrentCoolingPower(double newPower, Time t) {
 		assert	newPower >= 0.0 &&
-				newPower <= AirConditioningElectricityModel.MAX_COOLING_POWER :
+				newPower <= FridgeElectricityModel.MAX_COOLING_POWER :
 					new AssertionError(
 							"Precondition violation: newPower >= 0.0 && "
-									+ "newPower <= AirConditioningElectricityModel.MAX_COOLING_POWER,"
+									+ "newPower <= FridgeElectricityModel.MAX_COOLING_POWER,"
 									+ " but newPower = " + newPower);
 
 		double oldPower = this.currentCoolingPower.getValue();
@@ -278,7 +279,7 @@ extends AtomicHIOA {
 	public void initialiseState(Time initialTime) {
 		super.initialiseState(initialTime);
 
-		this.currentState = AirConditioningState.OFF;
+		this.currentState = FridgeState.OFF;
 		this.consumptionHasChanged = false;
 		this.totalConsumption = 0.0;
 
@@ -303,9 +304,9 @@ extends AtomicHIOA {
 	public Pair<Integer, Integer> fixpointInitialiseVariables() {
 		if (!this.currentIntensity.isInitialised() ||
 				!this.currentCoolingPower.isInitialised()) {
-			// initially, the AirConditioning is off, so its consumption is zero.
+			// initially, the Fridge is off, so its consumption is zero.
 			this.currentIntensity.initialise(0.0);
-			this.currentCoolingPower.initialise((double) 1200); // TODO AR
+			this.currentCoolingPower.initialise((double) 200); // TODO AR
 
 			StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "Current consumption: ");
 			sb.append(this.currentIntensity.getValue());
@@ -356,18 +357,18 @@ extends AtomicHIOA {
 		super.userDefinedInternalTransition(elapsedTime);
 
 		Time t = this.getCurrentStateTime();
-		if (this.currentState == AirConditioningState.ON) {
+		if (this.currentState == FridgeState.ON) {
 			this.currentIntensity.setNewValue(
-					AirConditioningElectricityModel.NOT_COOLING_POWER/
-					AirConditioningElectricityModel.TENSION,
+					FridgeElectricityModel.NOT_COOLING_POWER/
+					FridgeElectricityModel.TENSION,
 					t);
-		} else if (this.currentState == AirConditioningState.COOLING) {
+		} else if (this.currentState == FridgeState.COOLING) {
 			this.currentIntensity.setNewValue(
 					this.currentCoolingPower.getValue()/
-					AirConditioningElectricityModel.TENSION,
+					FridgeElectricityModel.TENSION,
 					t);
 		} else {
-			assert this.currentState == AirConditioningState.OFF;
+			assert this.currentState == FridgeState.OFF;
 			this.currentIntensity.setNewValue(0.0, t);
 		}
 
@@ -390,12 +391,12 @@ extends AtomicHIOA {
 		// get the vector of current external events
 		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 		// when this method is called, there is at least one external event,
-		// and for the AirConditioning model, there will be exactly one by
+		// and for the Fridge model, there will be exactly one by
 		// construction.
 		assert	currentEvents != null && currentEvents.size() == 1;
 
 		Event ce = (Event) currentEvents.get(0);
-		assert ce instanceof AirConditioningEventI;
+		assert ce instanceof FridgeEventI;
 
 		// compute the total consumption for the simulation report.
 		this.totalConsumption +=
@@ -408,10 +409,10 @@ extends AtomicHIOA {
 		sb.append(".\n" + ANSI_RESET);
 		this.logMessage(sb.toString());
 
-		// the next call will update the current state of the AirConditioning and if
+		// the next call will update the current state of the Fridge and if
 		// this state has changed, it put the boolean consumptionHasChanged
 		// at true, which in turn will trigger an immediate internal transition
-		// to update the current intensity of the AirConditioning electricity
+		// to update the current intensity of the Fridge electricity
 		// consumption.
 		ce.executeOn(this);
 	}
@@ -429,7 +430,7 @@ extends AtomicHIOA {
 						TENSION*this.currentIntensity.getValue());
 
 		this.logMessage("simulation ends.\n");
-		this.logMessage(new AirConditioningElectricityReport(URI, Math.round(this.totalConsumption * 100.0) / 100.0).printout("-"));
+		this.logMessage(new FridgeElectricityReport(URI, Math.round(this.totalConsumption * 100.0) / 100.0).printout("-"));
 		super.endSimulation(endTime);
 	}
 
@@ -437,11 +438,11 @@ extends AtomicHIOA {
 	// Optional DEVS simulation protocol: simulation run parameters
 	// -------------------------------------------------------------------------
 
-	/** power of the AirConditioning in watts.										*/
+	/** power of the Fridge in watts.										*/
 	public static final String	NOT_COOLING_POWER_RUNPNAME = "NOT_COOLING_POWER";
-	/** power of the AirConditioning in watts.										*/
+	/** power of the Fridge in watts.										*/
 	public static final String	MAX_COOLING_POWER_RUNPNAME = "MAX_COOLING_POWER";
-	/** nominal tension (in Volts) of the AirConditioning.							*/
+	/** nominal tension (in Volts) of the Fridge.							*/
 	public static final String	TENSION_RUNPNAME = "TENSION";
 
 	/***********************************************************************************/
@@ -475,8 +476,8 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * The class <code>AirConditioningElectricityReport</code> implements the
-	 * simulation report for the <code>AirConditioningElectricityModel</code>.
+	 * The class <code>FridgeElectricityReport</code> implements the
+	 * simulation report for the <code>FridgeElectricityModel</code>.
 	 *
 	 * <p><strong>Description</strong></p>
 	 * 
@@ -496,14 +497,14 @@ extends AtomicHIOA {
 	 * 
 	 * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
 	 */
-	public static class AirConditioningElectricityReport
+	public static class FridgeElectricityReport
 	implements	SimulationReportI, HEM_ReportI {
 		private static final long serialVersionUID = 1L;
 		protected String modelURI;
 		protected double totalConsumption; // in kwh
 
 		/***********************************************************************************/
-		public AirConditioningElectricityReport(
+		public FridgeElectricityReport(
 				String modelURI,
 				double totalConsumption
 				) {
@@ -544,7 +545,7 @@ extends AtomicHIOA {
 	 */
 	@Override
 	public SimulationReportI getFinalReport() {
-		return new AirConditioningElectricityReport(URI, this.totalConsumption);
+		return new FridgeElectricityReport(URI, this.totalConsumption);
 	}
 
 }

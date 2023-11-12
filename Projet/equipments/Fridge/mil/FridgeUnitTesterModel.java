@@ -1,14 +1,14 @@
-package equipments.AirConditioning.mil;
+package equipments.Fridge.mil;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import equipments.AirConditioning.mil.events.Cool;
-import equipments.AirConditioning.mil.events.DoNotCool;
-import equipments.AirConditioning.mil.events.SetPowerAirConditioning;
-import equipments.AirConditioning.mil.events.SetPowerAirConditioning.PowerValue;
-import equipments.AirConditioning.mil.events.SwitchOffAirConditioning;
-import equipments.AirConditioning.mil.events.SwitchOnAirConditioning;
+import equipments.Fridge.mil.events.Cool;
+import equipments.Fridge.mil.events.DoNotCool;
+import equipments.Fridge.mil.events.SetPowerFridge;
+import equipments.Fridge.mil.events.SetPowerFridge.PowerValue;
+import equipments.Fridge.mil.events.SwitchOffFridge;
+import equipments.Fridge.mil.events.SwitchOnFridge;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
@@ -22,19 +22,19 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>AirConditioningUnitTesterModel</code> defines a model that is used
- * to test the models defining the AirConditioning simulator.
+ * The class <code>FridgeUnitTesterModel</code> defines a model that is used
+ * to test the models defining the Fridge simulator.
  *
  * <p><strong>Description</strong></p>
  * 
  * <ul>
  * <li>Imported events: none</li>
  * <li>Exported events:
- *   {@code SwitchOnAirConditioning},
- *   {@code SwitchOffAirConditioning},
+ *   {@code SwitchOnFridge},
+ *   {@code SwitchOffFridge},
  *   {@code Cool},
  *   {@code DoNotCool},
- *   {@code SetPowerAirConditioning}</li>
+ *   {@code SetPowerFridge}</li>
  * </ul>
  * 
  * <p><strong>White-box Invariant</strong></p>
@@ -52,13 +52,14 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
  * <p>Created on : 2023-11-11</p>
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
+ * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-@ModelExternalEvents(exported = {SwitchOnAirConditioning.class,
-		SwitchOffAirConditioning.class,
+@ModelExternalEvents(exported = {SwitchOnFridge.class,
+		SwitchOffFridge.class,
 		Cool.class,
 		DoNotCool.class,
-		SetPowerAirConditioning.class})
-public class AirConditioningUnitTesterModel 
+		SetPowerFridge.class})
+public class FridgeUnitTesterModel 
 extends AtomicModel {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -66,7 +67,7 @@ extends AtomicModel {
 
 	private static final long serialVersionUID = 1L;
 	/** URI for a model; works when only one instance is created.			*/
-	public static final String	URI = AirConditioningUnitTesterModel.class.getSimpleName();
+	public static final String	URI = FridgeUnitTesterModel.class.getSimpleName();
 
 	/** steps in the test scenario.											*/
 	protected int step;
@@ -76,7 +77,7 @@ extends AtomicModel {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a <code>AirConditioningUnitTesterModel</code> instance.
+	 * create a <code>FridgeUnitTesterModel</code> instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -90,7 +91,7 @@ extends AtomicModel {
 	 * @param simulationEngine	simulation engine to which the model is attached.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public AirConditioningUnitTesterModel(
+	public FridgeUnitTesterModel(
 			String uri,
 			TimeUnit simulatedTimeUnit,
 			AtomicSimulatorI simulationEngine
@@ -127,7 +128,7 @@ extends AtomicModel {
 			ArrayList<EventI> ret = new ArrayList<EventI>();
 			switch (this.step) {
 			case 1:
-				ret.add(new SwitchOnAirConditioning(this.getTimeOfNextEvent()));
+				ret.add(new SwitchOnFridge(this.getTimeOfNextEvent()));
 				break;
 			case 2:
 				ret.add(new Cool(this.getTimeOfNextEvent())); // init at 1200W
@@ -139,23 +140,23 @@ extends AtomicModel {
 				ret.add(new Cool(this.getTimeOfNextEvent()));
 				break;
 			case 5:
-				ret.add(new SetPowerAirConditioning(this.getTimeOfNextEvent(),
-						new PowerValue(800.0)));
+				ret.add(new SetPowerFridge(this.getTimeOfNextEvent(),
+						new PowerValue(50.0)));
 				break;
 			case 6:
-				ret.add(new SetPowerAirConditioning(this.getTimeOfNextEvent(),
-						new PowerValue(1200.0)));
+				ret.add(new SetPowerFridge(this.getTimeOfNextEvent(),
+						new PowerValue(100.0)));
 				break;
 			case 7:
-				ret.add(new SetPowerAirConditioning(this.getTimeOfNextEvent(),
-						new PowerValue(1500.0)));
+				ret.add(new SetPowerFridge(this.getTimeOfNextEvent(),
+						new PowerValue(150.0)));
 				break;
 			case 8:
-				ret.add(new SetPowerAirConditioning(this.getTimeOfNextEvent(),
-						new PowerValue(2000.0)));
+				ret.add(new SetPowerFridge(this.getTimeOfNextEvent(),
+						new PowerValue(200.0)));
 				break;
 			case 9:
-				ret.add(new SwitchOffAirConditioning(this.getTimeOfNextEvent()));
+				ret.add(new SwitchOffFridge(this.getTimeOfNextEvent()));
 				break;
 			}
 			return ret;

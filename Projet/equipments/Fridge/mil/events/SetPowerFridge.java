@@ -1,6 +1,6 @@
-package equipments.AirConditioning.events;
+package equipments.Fridge.mil.events;
 
-import equipments.AirConditioning.mil.AirConditioningElectricityModel;
+import equipments.Fridge.mil.FridgeElectricityModel;
 import fr.sorbonne_u.devs_simulation.es.events.ES_Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
@@ -11,8 +11,8 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>SetPowerAirConditioning</code> defines the simulation event of the
- * AirConditioning power being set to some level (in watts).
+ * The class <code>SetPowerFridge</code> defines the simulation event of the
+ * Fridge power being set to some level (in watts).
  *
  * <p><strong>Description</strong></p>
  * 
@@ -31,17 +31,18 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
  * <p>Created on : 2023-11-11</p>
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
+ * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-public class SetPowerAirConditioning 
+public class SetPowerFridge 
 extends ES_Event
-implements AirConditioningEventI {
+implements FridgeEventI {
 	// -------------------------------------------------------------------------
 	// Inner types and classes
 	// -------------------------------------------------------------------------
 
 	/**
 	 * The class <code>PowerValue</code> represent a power value to be passed
-	 * as an {@code EventInformationI} when creating a {@code SetPowerAirConditioning}
+	 * as an {@code EventInformationI} when creating a {@code SetPowerFridge}
 	 * event.
 	 *
 	 * <p><strong>Description</strong></p>
@@ -49,7 +50,7 @@ implements AirConditioningEventI {
 	 * <p><strong>White-box Invariant</strong></p>
 	 * 
 	 * <pre>
-	 * invariant	{@code power >= 0.0 && power <= AirConditioningElectricityModel.MAX_COOLING_POWER}
+	 * invariant	{@code power >= 0.0 && power <= FridgeElectricityModel.MAX_COOLING_POWER}
 	 * </pre>
 	 * 
 	 * <p><strong>Black-box Invariant</strong></p>
@@ -74,7 +75,7 @@ implements AirConditioningEventI {
 		 * <p><strong>Contract</strong></p>
 		 * 
 		 * <pre>
-		 * pre	{@code power >= 0.0 && power <= AirConditioningElectricityModel.MAX_COOLING_POWER}
+		 * pre	{@code power >= 0.0 && power <= FridgeElectricityModel.MAX_COOLING_POWER}
 		 * post	{@code getPower() == power}
 		 * </pre>
 		 *
@@ -84,10 +85,10 @@ implements AirConditioningEventI {
 			super();
 
 			assert	power >= 0.0 &&
-					power <= AirConditioningElectricityModel.MAX_COOLING_POWER:
+					power <= FridgeElectricityModel.MAX_COOLING_POWER:
 						new AssertionError(
 								"Precondition violation: power >= 0.0 && "
-										+ "power <= AirConditioningElectricityModel.MAX_COOLING_POWER,"
+										+ "power <= FridgeElectricityModel.MAX_COOLING_POWER,"
 										+ " but power = " + power);
 
 			this.power = power;
@@ -101,7 +102,7 @@ implements AirConditioningEventI {
 		 * 
 		 * <pre>
 		 * pre	{@code true}	// no precondition.
-		 * post	{@code power >= 0.0 && power <= AirConditioningElectricityModel.MAX_COOLING_POWER}
+		 * post	{@code power >= 0.0 && power <= FridgeElectricityModel.MAX_COOLING_POWER}
 		 * </pre>
 		 *
 		 * @return	the power value in watts.
@@ -127,7 +128,7 @@ implements AirConditioningEventI {
 	// -------------------------------------------------------------------------
 
 	private static final long	serialVersionUID = 1L;
-	/** the power value to be set on the AirConditioning when the event will be
+	/** the power value to be set on the Fridge when the event will be
 	 *  executed.															*/
 	protected final PowerValue	powerValue;
 
@@ -136,7 +137,7 @@ implements AirConditioningEventI {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a {@code SetPowerAirConditioning} event which content is a
+	 * create a {@code SetPowerFridge} event which content is a
 	 * {@code PowerValue}.
 	 * 
 	 * <p><strong>Contract</strong></p>
@@ -147,9 +148,9 @@ implements AirConditioningEventI {
 	 * </pre>
 	 *
 	 * @param timeOfOccurrence	time at which the event must be executed in simulated time.
-	 * @param content			the power value to be set on the AirConditioning when the event will be executed.
+	 * @param content			the power value to be set on the Fridge when the event will be executed.
 	 */
-	public SetPowerAirConditioning(
+	public SetPowerFridge(
 			Time timeOfOccurrence,
 			EventInformationI content
 			)
@@ -173,9 +174,9 @@ implements AirConditioningEventI {
 	 */
 	@Override
 	public boolean hasPriorityOver(EventI e) {
-		// if many AirConditioning events occur at the same time, the SetPowerAirConditioning one
-		// will be executed first except for SwitchOnAirConditioning ones.
-		if (e instanceof SwitchOnAirConditioning) {
+		// if many Fridge events occur at the same time, the SetPowerFridge one
+		// will be executed first except for SwitchOnFridge ones.
+		if (e instanceof SwitchOnFridge) {
 			return true;
 		} else {
 			return false;
@@ -188,13 +189,13 @@ implements AirConditioningEventI {
 	 */
 	@Override
 	public void executeOn(AtomicModelI model) {
-		assert	model instanceof AirConditioningElectricityModel;
+		assert	model instanceof FridgeElectricityModel;
 
-		AirConditioningElectricityModel m = (AirConditioningElectricityModel)model;
-		assert	m.getState() == AirConditioningElectricityModel.AirConditioningState.COOLING :
+		FridgeElectricityModel m = (FridgeElectricityModel)model;
+		assert	m.getState() == FridgeElectricityModel.FridgeState.COOLING :
 			new AssertionError(
 					"model not in the right state, should be "
-							+ "AirConditioningElectricityModel.AirConditioningState.COOLING but is " + m.getState());
+							+ "FridgeElectricityModel.FridgeState.COOLING but is " + m.getState());
 		m.setCurrentCoolingPower(this.powerValue.getPower(),
 				this.getTimeOfOccurrence());
 	}

@@ -1,7 +1,7 @@
-package equipments.AirConditioning.events;
+package equipments.Fridge.mil.events;
 
-import equipments.AirConditioning.mil.AirConditioningElectricityModel;
-import equipments.AirConditioning.mil.AirConditioningTemperatureModel;
+import equipments.Fridge.mil.FridgeElectricityModel;
+import equipments.Fridge.mil.FridgeTemperatureModel;
 import fr.sorbonne_u.devs_simulation.models.events.Event;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
@@ -10,10 +10,9 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
-//-----------------------------------------------------------------------------
 /**
- * The class <code>DoNotCool</code> defines the simulation event of the
- * AirConditioning stopping to cool.
+ * The class <code>Cool</code> defines the simulation event of the Fridge
+ * starting to cool.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -33,9 +32,9 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class DoNotCool 
+public class Cool 
 extends Event
-implements AirConditioningEventI {
+implements FridgeEventI {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
@@ -47,7 +46,7 @@ implements AirConditioningEventI {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a <code>DoNotCool</code> event.
+	 * create a <code>Cool</code> event.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -58,7 +57,7 @@ implements AirConditioningEventI {
 	 *
 	 * @param timeOfOccurrence	time of occurrence of the event.
 	 */
-	public DoNotCool(Time timeOfOccurrence) {
+	public Cool(Time timeOfOccurrence) {
 		super(timeOfOccurrence, null);
 	}
 
@@ -71,9 +70,10 @@ implements AirConditioningEventI {
 	 */
 	@Override
 	public boolean hasPriorityOver(EventI e) {
-		// if many AirConditioning events occur at the same time, the DoNotCool one
-		// will be executed first except for SwitchOnAirConditioning ones.
-		if (e instanceof SwitchOnAirConditioning) {
+		// if many Fridge events occur at the same time, the Cool one will be
+		// executed after SwitchOnFridge and DoNotCool ones but before
+		// SwitchOffFridge.
+		if (e instanceof SwitchOnFridge || e instanceof DoNotCool) {
 			return false;
 		} else {
 			return true;
@@ -86,26 +86,26 @@ implements AirConditioningEventI {
 	 */
 	@Override
 	public void executeOn(AtomicModelI model) {
-		assert	model instanceof AirConditioningElectricityModel ||
-		model instanceof AirConditioningTemperatureModel;
+		assert	model instanceof FridgeElectricityModel ||
+		model instanceof FridgeTemperatureModel;
 
-		if (model instanceof AirConditioningElectricityModel) {
-			AirConditioningElectricityModel m = (AirConditioningElectricityModel)model;
-			assert	m.getState() == AirConditioningElectricityModel.AirConditioningState.COOLING:
+		if (model instanceof FridgeElectricityModel) {
+			FridgeElectricityModel m = (FridgeElectricityModel)model;
+			assert	m.getState() == FridgeElectricityModel.FridgeState.ON:
 				new AssertionError(
 						"model not in the right state, should be "
-								+ "AirConditioningElectricityModel.AirConditioningState.COOLING but is "
+								+ "FridgeElectricityModel.FridgeState.ON but is "
 								+ m.getState());
-			m.setState(AirConditioningElectricityModel.AirConditioningState.ON,
+			m.setState(FridgeElectricityModel.FridgeState.COOLING,
 					this.getTimeOfOccurrence());
 		} else {
-			AirConditioningTemperatureModel m = (AirConditioningTemperatureModel)model;
-			assert	m.getState() == AirConditioningTemperatureModel.State.COOLING:
+			FridgeTemperatureModel m = (FridgeTemperatureModel)model;
+			assert	m.getState() == FridgeTemperatureModel.State.NOT_COOLING:
 				new AssertionError(
 						"model not in the right state, should be "
-								+ "AirConditioningTemperatureModel.State.COOLING but is "
+								+ "FridgeTemperatureModel.State.NOT_COOLING but is "
 								+ m.getState());
-			m.setState(AirConditioningTemperatureModel.State.NOT_COOLING);
+			m.setState(FridgeTemperatureModel.State.COOLING);
 		}
 	}
 }
