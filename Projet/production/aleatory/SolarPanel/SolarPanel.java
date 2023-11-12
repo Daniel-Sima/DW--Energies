@@ -12,7 +12,7 @@ import production.aleatory.SolarPanel.connections.SolarPanelMeteoControlInboundP
 /**
  * The class <code>SolarPanel</code> is a solar panel component.
  *
- * <p><strong>Always on, not producing if the weather is bad</strong></p>
+ * <p><strong>Always on, not producing if the weather is bad. Size: 0.5m^2.</strong></p>
  * 
  * <p><strong>White-box Invariant</strong></p>
  * 

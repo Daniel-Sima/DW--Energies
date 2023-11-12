@@ -1,4 +1,4 @@
-package equipments.CookingPlate.mil;
+package production.aleatory.SolarPanel.mil;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,20 +6,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
-import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
-import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
-import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
+import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
+import fr.sorbonne_u.devs_simulation.hioa.models.vars.VariableSink;
+import fr.sorbonne_u.devs_simulation.hioa.models.vars.VariableSource;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.AtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor;
-import fr.sorbonne_u.devs_simulation.models.events.EventSink;
-import fr.sorbonne_u.devs_simulation.models.events.EventSource;
-import fr.sorbonne_u.devs_simulation.models.time.Duration;
-import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 
@@ -27,8 +22,8 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 /***********************************************************************************/
 /***********************************************************************************/
 /**
- * The class <code>RunCookingPlateUnitaryMILSimulation</code> is the main class used
- * to run simulations on the example models of the Cooking Plate in isolation.
+ * The class <code>RunSolarPanelUnitarySimulation</code> creates a simulator
+ * for the Solar Panel and then runs a typical simulation of a day.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -38,10 +33,11 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
  * architecture by instantiating and connecting the models. Note how models
  * are described by atomic model descriptors and coupled model descriptors and
  * then the connections between coupled models and their submodels as well as
- * exported events to imported ones are described by different maps. In this
- * example, only connections between models within this architecture are
- * necessary, but when creating coupled models, they can also import and export
- * events consumed and produced by their submodels.
+ * exported events and variables to imported ones are described by different
+ * maps. In this example, only connections of events and bindings of variables
+ * between models within this architecture are necessary, but when creating
+ * coupled models, they can also import and export events and variables
+ * consumed and produced by their submodels.
  * </p>
  * <p>
  * The architecture object is the root of this description and it provides
@@ -49,7 +45,7 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
  * connect them. This method returns the reference on the simulator attached
  * to the root coupled model in the architecture instance, which is then used
  * to perform simulation runs by calling the method
- * {@code doStandAloneSimulation}
+ * {@code doStandAloneSimulation}.
  * </p>
  * <p>
  * The descriptors and maps can be viewed as kinds of nodes in the abstract
@@ -73,90 +69,84 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-public class RunCookingPlateUnitaryMILSimulation {
-	public static void	main(String[] args) {
-		Time.setPrintPrecision(4);
-		Duration.setPrintPrecision(4);
-
+public class RunSolarPanelUnitarySimulation {
+	public static void main(String[] args)
+	{
 		try {
 			// map that will contain the atomic model descriptors to construct
 			// the simulation architecture
 			Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
 
-			// the Cooking Plate model simulating its electricity consumption, an
-			// atomic HIOA model hence we use an AtomicHIOA_Descriptor
+			// the heater models simulating its electricity consumption, its
+			// temperatures and the external temperature are atomic HIOA models
+			// hence we use an AtomicHIOA_Descriptor(s)
 			atomicModelDescriptors.put(
-					CookingPlateElectricityModel.URI,
+					SolarPanelElectricityModel.URI,
 					AtomicHIOA_Descriptor.create(
-							CookingPlateElectricityModel.class,
-							CookingPlateElectricityModel.URI,
+							SolarPanelElectricityModel.class,
+							SolarPanelElectricityModel.URI,
 							TimeUnit.HOURS,
 							null));
-			
-			// for atomic model, we use an AtomicModelDescriptor
 			atomicModelDescriptors.put(
-					CookingPlateUserModel.URI,
+					ExternalWeatherModel.URI,
+					AtomicHIOA_Descriptor.create(
+							ExternalWeatherModel.class,
+							ExternalWeatherModel.URI,
+							TimeUnit.HOURS,
+							null));
+			// the heater unit tester model only exchanges event, an
+			// atomic model hence we use an AtomicModelDescriptor
+			atomicModelDescriptors.put(
+					SolarPanelUnitTesterModel.URI,
 					AtomicModelDescriptor.create(
-							CookingPlateUserModel.class,
-							CookingPlateUserModel.URI,
+							SolarPanelUnitTesterModel.class,
+							SolarPanelUnitTesterModel.URI,
 							TimeUnit.HOURS,
 							null));
 
-			
 			// map that will contain the coupled model descriptors to construct
 			// the simulation architecture
-			Map<String,CoupledModelDescriptor> coupledModelDescriptors = new HashMap<>();
+			Map<String,CoupledModelDescriptor> coupledModelDescriptors =
+					new HashMap<>();
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
-			submodels.add(CookingPlateElectricityModel.URI);
-			submodels.add(CookingPlateUserModel.URI);
+			submodels.add(SolarPanelElectricityModel.URI);
+			submodels.add(ExternalWeatherModel.URI);
+			submodels.add(SolarPanelUnitTesterModel.URI);
 
-			// event exchanging connections between exporting and importing models
-			Map<EventSource,EventSink[]> connections =
-					new HashMap<EventSource,EventSink[]>();
+			// variable bindings between exporting and importing models
+			Map<VariableSource,VariableSink[]> bindings =
+					new HashMap<VariableSource,VariableSink[]>();
 
-					connections.put(
-							new EventSource(CookingPlateUserModel.URI, SwitchOnCookingPlate.class),
-							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
-											SwitchOnCookingPlate.class)
-							});
-					connections.put(
-							new EventSource(CookingPlateUserModel.URI, SwitchOffCookingPlate.class),
-							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
-											SwitchOffCookingPlate.class)
-							});
-					connections.put(
-							new EventSource(CookingPlateUserModel.URI, IncreaseCookingPlate.class),
-							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
-											IncreaseCookingPlate.class)
-							});
-					connections.put(
-							new EventSource(CookingPlateUserModel.URI, DecreaseCookingPlate.class),
-							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
-											DecreaseCookingPlate.class)
-							});
+					bindings.put(new VariableSource("externalSolarIrradiance",
+							Double.class,
+							ExternalWeatherModel.URI),
+							new VariableSink[] {
+									new VariableSink("externalSolarIrradiance",
+											Double.class,
+											SolarPanelElectricityModel.URI)
+					});
 
 					// coupled model descriptor
 					coupledModelDescriptors.put(
-							CookingPlateCoupledModel.URI,
-							new CoupledModelDescriptor(
-									CookingPlateCoupledModel.class,
-									CookingPlateCoupledModel.URI,
+							SolarPanelCoupledModel.URI,
+							new CoupledHIOA_Descriptor(
+									SolarPanelCoupledModel.class,
+									SolarPanelCoupledModel.URI,
 									submodels,
 									null,
 									null,
-									connections,
-									null));
+									null,
+									null,
+									null,
+									null,
+									bindings));
 
 					// simulation architecture
 					ArchitectureI architecture =
 							new Architecture(
-									CookingPlateCoupledModel.URI,
+									SolarPanelCoupledModel.URI,
 									atomicModelDescriptors,
 									coupledModelDescriptors,
 									TimeUnit.HOURS);
@@ -168,15 +158,13 @@ public class RunCookingPlateUnitaryMILSimulation {
 					SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 					// run a simulation with the simulation beginning at 0.0 and
 					// ending at 24.0
-					se.doStandAloneSimulation(0.0, 1.0);
+					se.doStandAloneSimulation(0.0, 24.0);
 					System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}
 	}
-
 }
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
-

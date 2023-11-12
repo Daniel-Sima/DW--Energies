@@ -396,10 +396,9 @@ extends	AtomicHIOA {
 		}
 		}
 		// Tracing
-		StringBuffer message = new StringBuffer(ANSI_GREY_BACKGROUND + "executes an internal transition with current consumption " + 
-										this.currentIntensity.getValue() + " A" +
-										" at " + this.currentIntensity.getTime() + ".\n" +
-										ANSI_RESET);
+		StringBuffer message = new StringBuffer(ANSI_GREY_BACKGROUND + "Current consumption ");
+		message.append(Math.round(this.currentIntensity.getValue() * 100.0) / 100.0);
+		message.append(" Amperes at " + this.currentIntensity.getTime() + ".\n" + ANSI_RESET);
 		this.logMessage(message.toString());
 	}
 
@@ -428,7 +427,7 @@ extends	AtomicHIOA {
 
 		// Tracing
 		StringBuffer message =
-				new StringBuffer(ANSI_BLACK_BACKGROUND + "executes an external transition " + ce.toString() + ")\n" + ANSI_RESET);
+				new StringBuffer(ANSI_BLACK_BACKGROUND + "Execute the external event: " + ce.toString() + ")\n" + ANSI_RESET);
 		this.logMessage(message.toString());
 
 		assert	ce instanceof AbstractCookingPlateEvent;
@@ -449,6 +448,7 @@ extends	AtomicHIOA {
 						d,
 						TENSION*this.currentIntensity.getValue());
 
+		this.logMessage("\n" + (new CookingPlateElectricityReport(URI, Math.round(this.totalConsumption * 100.0)/100.0)).printout("-"));
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
 	}
@@ -532,7 +532,7 @@ extends	AtomicHIOA {
 		/***********************************************************************************/
 		@Override
 		public String getModelURI() {
-			return null;
+			return modelURI;
 		}
 
 		/***********************************************************************************/
@@ -547,7 +547,7 @@ extends	AtomicHIOA {
 			ret.append(" report\n");
 			ret.append(indent);
 			ret.append('|');
-			ret.append("total consumption in kwh = ");
+			ret.append("total consumption in kWh = ");
 			ret.append(this.totalConsumption);
 			ret.append(".\n");
 			ret.append(indent);

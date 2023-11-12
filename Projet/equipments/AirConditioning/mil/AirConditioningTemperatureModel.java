@@ -447,12 +447,12 @@ extends AtomicHIOA {
 						this.getSimulatedTimeUnit()));
 
 		// Tracing
-		String mark = this.currentState == State.COOLING ? "Is COOLING" : " Is NOT COOLING";
+		String mark = this.currentState == State.COOLING ? "is COOLING" : "is NOT COOLING";
 		StringBuffer message = new StringBuffer();
-		message.append(ANSI_GREY_BACKGROUND + this.currentTemperature.getTime().getSimulatedTime()+"h -- ");
+		message.append(ANSI_GREY_BACKGROUND);
+		message.append((Math.round(this.currentTemperature.getValue() *100.0) / 100.0) + "° in the room and ");
 		message.append(mark);
-		message.append(" -- ");
-		message.append(this.currentTemperature.getValue()+"° in the room.");
+		message.append(" at " + this.currentTemperature.getTime());
 		message.append('\n' + ANSI_RESET);
 		this.logMessage(message.toString());
 

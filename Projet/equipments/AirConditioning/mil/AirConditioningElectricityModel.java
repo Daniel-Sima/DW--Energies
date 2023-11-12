@@ -253,8 +253,6 @@ extends AtomicHIOA {
 	 * @param t			time at which the new power is set.
 	 */
 	public void setCurrentCoolingPower(double newPower, Time t) {
-		System.err.println("newPower: "+newPower);
-		System.err.println("AirConditioningElectricityModel.MAX_COOLING_POWER: "+AirConditioningElectricityModel.MAX_COOLING_POWER);
 		assert	newPower >= 0.0 &&
 				newPower <= AirConditioningElectricityModel.MAX_COOLING_POWER :
 					new AssertionError(
@@ -309,7 +307,7 @@ extends AtomicHIOA {
 			this.currentIntensity.initialise(0.0);
 			this.currentCoolingPower.initialise((double) 1200); // TODO AR
 
-			StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "new consumption: ");
+			StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "Current consumption: ");
 			sb.append(this.currentIntensity.getValue());
 			sb.append(" amperes at ");
 			sb.append(this.currentIntensity.getTime());
@@ -373,11 +371,11 @@ extends AtomicHIOA {
 			this.currentIntensity.setNewValue(0.0, t);
 		}
 
-		StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "new consumption: ");
-		sb.append(this.currentIntensity.getValue());
-		sb.append(" amperes at ");
+		StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "Current consumption: ");
+		sb.append((Math.round(this.currentIntensity.getValue() * 100.0) / 100.0));
+		sb.append(" Amperes at ");
 		sb.append(this.currentIntensity.getTime());
-		sb.append(" seconds.\n" + ANSI_RESET);
+		sb.append("\n" + ANSI_RESET);
 		this.logMessage(sb.toString());
 	}
 
@@ -405,7 +403,7 @@ extends AtomicHIOA {
 						elapsedTime,
 						TENSION*this.currentIntensity.getValue());
 
-		StringBuffer sb = new StringBuffer(ANSI_BLACK_BACKGROUND + "execute the external event: ");
+		StringBuffer sb = new StringBuffer(ANSI_BLACK_BACKGROUND + "Execute the external event: ");
 		sb.append(ce.eventAsString());
 		sb.append(".\n" + ANSI_RESET);
 		this.logMessage(sb.toString());
@@ -431,6 +429,7 @@ extends AtomicHIOA {
 						TENSION*this.currentIntensity.getValue());
 
 		this.logMessage("simulation ends.\n");
+		this.logMessage(new AirConditioningElectricityReport(URI, Math.round(this.totalConsumption * 100.0) / 100.0).printout("-"));
 		super.endSimulation(endTime);
 	}
 
@@ -523,14 +522,14 @@ extends AtomicHIOA {
 		@Override
 		public String printout(String indent) {
 			StringBuffer ret = new StringBuffer(indent);
-			ret.append("---\n");
+			ret.append("\n---\n");
 			ret.append(indent);
 			ret.append('|');
 			ret.append(this.modelURI);
 			ret.append(" report\n");
 			ret.append(indent);
 			ret.append('|');
-			ret.append("total consumption in kwh = ");
+			ret.append("total consumption in kWh = ");
 			ret.append(this.totalConsumption);
 			ret.append(".\n");
 			ret.append(indent);
