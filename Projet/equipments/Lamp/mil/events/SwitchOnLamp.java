@@ -40,7 +40,7 @@ import equipments.Lamp.mil.LampElectricityModel;
 // -----------------------------------------------------------------------------
 /**
  * The class <code>SwitchOnLamp</code> defines the simulation event of the
- * lamp being switched on.
+ * lamp being switched On.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -90,18 +90,18 @@ extends		AbstractLampEvent
 		super(timeOfOccurrence, null);
 	}
 
-	// -------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 	// Methods
-	// -------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.es.events.ES_Event#hasPriorityOver(fr.sorbonne_u.devs_simulation.models.events.EventI)
 	 */
 	@Override
-	public boolean			hasPriorityOver(EventI e)
+	public boolean		hasPriorityOver(EventI e)
 	{
 		// if many lamp events occur at the same time, the
-		// SwitchOnLamp one will be executed first.
+		// SwitchOnLamp one will be executed after all others.
 		return true;
 	}
 
@@ -109,15 +109,15 @@ extends		AbstractLampEvent
 	 * @see fr.sorbonne_u.devs_simulation.models.events.Event#executeOn(fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI)
 	 */
 	@Override
-	public void				executeOn(AtomicModelI model)
+	public void			executeOn(AtomicModelI model)
 	{
 		assert	model instanceof LampElectricityModel;
 
-		// a SwitchOnLamp event can be executed when the state of the lamp
-		// model is in the state OFF
-		LampElectricityModel m = (LampElectricityModel)model;
-		if (m.getState() == LampElectricityModel.State.OFF) {
-			// then put it in the state LOW
+		LampElectricityModel m = ((LampElectricityModel)model);
+		// a SwitchOn event can be executed when the state of the lamp
+		// model is *not* in the state ON
+		if (m.getState() != LampElectricityModel.State.LOW) {
+			// then put it in the state ON
 			m.setState(LampElectricityModel.State.LOW);
 			// trigger an internal transition by toggling the electricity
 			// consumption changed boolean to true

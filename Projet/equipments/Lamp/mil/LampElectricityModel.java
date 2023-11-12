@@ -33,13 +33,16 @@ package equipments.Lamp.mil;
 // knowledge of the CeCILL-C license and that you accept its terms.
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import equipments.CookingPlate.mil.CookingPlateElectricityModel.CookingPlateElectricityReport;
 import equipments.HEM.simulation.HEM_ReportI;
+import equipments.Lamp.LampImplementationI.LampState;
 import equipments.Lamp.mil.events.AbstractLampEvent;
-import equipments.Lamp.mil.events.SetHighLamp;
-import equipments.Lamp.mil.events.SetLowLamp;
+import equipments.Lamp.mil.events.DecreaseLamp;
+import equipments.Lamp.mil.events.IncreaseLamp;
 import equipments.Lamp.mil.events.SwitchOffLamp;
 import equipments.Lamp.mil.events.SwitchOnLamp;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
@@ -79,17 +82,17 @@ import java.io.Serializable;
  * </p>
  * <p>
  * To model the user actions, four events are defined to be imported and the
- * external transitions upon the reception of these events force the hair
- * dryer electricity model in the corresponding mode with the corresponding
+ * external transitions upon the reception of these events force the lamp
+ * electricity model in the corresponding mode with the corresponding
  * electricity consumption.
  * </p>
  * 
  * <ul>
  * <li>Imported events:
- *   {@code SwitchOnLamp},
  *   {@code SwitchOffLamp},
- *   {@code SetLowLamp},
- *   {@code SetHighLamp}</li>
+ *   {@code SwitchOnLamp},
+ *   {@code IncreaseLamp},
+ *   {@code DecreaseLamp}
  * <li>Exported events: none</li>
  * <li>Imported variables: none</li>
  * <li>Exported variables:
@@ -110,17 +113,32 @@ import java.io.Serializable;
  * 
  * <p>Created on : 2023-09-29</p>
  * 
- * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
+ * @author	<a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-@ModelExternalEvents(imported = {SwitchOnLamp.class,
-								 SwitchOffLamp.class,
-								 SetLowLamp.class,
-								 SetHighLamp.class})
+@ModelExternalEvents(imported = {SwitchOffLamp.class,
+		 					     SwitchOnLamp.class,
+								 IncreaseLamp.class,
+								 DecreaseLamp.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
 // -----------------------------------------------------------------------------
 public class			LampElectricityModel
 extends		AtomicHIOA
 {
+	// -------------------------------------------------------------------------
+		// Color for prints
+		// -------------------------------------------------------------------------
+
+		// Declaring ANSI_RESET so that we can reset the color 
+		public static final String ANSI_RESET = "\u001B[0m"; 
+		// Declaring colors
+		public static final String ANSI_CYAN = "\u001B[36m"; 
+
+		// Declaring the background color 
+		public static final String ANSI_RED_BACKGROUND  = "\u001B[41m"; 
+		public static final String ANSI_BLACK_BACKGROUND  = "\033[40m"; 
+		public static final String ANSI_GREY_BACKGROUND  = "\033[0;100m"; 
+		public static final String ANSI_BLUE_BACKGROUND  = "\u001B[44m"; 
+		
 	// -------------------------------------------------------------------------
 	// Inner classes and types
 	// -------------------------------------------------------------------------
@@ -138,7 +156,7 @@ extends		AtomicHIOA
 	 * 
 	 * <p>Created on : 2019-10-10</p>
 	 * 
-	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
+	 * @author	<a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
 	public static enum State {
 		OFF,
@@ -153,7 +171,7 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
-
+	
 	private static final long		serialVersionUID = 1L;
 
 	/** URI for an instance model; works as long as only one instance is
@@ -161,18 +179,20 @@ extends		AtomicHIOA
 	public static final String		URI = LampElectricityModel.class.
 																getSimpleName();
 
-	/** energy consumption (in Watts) of the lamp in LOW mode.		*/
-	public static double			LOW_MODE_CONSUMPTION = 65.0; // Watts
-	/** energy consumption (in Watts) of the lamp in MEDIUM mode.		*/
-	public static double			MEDIUM_MODE_CONSUMPTION = 110.0; // Watts
-	/** energy consumption (in Watts) of the lamp in HIGH mode.		*/
-	public static double			HIGH_MODE_CONSUMPTION = 230.0; // Watts
+	/** energy consumption (in Watts) of the Lamp depending the mode.		*/
+	public static HashMap<State, Double> LampEnergyConsumption = new HashMap<State, Double>() {{
+		put(State.LOW,65.0); 
+		put(State.MEDIUM,110.0);
+		put(State.HIGH,230.0);}
+	};
+
+
 	/** nominal tension (in Volts) of the lamp.						*/
 	public static double			TENSION = 5.2; // Volts
 
 	/** current state (OFF, LOW, HIGH) of the lamp.					*/
 	protected State					currentState = State.OFF;
-	/** true when the electricity consumption of the dryer has changed
+	/** true when the electricity consumption of the lamp has changed
 	 *  after executing an external event; the external event changes the
 	 *  value of <code>currentState</code> and then an internal transition
 	 *  will be triggered by putting through in this variable which will
@@ -359,25 +379,25 @@ extends		AtomicHIOA
 			case OFF : this.currentIntensity.setNewValue(0.0, t); break;
 			case LOW :
 				this.currentIntensity.
-							setNewValue(LOW_MODE_CONSUMPTION/TENSION, t);
+							setNewValue(LampEnergyConsumption.get(State.LOW)/TENSION, t);
 				break;
 			case MEDIUM :
 				this.currentIntensity.
-							setNewValue(MEDIUM_MODE_CONSUMPTION/TENSION, t);
+							setNewValue(LampEnergyConsumption.get(State.MEDIUM)/TENSION, t);
 				break;
 			case HIGH :
 				this.currentIntensity.
-							setNewValue(HIGH_MODE_CONSUMPTION/TENSION, t);
+							setNewValue(LampEnergyConsumption.get(State.HIGH)/TENSION, t);
 		}
 
 		// Tracing
 		StringBuffer message =
 				new StringBuffer("executes an internal transition ");
-		message.append("with current consumption ");
+		message.append(ANSI_GREY_BACKGROUND +"Current consumption ");
 		message.append(this.currentIntensity.getValue());
 		message.append(" at ");
 		message.append(this.currentIntensity.getTime());
-		message.append(".\n");
+		message.append(".\n" + ANSI_RESET);
 		this.logMessage(message.toString());
 	}
 
@@ -406,9 +426,9 @@ extends		AtomicHIOA
 
 		// Tracing
 		StringBuffer message =
-				new StringBuffer("executes an external transition ");
+				new StringBuffer(ANSI_BLACK_BACKGROUND + "Executes an external transition ");
 		message.append(ce.toString());
-		message.append(")\n");
+		message.append(")\n" + ANSI_RESET);
 		this.logMessage(message.toString());
 
 		assert	ce instanceof AbstractLampEvent;
@@ -429,6 +449,7 @@ extends		AtomicHIOA
 									d,
 									TENSION*this.currentIntensity.getValue());
 
+		this.logMessage("\n" + (new CookingPlateElectricityReport(URI, Math.round(this.totalConsumption * 100.0)/100.0)).printout("-"));
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
 	}
@@ -463,19 +484,19 @@ extends		AtomicHIOA
 			ModelI.createRunParameterName(getURI(),
 										  LOW_MODE_CONSUMPTION_RPNAME);
 		if (simParams.containsKey(lowName)) {
-			LOW_MODE_CONSUMPTION = (double) simParams.get(lowName);
+			LampEnergyConsumption.put(State.LOW,(double) simParams.get(lowName));
 		}
 		String mediumName =
 			ModelI.createRunParameterName(getURI(),
 										  MEDIUM_MODE_CONSUMPTION_RPNAME);
 		if (simParams.containsKey(mediumName)) {
-			MEDIUM_MODE_CONSUMPTION = (double) simParams.get(mediumName);
+			LampEnergyConsumption.put(State.MEDIUM,(double) simParams.get(mediumName));
 		}
 		String highName =
 			ModelI.createRunParameterName(getURI(),
 										  HIGH_MODE_CONSUMPTION_RPNAME);
 		if (simParams.containsKey(highName)) {
-			HIGH_MODE_CONSUMPTION = (double) simParams.get(highName);
+			LampEnergyConsumption.put(State.HIGH,(double) simParams.get(highName));
 		}
 		String tensionName =
 				ModelI.createRunParameterName(getURI(), TENSION_RPNAME);
@@ -508,7 +529,7 @@ extends		AtomicHIOA
 	 * 
 	 * <p>Created on : 2023-09-29</p>
 	 * 
-	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
+	 * @author	<a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
 	public static class		LampElectricityReport
 	implements	SimulationReportI, HEM_ReportI

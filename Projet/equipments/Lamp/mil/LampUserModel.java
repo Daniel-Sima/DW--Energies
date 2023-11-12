@@ -37,8 +37,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import java.io.Serializable;
-import equipments.Lamp.mil.events.SetHighLamp;
-import equipments.Lamp.mil.events.SetLowLamp;
+
+import equipments.Lamp.mil.events.DecreaseLamp;
+import equipments.Lamp.mil.events.IncreaseLamp;
 import equipments.Lamp.mil.events.SwitchOffLamp;
 import equipments.Lamp.mil.events.SwitchOnLamp;
 import fr.sorbonne_u.devs_simulation.es.events.ES_EventI;
@@ -85,10 +86,10 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
  * <ul>
  * <li>Imported events: none</li>
  * <li>Exported events:
- *   {@code SwitchOnLamp},
  *   {@code SwitchOffLamp},
- *   {@code SetLowLamp},
- *   {@code SetHighLamp}</li>
+ *   {@code SwitchOnLamp},
+ *   {@code IncreaseLamp},
+ *   {@code DecreaseLamp}</li>
  * </ul>
  * 
  * <p><strong>White-box Invariant</strong></p>
@@ -103,14 +104,14 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
  * invariant	{@code true}	// no more invariant
  * </pre>
  * 
- * <p>Created on : 2023-09-29</p>
+ * <p>Created on : 2023-11-12</p>
  * 
- * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
+ * @author	<a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-@ModelExternalEvents(exported = {SwitchOnLamp.class,
-								 SwitchOffLamp.class,
-								 SetLowLamp.class,
-								 SetHighLamp.class})
+@ModelExternalEvents(exported = {SwitchOffLamp.class,
+								 SwitchOnLamp.class,
+								 IncreaseLamp.class,
+								 DecreaseLamp.class})
 // -----------------------------------------------------------------------------
 public class			LampUserModel
 extends		AtomicES_Model
@@ -131,6 +132,10 @@ extends		AtomicES_Model
 
 	/**	the random number generator from common math library.				*/
 	protected final RandomDataGenerator	rg ;
+	/** Times left to increase/decrease */
+	protected static int timesLeft = 0;
+	/** Try to increase boolean */
+	protected static boolean increase = true;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -168,10 +173,9 @@ extends		AtomicES_Model
 
 	/**
 	 * generate the next event in the test scenario; current implementation
-	 * cycles through {@code SwitchOnLamp}, {@code SetHighLamp},
-	 * {@code SetLowLamp} and {@code SwitchOffLamp} in this order
-	 * at a random time interval following a gaussian distribution with
-	 * mean {@code STEP_MEAN_DURATION} and standard deviation
+	 * cycles through {@code SetHighLamp}, {@code SetMediumLamp}, {@code SetLowLamp}
+	 * and {@code SwitchOffLamp} in this order at a random time interval following
+	 * a gaussian distribution with mean {@code STEP_MEAN_DURATION} and standard deviation
 	 * {@code STEP_MEAN_DURATION/2.0}.
 	 * 
 	 * <p><strong>Contract</strong></p>
@@ -188,17 +192,25 @@ extends		AtomicES_Model
 		// compute the next event type given the current event
 		ES_EventI nextEvent = null;
 		if (current instanceof SwitchOffLamp) {
-			// compute the time of occurrence for the next lamp usage
+			// compute the time of occurrence for the next Cooking Plate usage
 			Time t2 = this.computeTimeOfNextUsage(current.getTimeOfOccurrence());
 			nextEvent = new SwitchOnLamp(t2);
 		} else {
 			// compute the time of occurrence for the next event
 			Time t = this.computeTimeOfNextEvent(current.getTimeOfOccurrence());
 			if (current instanceof SwitchOnLamp) {
-				nextEvent = new SetHighLamp(t);
-			} else if (current instanceof SetHighLamp) {
-				nextEvent = new SetLowLamp(t);
-			} else if (current instanceof SetLowLamp) {
+				nextEvent = new IncreaseLamp(t);
+			} else if ((current instanceof IncreaseLamp) && (increase)){
+				nextEvent = new IncreaseLamp(t);
+				timesLeft++;
+				increase = timesLeft == 2 ? false : true;
+			} else if ((current instanceof IncreaseLamp) && (!increase)) {
+				nextEvent = new DecreaseLamp(t);
+			} else if ((current instanceof DecreaseLamp) && (!increase)) {
+				nextEvent = new DecreaseLamp(t);
+				timesLeft--;
+				increase = timesLeft == 0 ? true : false;
+			} else if ((current instanceof DecreaseLamp) && (increase)) {
 				nextEvent = new SwitchOffLamp(t);
 			}
 		}

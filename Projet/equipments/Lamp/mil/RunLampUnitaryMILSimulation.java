@@ -38,8 +38,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import equipments.Lamp.mil.events.SetHighLamp;
-import equipments.Lamp.mil.events.SetLowLamp;
+import equipments.Lamp.mil.events.DecreaseLamp;
+import equipments.Lamp.mil.events.IncreaseLamp;
 import equipments.Lamp.mil.events.SwitchOffLamp;
 import equipments.Lamp.mil.events.SwitchOnLamp;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
@@ -101,7 +101,7 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
  * 
  * <p>Created on : 2023-09-29</p>
  * 
- * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
+ * @author	<a href="mailto:walterbeles@gmail.com"Walter ABELES</a>
  */
 public class			RunLampUnitaryMILSimulation
 {
@@ -161,18 +161,20 @@ public class			RunLampUnitaryMILSimulation
 							new EventSink(LampElectricityModel.URI,
 										  SwitchOffLamp.class)
 					});
+			
 			connections.put(
-					new EventSource(LampUserModel.URI, SetHighLamp.class),
+					new EventSource(LampUserModel.URI, IncreaseLamp.class),
 					new EventSink[] {
 							new EventSink(LampElectricityModel.URI,
-										  SetHighLamp.class)
+										  IncreaseLamp.class)
 					});
 			connections.put(
-					new EventSource(LampUserModel.URI, SetLowLamp.class),
+					new EventSource(LampUserModel.URI, DecreaseLamp.class),
 					new EventSink[] {
 							new EventSink(LampElectricityModel.URI,
-										  SetLowLamp.class)
+										  DecreaseLamp.class)
 					});
+			
 
 			// coupled model descriptor
 			coupledModelDescriptors.put(
