@@ -33,7 +33,7 @@ public class MakeConnectors {
 		CtClass cs = pool.get(connectorSuperclass.getCanonicalName()) ;
 		CtClass cii = pool.get(connectorImplementedInterface.getCanonicalName()) ;
 		CtClass oi = pool.get(offeredInterface.getCanonicalName()) ;
-		CtClass connectorCtClass = pool.makeClass(connectorCanonicalClassName) ;
+		CtClass connectorCtClass = pool.makeClass("equipments.HEM."+connectorCanonicalClassName+"Connector") ;
 		connectorCtClass.setSuperclass(cs) ;
 		ArrayList<Operation> cfpOps = cfp.getOperations();
 		ArrayList<InstanceVar> instanceVars = cfp.getInstanceVars();
@@ -43,6 +43,7 @@ public class MakeConnectors {
 												instanceVars.get(i).name,
 												connectorCtClass);
 			field.setModifiers(Modifier.PROTECTED);
+			field.setModifiers(Modifier.FINAL);
 			connectorCtClass.addField(field, instanceVars.get(i).staticInit);
 		}
 		for(int i=instanceVars.size()-2; i<instanceVars.size(); i++) {
@@ -91,7 +92,7 @@ public class MakeConnectors {
 			connectorCtClass.addMethod(theCtMethod) ;
 		}
 		connectorCtClass.setInterfaces(new CtClass[]{cii}) ;
-		CtConstructor c = CtNewConstructor.make("public AirConditioningConnector() {\r\n"
+		CtConstructor c = CtNewConstructor.make("public "+connectorCanonicalClassName+"Connector() {\r\n"
 				+ "		super();\r\n"
 				+ "		this.currentMode = MAX_MODE;\r\n"
 				+ "		this.isSuspended = false;\r\n"

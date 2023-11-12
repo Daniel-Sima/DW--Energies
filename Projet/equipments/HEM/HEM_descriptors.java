@@ -137,16 +137,13 @@ extends AbstractComponent {
 					this.adjustableOutboundPortAirConditioning.getPortURI(),
 					AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 					AirCondCIConnector.getClass().getCanonicalName());
-//			
+		
 			this.adjustableOutboundPortFridge = new AdjustableOutboundPort(this);
 			this.adjustableOutboundPortFridge.publishPort();
 			this.doPortConnection(
 					this.adjustableOutboundPortFridge.getPortURI(),
 					Fridge.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 					FridgeCIConnector.getClass().getCanonicalName());
-			
-//			System.out.println("A: "+adjustableOutboundPortAirConditioning.maxMode());
-//			System.out.println("F: "+adjustableOutboundPortFridge.maxMode());
 			
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;

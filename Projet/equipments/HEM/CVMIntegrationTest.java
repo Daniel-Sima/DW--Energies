@@ -153,8 +153,8 @@ extends	AbstractCVM {
 	public static void	main(String[] args) {
 		try {
 			CVMIntegrationTest cvm = new CVMIntegrationTest();
-			cvm.startStandardLifeCycle(12000L);
-			Thread.sleep(30000L);
+			cvm.startStandardLifeCycle(120000L);
+			Thread.sleep(300000L);
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();

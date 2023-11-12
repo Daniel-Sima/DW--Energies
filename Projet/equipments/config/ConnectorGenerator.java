@@ -62,7 +62,7 @@ public class ConnectorGenerator {
 			Class<?> connector = null;
 			try {
 				connector = MakeConnectors.makeConnectorClassJavassist(
-									"equipments.HEM."+className+"Connector",
+									className,
 									AbstractConnector.class,
 									adjustableCI,
 									controlCI,
