@@ -312,7 +312,7 @@ extends	AtomicHIOA {
 		this.logMessage(message.toString());
 
 		// reset the energy produced after the battery has stored it
-		this.currentPowerProducedPetrolGenerator.setNewValue(0.0, this.totalPowerStored.getTime());
+		this.currentPowerProducedPetrolGenerator.setNewValue(0.0, this.currentPowerProducedPetrolGenerator.getTime());
 
 		super.userDefinedInternalTransition(elapsedTime);
 	}
