@@ -39,7 +39,7 @@ import production.intermittent.PetrolGenerator.mil.events.SwitchOnPetrolGenerato
  * 
  * <p>
  * The electric power production (in Wh) depends upon the petrol quantity (5L) and 
- * its production capacity (2kWh).
+ * its production capacity (6kWh).
  * </p>
  * 
  * <p>
@@ -126,29 +126,34 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
-	/** URI for a model; works when only one instance is created.			*/
+	/** URI for a model; works when only one instance is created.				*/
 	public static final String URI = PetrolGeneratorElectricityModel.class.getSimpleName();
 
-	/** power produced by the PetrolGenerator while not PRODUCING in Wh.	*/
+	/** power produced by the PetrolGenerator while not PRODUCING in Wh.		*/
 	public static double NOT_PRODUCING_POWER = 0.0;
-	/** power produced in 1h by the PetrolGenerator while PRODUCING in Wh.		*/
-	public static double MAX_PRODUCING_POWER = 2000.0;
-	/** max fuel tank level of the petrol generator, in L.				    */
+	/** power produced in 1h by the PetrolGenerator while PRODUCING in Wh.	 	*/
+	public static double MAX_PRODUCING_POWER = 6000.0;
+	/** max fuel tank level of the petrol generator, in L.				   		*/
 	protected static final double MAX_FUEL_TANK_LEVEL = 5.0; // 5L
 	/** fuel consumed in 1h of producing */
 	protected static final double MAX_CONSOMATION_FUEL = 1.9; // 1.9L
 
-	/** current state of the PetrolGenerator.								*/
+	/** current state of the PetrolGenerator.									*/
 	protected GeneratorState currentState = GeneratorState.OFF;
 	/** true when the electricity production of the PetrolGenerator has changed
 	 *  after executing an external event; the external event changes the
 	 *  value of <code>currentState</code> and then an internal transition
 	 *  will be triggered by putting through in this variable which will
-	 *  update the variable <code>currentPowerProducedPetrolGenerator</code>.				*/
+	 *  update the variable <code>currentPowerProducedPetrolGenerator</code>.	*/
 	protected boolean productionHasChanged = false;
 
 	/** total production of the PetrolGenerator during the simulation in Wh.*/
 	protected double totalProduction;
+	
+	/** integration step as a duration, including the time unit.				*/
+	protected final Duration integrationStep;
+	/** integration step for the differential equation(assumed in hours).		*/
+	protected static double	STEP = 60.0/3600.0;	// 60 seconds 
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
@@ -189,6 +194,7 @@ extends AtomicHIOA {
 			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine);
+		this.integrationStep = new Duration(STEP, simulatedTimeUnit);
 		this.getSimulationEngine().setLogger(new StandardLogger());
 	}
 
@@ -334,17 +340,7 @@ extends AtomicHIOA {
 	 */
 	@Override
 	public Duration timeAdvance() {
-		if (this.productionHasChanged) {
-			// When the production has changed, an immediate (delay = 0.0)
-			// internal transition must be made to update the electricity
-			// production.
-			this.productionHasChanged = false;
-			return Duration.zero(this.getSimulatedTimeUnit());
-		} else {
-			// As long as the state does not change, no internal transition
-			// is made (delay = infinity).
-			return Duration.INFINITY;
-		}
+		return this.integrationStep;
 	}
 
 	/***********************************************************************************/
@@ -361,7 +357,7 @@ extends AtomicHIOA {
 					PetrolGeneratorElectricityModel.NOT_PRODUCING_POWER, t);
 		} else if (this.currentState == GeneratorState.PRODUCING) {
 			this.currentPowerProducedPetrolGenerator.setNewValue(
-					MAX_PRODUCING_POWER, t); // 2000Wh  // TODO AR qd pas par heure
+					MAX_PRODUCING_POWER*STEP, t); // TODO AR 
 			// compute the total consumption for the simulation report.
 			this.totalProduction += this.currentPowerProducedPetrolGenerator.getValue(); 
 
@@ -397,7 +393,7 @@ extends AtomicHIOA {
 		assert ce instanceof PetrolGeneratorEventI;
 
 		// TODO AV qd on produit sur une periode plus courte (pas juste 1h)
-		if (this.currentPowerProducedPetrolGenerator.getValue()  > 0) {
+		if (this.currentPowerProducedPetrolGenerator.getValue() > 0) {
 			this.currentFuelTankLevel.setNewValue(this.currentFuelTankLevel.getValue().doubleValue()-MAX_CONSOMATION_FUEL, this.getCurrentStateTime());
 		}
 
@@ -437,7 +433,7 @@ extends AtomicHIOA {
 	 */
 	@Override
 	public void endSimulation(Time endTime) {
-		//		this.totalProduction += this.currentPowerProducedPetrolGenerator.getValue(); // TODO AR si ici
+		//		this.totalProduction += this.currentPowerProducedPetrolGenerator.getValue(); // TODO AR 
 
 		this.logMessage((new PetrolGeneratorElectricityReport(URI, this.totalProduction).printout("-")));
 

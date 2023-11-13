@@ -449,7 +449,7 @@ extends AtomicHIOA {
 		// Tracing
 		String mark = this.currentState == State.COOLING ? "is COOLING" : "is NOT COOLING";
 		StringBuffer message = new StringBuffer();
-		message.append((Math.round(this.currentTemperature.getValue() *100.0) / 100.0) + "° in the fridge and ");
+		message.append(ANSI_GREY_BACKGROUND + (Math.round(this.currentTemperature.getValue() *100.0) / 100.0) + "° in the fridge and ");
 		message.append(mark);
 		message.append(" at " + this.currentTemperature.getTime());
 		message.append('\n' + ANSI_RESET);

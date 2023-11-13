@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 
 import equipments.CookingPlate.mil.CookingPlateElectricityModel.CookingPlateElectricityReport;
 import equipments.HEM.simulation.HEM_ReportI;
-import equipments.Lamp.LampImplementationI.LampState;
 import equipments.Lamp.mil.events.AbstractLampEvent;
 import equipments.Lamp.mil.events.DecreaseLamp;
 import equipments.Lamp.mil.events.IncreaseLamp;
@@ -65,7 +64,7 @@ import java.io.Serializable;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>LampElectricity_MILModel</code> defines a MIL model
+ * The class <code>LampElectricityModel</code> defines a MIL model
  * of the electricity consumption of a lamps.
  *
  * <p><strong>Description</strong></p>
@@ -392,10 +391,10 @@ extends		AtomicHIOA
 
 		// Tracing
 		StringBuffer message =
-				new StringBuffer("executes an internal transition ");
-		message.append(ANSI_GREY_BACKGROUND +"Current consumption ");
-		message.append(this.currentIntensity.getValue());
-		message.append(" at ");
+				new StringBuffer(ANSI_BLUE_BACKGROUND +"Current consumption ");
+		message.append((Math.round(this.currentIntensity.getValue()* 100.0) / 100.0) );
+		message.append(" Amperes (Total: " + 
+		(Math.round(this.totalConsumption * 100.0) / 100.0) + " kWh" + ") at ");
 		message.append(this.currentIntensity.getTime());
 		message.append(".\n" + ANSI_RESET);
 		this.logMessage(message.toString());

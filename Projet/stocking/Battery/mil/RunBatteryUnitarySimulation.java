@@ -6,6 +6,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import equipments.CookingPlate.mil.CookingPlateElectricityModel;
+import equipments.CookingPlate.mil.CookingPlateUserModel;
+import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
+import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
+import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
+import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
@@ -92,6 +98,7 @@ public class RunBatteryUnitarySimulation {
 			// the heater models simulating its electricity consumption, its
 			// temperatures and the external temperature are atomic HIOA models
 			// hence we use an AtomicHIOA_Descriptor(s)
+			// Battery
 			atomicModelDescriptors.put(
 					BatteryElectricityModel.URI,
 					AtomicHIOA_Descriptor.create(
@@ -99,7 +106,7 @@ public class RunBatteryUnitarySimulation {
 							BatteryElectricityModel.URI,
 							TimeUnit.HOURS,
 							null));
-
+			// Solar Panel
 			atomicModelDescriptors.put(
 					SolarPanelElectricityModel.URI,
 					AtomicHIOA_Descriptor.create(
@@ -114,6 +121,7 @@ public class RunBatteryUnitarySimulation {
 							ExternalWeatherModel.URI,
 							TimeUnit.HOURS,
 							null));
+			// Petrol Generator
 			atomicModelDescriptors.put(
 					PetrolGeneratorElectricityModel.URI,
 					AtomicHIOA_Descriptor.create(
@@ -121,9 +129,18 @@ public class RunBatteryUnitarySimulation {
 							PetrolGeneratorElectricityModel.URI,
 							TimeUnit.HOURS,
 							null));
+			// Cooking Plate
+//			atomicModelDescriptors.put(
+//					CookingPlateElectricityModel.URI,
+//					AtomicHIOA_Descriptor.create(
+//							CookingPlateElectricityModel.class,
+//							CookingPlateElectricityModel.URI,
+//							TimeUnit.HOURS,
+//							null));
 
 			// the heater unit tester model only exchanges event, an
 			// atomic model hence we use an AtomicModelDescriptor
+			// Battery
 			atomicModelDescriptors.put(
 					BatteryUnitTesterModel.URI,
 					AtomicModelDescriptor.create(
@@ -131,6 +148,7 @@ public class RunBatteryUnitarySimulation {
 							BatteryUnitTesterModel.URI,
 							TimeUnit.HOURS,
 							null));
+			// Petrol Generator
 			atomicModelDescriptors.put(
 					PetrolGeneratorUnitTesterModel.URI,
 					AtomicModelDescriptor.create(
@@ -138,6 +156,14 @@ public class RunBatteryUnitarySimulation {
 							PetrolGeneratorUnitTesterModel.URI,
 							TimeUnit.HOURS,
 							null));
+			// Cooking Plate
+//			atomicModelDescriptors.put(
+//					CookingPlateUserModel.URI,
+//					AtomicModelDescriptor.create(
+//							CookingPlateUserModel.class,
+//							CookingPlateUserModel.URI,
+//							TimeUnit.HOURS,
+//							null));
 
 
 
@@ -148,19 +174,25 @@ public class RunBatteryUnitarySimulation {
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
+			// Battery 
 			submodels.add(BatteryElectricityModel.URI);
+			submodels.add(BatteryUnitTesterModel.URI);
+			// Solar Panel
 			submodels.add(SolarPanelElectricityModel.URI);
 			submodels.add(ExternalWeatherModel.URI);
+			// Petrol Generator
 			submodels.add(PetrolGeneratorElectricityModel.URI);
-			submodels.add(BatteryUnitTesterModel.URI);
 			submodels.add(PetrolGeneratorUnitTesterModel.URI);
-
+			// Cooking Plate
+//			submodels.add(CookingPlateElectricityModel.URI);
+//			submodels.add(CookingPlateUserModel.URI);
 
 			// event exchanging connections between exporting and importing
 			// models
 			Map<EventSource,EventSink[]> connections =
 					new HashMap<EventSource,EventSink[]>();
 
+					// Petrol Generator
 					connections.put(
 							new EventSource(PetrolGeneratorUnitTesterModel.URI,
 									FillFuelTank.class),
@@ -195,10 +227,37 @@ public class RunBatteryUnitarySimulation {
 											DoNotProduce.class)
 							});
 
+					// Cooking plate
+//					connections.put(
+//							new EventSource(CookingPlateUserModel.URI, SwitchOnCookingPlate.class),
+//							new EventSink[] {
+//									new EventSink(CookingPlateElectricityModel.URI,
+//											SwitchOnCookingPlate.class)
+//							});
+//					connections.put(
+//							new EventSource(CookingPlateUserModel.URI, SwitchOffCookingPlate.class),
+//							new EventSink[] {
+//									new EventSink(CookingPlateElectricityModel.URI,
+//											SwitchOffCookingPlate.class)
+//							});
+//					connections.put(
+//							new EventSource(CookingPlateUserModel.URI, IncreaseCookingPlate.class),
+//							new EventSink[] {
+//									new EventSink(CookingPlateElectricityModel.URI,
+//											IncreaseCookingPlate.class)
+//							});
+//					connections.put(
+//							new EventSource(CookingPlateUserModel.URI, DecreaseCookingPlate.class),
+//							new EventSink[] {
+//									new EventSink(CookingPlateElectricityModel.URI,
+//											DecreaseCookingPlate.class)
+//							});
+
 					// variable bindings between exporting and importing models
 					Map<VariableSource,VariableSink[]> bindings =
 							new HashMap<VariableSource,VariableSink[]>();
 
+							// Solar Panel
 							bindings.put(new VariableSource("externalSolarIrradiance",
 									Double.class,
 									ExternalWeatherModel.URI),
@@ -207,7 +266,6 @@ public class RunBatteryUnitarySimulation {
 													Double.class,
 													SolarPanelElectricityModel.URI)
 							});
-
 
 							bindings.put(new VariableSource("currentPowerProducedSolarPanel",
 									Double.class,
@@ -218,6 +276,7 @@ public class RunBatteryUnitarySimulation {
 													BatteryElectricityModel.URI)
 							});
 
+							// Petrol Generator
 							bindings.put(new VariableSource("currentPowerProducedPetrolGenerator",
 									Double.class,
 									PetrolGeneratorElectricityModel.URI),
@@ -226,6 +285,16 @@ public class RunBatteryUnitarySimulation {
 													Double.class,
 													BatteryElectricityModel.URI)
 							});
+							
+							// Cooking Plate
+//							bindings.put(new VariableSource("currentPowerConsumed",
+//									Double.class,
+//									CookingPlateElectricityModel.URI),
+//									new VariableSink[] {
+//											new VariableSink("currentPowerConsumedCookingPlate", 
+//													Double.class,
+//													BatteryElectricityModel.URI)
+//							});
 
 							// coupled model descriptor
 							coupledModelDescriptors.put(
@@ -258,7 +327,7 @@ public class RunBatteryUnitarySimulation {
 							SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 							// run a simulation with the simulation beginning at 0.0 and
 							// ending at 24.0
-							se.doStandAloneSimulation(0.0, 5.0);
+							se.doStandAloneSimulation(0.0, 6.0);
 							System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;

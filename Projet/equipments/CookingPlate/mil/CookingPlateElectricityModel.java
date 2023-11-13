@@ -87,6 +87,7 @@ import utils.Electricity;
 		DecreaseCookingPlate.class
 })
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
+@ModelExportedVariable(name = "currentPowerConsumed", type = Double.class)
 public class CookingPlateElectricityModel 
 extends	AtomicHIOA {
 	// -------------------------------------------------------------------------
@@ -162,7 +163,7 @@ extends	AtomicHIOA {
 	public static final String URI = CookingPlateElectricityModel.class.getSimpleName();
 
 	/** energy consumption (in Watts) of the Cooking Plate depending the mode.		*/
-	public static double[] CookingPlateEnergyConsumption = new double[] {4.0, 500.0, 800.0, 1000.0, 1200.0, 1500.0, 1800.0, 2000.0};
+	public static double[] CookingPlateEnergyConsumption = new double[] {4.0, 250.0, 400.0, 500.0, 600.0, 750.0, 900.0, 1000.0};
 
 	/** nominal tension (in Volts) in Europe										*/
 	public static double TENSION = 220.0; // Volts
@@ -189,6 +190,10 @@ extends	AtomicHIOA {
 	/** current intensity in amperes; intensity is power/tension.					*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double> currentIntensity = new Value<Double>(this);
+	
+	/** current power consumed in kWh.					*/
+	@ExportedVariable(type = Double.class)
+	protected final Value<Double> currentPowerConsumed = new Value<Double>(this);
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -340,6 +345,7 @@ extends	AtomicHIOA {
 
 		// initially, the Cooking Plate is off, so its consumption is zero.
 		this.currentIntensity.initialise(0.0);
+		this.currentPowerConsumed.initialise(0.0);
 	}
 
 	/***********************************************************************************/
@@ -395,11 +401,6 @@ extends	AtomicHIOA {
 		case 7 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[7]/TENSION, t); break;
 		}
 		}
-		// Tracing
-		StringBuffer message = new StringBuffer(ANSI_GREY_BACKGROUND + "Current consumption ");
-		message.append(Math.round(this.currentIntensity.getValue() * 100.0) / 100.0);
-		message.append(" Amperes at " + this.currentIntensity.getTime() + ".\n" + ANSI_RESET);
-		this.logMessage(message.toString());
 	}
 
 	/***********************************************************************************/
@@ -420,15 +421,22 @@ extends	AtomicHIOA {
 		Event ce = (Event) currentEvents.get(0);
 
 		// compute the total consumption (in kwh) for the simulation report.
-		this.totalConsumption +=
-				Electricity.computeConsumption(
-						elapsedTime,
-						TENSION*this.currentIntensity.getValue());
+		double currentIntensityInPower = Electricity.computeConsumption(elapsedTime,
+				TENSION*this.currentIntensity.getValue());
+		this.totalConsumption += currentIntensityInPower;
+
+		this.currentPowerConsumed.setNewValue(currentIntensityInPower, currentStateTime);
 
 		// Tracing
-		StringBuffer message =
-				new StringBuffer(ANSI_BLACK_BACKGROUND + "Execute the external event: " + ce.toString() + ")\n" + ANSI_RESET);
+		StringBuffer message = new StringBuffer(ANSI_GREY_BACKGROUND + "Current consumption ");
+		message.append(Math.round(this.currentIntensity.getValue() * 100.0) / 100.0);
+		message.append(" Amperes (total: " +  (Math.round(this.totalConsumption * 100.0) / 100.0) + " kWh) at " + this.currentIntensity.getTime() + ".\n" + ANSI_RESET);
 		this.logMessage(message.toString());
+
+		StringBuffer message1 =
+				new StringBuffer(ANSI_BLACK_BACKGROUND + "Execute the external event: " + ce.toString() + ")\n" + ANSI_RESET);
+		this.logMessage(message1.toString());
+
 
 		assert	ce instanceof AbstractCookingPlateEvent;
 		// events have a method execute on to perform their effect on this
@@ -442,12 +450,6 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void endSimulation(Time endTime) {
-		Duration d = endTime.subtract(this.getCurrentStateTime());
-		this.totalConsumption +=
-				Electricity.computeConsumption(
-						d,
-						TENSION*this.currentIntensity.getValue());
-
 		this.logMessage("\n" + (new CookingPlateElectricityReport(URI, Math.round(this.totalConsumption * 100.0)/100.0)).printout("-"));
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);

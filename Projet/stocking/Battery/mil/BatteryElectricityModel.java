@@ -21,6 +21,7 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.Pair;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
+import utils.Electricity;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -65,7 +66,8 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
 @ModelImportedVariable(name = "currentPowerProducedSolarPanel", type = Double.class)
- @ModelImportedVariable(name = "currentPowerProducedPetrolGenerator", type = Double.class)
+@ModelImportedVariable(name = "currentPowerProducedPetrolGenerator", type = Double.class)
+//@ModelImportedVariable(name = "currentPowerConsumedCookingPlate", type = Double.class)
 @ModelExportedVariable(name = "totalPowerStored", type = Double.class)
 public class BatteryElectricityModel 
 extends	AtomicHIOA {
@@ -115,7 +117,7 @@ extends	AtomicHIOA {
 	/** integration step as a duration, including the time unit.			*/
 	protected final Duration integrationStep;
 	/** integration step for the differential equation(assumed in hours).	*/
-	protected static double	STEP = (10* 60.0)/3600.0;	// 60 seconds * 10 = 10 min
+	protected static double	STEP = 60.0/3600.0;	
 
 	/** current state of the Battery.										*/
 	protected BatteryState currentState = BatteryState.CONSUMING;
@@ -134,11 +136,15 @@ extends	AtomicHIOA {
 	/** current power produced by the SolarPanel in Wh.						*/
 	@ImportedVariable(type = Double.class)
 	protected Value<Double>	 currentPowerProducedSolarPanel; 
-	
+
 	/** current power produced by the PetrolGenerator in Wh.				*/
 	@ImportedVariable(type = Double.class)
-	protected Value<Double>	 currentPowerProducedPetrolGenerator; 
-	
+	protected Value<Double>	 currentPowerProducedPetrolGenerator;
+
+//	/** current intensity consumed by the CookingPlate in Amperes.				*/
+//	@ImportedVariable(type = Double.class)
+//	protected Value<Double>	 currentPowerConsumedCookingPlate; 
+
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -288,6 +294,10 @@ extends	AtomicHIOA {
 		// adding power stored from the Petrol Generator
 		this.totalPowerStored.setNewValue(currentPowerProducedPetrolGenerator.getValue().doubleValue() + 
 				this.totalPowerStored.getValue().doubleValue(), this.totalPowerStored.getTime()); 
+
+//		// substract power consumed by the Cooking Plate
+//		this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
+//				this.currentPowerConsumedCookingPlate.getValue().doubleValue()*1000.0, currentStateTime);
 		
 		// Tracing
 		StringBuffer message1 = new StringBuffer();	
@@ -296,13 +306,20 @@ extends	AtomicHIOA {
 		message1.append(" at " + this.currentPowerProducedSolarPanel.getTime());
 		message1.append("\n" + ANSI_RESET);
 		this.logMessage(message1.toString());
-		
+
 		StringBuffer message2 = new StringBuffer();	
 		message2.append(ANSI_BLUE_BACKGROUND + "Current power stored from the Petrol Generator: ");
 		message2.append((Math.round(currentPowerProducedPetrolGenerator.getValue().doubleValue()* 100.0) / 100.0) + " Wh");
 		message2.append(" at " + this.currentPowerProducedPetrolGenerator.getTime());
 		message2.append("\n" + ANSI_RESET);
 		this.logMessage(message2.toString());
+
+//		StringBuffer message3 = new StringBuffer();	
+//		message3.append(ANSI_BLUE_BACKGROUND + "Current power consumed by Cooking Plate: ");
+//		message3.append((Math.round(currentPowerConsumedCookingPlate.getValue().doubleValue()*1000.0 * 100.0) / 100.0) + " Wh");
+//		message3.append(" at " + this.currentPowerConsumedCookingPlate.getTime());
+//		message3.append("\n" + ANSI_RESET);
+//		this.logMessage(message3.toString());
 
 		StringBuffer message = new StringBuffer();	
 		message.append(ANSI_BLUE_BACKGROUND + "Total power stored: ");
@@ -313,6 +330,7 @@ extends	AtomicHIOA {
 
 		// reset the energy produced after the battery has stored it
 		this.currentPowerProducedPetrolGenerator.setNewValue(0.0, this.currentPowerProducedPetrolGenerator.getTime());
+//		this.currentPowerConsumedCookingPlate.setNewValue(0.0, this.currentPowerConsumedCookingPlate.getTime());
 
 		super.userDefinedInternalTransition(elapsedTime);
 	}
@@ -323,6 +341,13 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void	endSimulation(Time endTime) {
+		this.totalPowerStored.setNewValue(currentPowerProducedSolarPanel.getValue().doubleValue() + 
+				this.totalPowerStored.getValue().doubleValue(), this.totalPowerStored.getTime()); 
+
+		// substract power consumed by the Cooking Plate
+//		this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
+//				this.currentPowerConsumedCookingPlate.getValue().doubleValue()*1000.0, currentStateTime);
+
 		this.logMessage("simulation ends.\n");
 		this.logMessage(new BatteryElectricityReport(URI, Math.round(this.totalPowerStored.getValue().doubleValue() * 100.0) / 100.0).printout("-"));
 		super.endSimulation(endTime);

@@ -94,22 +94,22 @@ extends	AtomicHIOA {
 	/** total production of the Solar Panel during the simulation in kWh.		*/
 	protected double totalProduction;
 
-	/** nominal tension (in Volts).							*/
+	/** nominal tension (in Volts).												*/
 	public static double TENSION = 220.0;
 
-	/** integration step as a duration, including the time unit.			*/
+	/** integration step as a duration, including the time unit.				*/
 	protected final Duration integrationStep;
-	/** integration step for the differential equation(assumed in hours).	*/
-	protected static double	STEP = (10* 60.0)/3600.0;	// 60 seconds * 10 = 10 min
+	/** integration step for the differential equation(assumed in hours).		*/
+	protected static double	STEP = 60.0/3600.0;	// 60 seconds 
 
 	/** size of the solar panel in m^2 */
-	protected final double SIZE_SOLAR_PANEL = 0.5; 
+	protected final double SIZE_SOLAR_PANEL = 2; 
 	
 	// -------------------------------------------------------------------------
 	// HIOA model variables
 	// -------------------------------------------------------------------------
 
-	/** the current power produced 					*/
+	/** the current power produced  Wh										*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double> currentPowerProducedSolarPanel = new Value<Double>(this);
 
@@ -242,14 +242,13 @@ extends	AtomicHIOA {
 	public void userDefinedInternalTransition(Duration elapsedTime) {
 		// Formula: total power (Wh) = solar irradiance (W/m^2) * surface (m^2) * period(h)
 		double currentPowerProduction = (this.externalSolarIrradiance.getValue().doubleValue()) * SIZE_SOLAR_PANEL;
-		double tenMinInOneHour = 0.166667; 
-		this.totalProduction += currentPowerProduction*tenMinInOneHour;
-		this.currentPowerProducedSolarPanel.setNewValue(currentPowerProduction*tenMinInOneHour, this.externalSolarIrradiance.getTime());
+		this.totalProduction += currentPowerProduction*elapsedTime.getSimulatedDuration();
+		this.currentPowerProducedSolarPanel.setNewValue(currentPowerProduction*elapsedTime.getSimulatedDuration(), this.externalSolarIrradiance.getTime());
 
 		// Tracing
 		StringBuffer message1 = new StringBuffer();	
 		message1.append(ANSI_BLUE_BACKGROUND + "Current power production: ");
-		message1.append((Math.round(currentPowerProduction*tenMinInOneHour * 100.0) / 100.0) + " Wh");
+		message1.append((Math.round(currentPowerProduction*elapsedTime.getSimulatedDuration() * 100.0) / 100.0) + " Wh");
 		message1.append(" at " + this.externalSolarIrradiance.getTime());
 		message1.append("\n" + ANSI_RESET);
 		this.logMessage(message1.toString());

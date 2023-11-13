@@ -310,7 +310,7 @@ extends AtomicHIOA {
 
 			StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "Current consumption: ");
 			sb.append(this.currentIntensity.getValue());
-			sb.append(" amperes at ");
+			sb.append(" Amperes at ");
 			sb.append(this.currentIntensity.getTime());
 			sb.append(" seconds.\n" + ANSI_RESET);
 			this.logMessage(sb.toString());
@@ -374,7 +374,7 @@ extends AtomicHIOA {
 
 		StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "Current consumption: ");
 		sb.append((Math.round(this.currentIntensity.getValue() * 100.0) / 100.0));
-		sb.append(" Amperes at ");
+		sb.append(" Amperes (" + (Math.round(this.totalConsumption * 100.0) / 100.0) + " kWh) at ");
 		sb.append(this.currentIntensity.getTime());
 		sb.append("\n" + ANSI_RESET);
 		this.logMessage(sb.toString());
