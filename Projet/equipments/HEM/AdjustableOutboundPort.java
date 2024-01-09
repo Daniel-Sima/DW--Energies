@@ -109,6 +109,7 @@ implements AdjustableCI {
 		int oldMode = this.currentMode();
 		assert	oldMode > 1;
 		boolean ret = ((AdjustableCI)this.getConnector()).downMode();
+		System.out.println("ret: "+ret);
 		assert	this.currentMode() < oldMode;
 		return ret;
 	}
