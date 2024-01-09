@@ -187,7 +187,7 @@ extends		AtomicHIOA
 
 
 	/** nominal tension (in Volts) of the lamp.						*/
-	public static double			TENSION = 5.2; // Volts
+	public static double TENSION = 220; // Volts
 
 	/** current state (OFF, LOW, HIGH) of the lamp.					*/
 	protected State					currentState = State.OFF;
@@ -389,12 +389,13 @@ extends		AtomicHIOA
 							setNewValue(LampEnergyConsumption.get(State.HIGH)/TENSION, t);
 		}
 
+		
 		// Tracing
 		StringBuffer message =
-				new StringBuffer(ANSI_BLUE_BACKGROUND +"Current consumption ");
+				new StringBuffer(ANSI_RED_BACKGROUND +"Current consumption ");
 		message.append((Math.round(this.currentIntensity.getValue()* 100.0) / 100.0) );
 		message.append(" Amperes (Total: " + 
-		(Math.round(this.totalConsumption * 100.0) / 100.0) + " kWh" + ") at ");
+		(Math.round(this.totalConsumption * 100.0) / 100.0) + " Wh" + ") at ");
 		message.append(this.currentIntensity.getTime());
 		message.append(".\n" + ANSI_RESET);
 		this.logMessage(message.toString());
@@ -417,11 +418,14 @@ extends		AtomicHIOA
 
 		Event ce = (Event) currentEvents.get(0);
 
-		// compute the total consumption (in kwh) for the simulation report.
+		// compute the total consumption (in Wh) for the simulation report.
 		this.totalConsumption +=
 				Electricity.computeConsumption(
 									elapsedTime,
 									TENSION*this.currentIntensity.getValue());
+		
+//		this.totalConsumption += TENSION * this.currentIntensity.getValue();
+
 
 		// Tracing
 		StringBuffer message =
@@ -448,8 +452,8 @@ extends		AtomicHIOA
 									d,
 									TENSION*this.currentIntensity.getValue());
 
-		this.logMessage("\n" + (new CookingPlateElectricityReport(URI, Math.round(this.totalConsumption * 100.0)/100.0)).printout("-"));
-		this.logMessage("simulation ends.\n");
+		this.logMessage("\n" + (new LampElectricityReport(URI, (Math.round(this.totalConsumption * 100.0)/100.0)*1000.0)).printout("-"));
+		this.logMessage("simulation ends.\n");	
 		super.endSimulation(endTime);
 	}
 
@@ -535,7 +539,7 @@ extends		AtomicHIOA
 	{
 		private static final long serialVersionUID = 1L;
 		protected String	modelURI;
-		protected double	totalConsumption; // in kwh
+		protected double	totalConsumption; // in Wh
 
 		public				LampElectricityReport(
 			String modelURI,
@@ -564,7 +568,7 @@ extends		AtomicHIOA
 			ret.append(" report\n");
 			ret.append(indent);
 			ret.append('|');
-			ret.append("total consumption in kwh = ");
+			ret.append("total consumption in Wh = ");
 			ret.append(this.totalConsumption);
 			ret.append(".\n");
 			ret.append(indent);

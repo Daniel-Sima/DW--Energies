@@ -95,7 +95,7 @@ extends AtomicES_Model {
 	public static final String	URI = CookingPlateUserModel.class.getSimpleName();
 
 	/** time interval between event outputs in hours.						*/
-	protected static double STEP_MEAN_DURATION = (10* 60.0)/3600.0;	// 60 seconds * 10 = 10 min
+	protected static double STEP_MEAN_DURATION = 60.0/3600.0;
 	/** time interval between Cooking Plate usages in hours.				*/
 	protected static double	DELAY_MEAN_DURATION = 4.0;
 	

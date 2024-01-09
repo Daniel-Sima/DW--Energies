@@ -429,7 +429,7 @@ extends AtomicHIOA {
 						TENSION*this.currentIntensity.getValue());
 
 		this.logMessage("simulation ends.\n");
-		this.logMessage(new AirConditioningElectricityReport(URI, Math.round(this.totalConsumption * 100.0) / 100.0).printout("-"));
+		this.logMessage(new AirConditioningElectricityReport(URI, (Math.round(this.totalConsumption * 100.0) / 100.0)*1000.0).printout("-"));
 		super.endSimulation(endTime);
 	}
 
@@ -529,7 +529,7 @@ extends AtomicHIOA {
 			ret.append(" report\n");
 			ret.append(indent);
 			ret.append('|');
-			ret.append("total consumption in kWh = ");
+			ret.append("total consumption in Wh = ");
 			ret.append(this.totalConsumption);
 			ret.append(".\n");
 			ret.append(indent);

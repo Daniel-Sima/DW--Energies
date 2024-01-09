@@ -141,19 +141,19 @@ extends AtomicModel {
 				break;
 			case 5:
 				ret.add(new SetPowerFridge(this.getTimeOfNextEvent(),
-						new PowerValue(50.0)));
+						new PowerValue(100.0)));
 				break;
 			case 6:
 				ret.add(new SetPowerFridge(this.getTimeOfNextEvent(),
-						new PowerValue(100.0)));
+						new PowerValue(300.0)));
 				break;
 			case 7:
 				ret.add(new SetPowerFridge(this.getTimeOfNextEvent(),
-						new PowerValue(150.0)));
+						new PowerValue(400.0)));
 				break;
 			case 8:
 				ret.add(new SetPowerFridge(this.getTimeOfNextEvent(),
-						new PowerValue(200.0)));
+						new PowerValue(500.0)));
 				break;
 			case 9:
 				ret.add(new SwitchOffFridge(this.getTimeOfNextEvent()));

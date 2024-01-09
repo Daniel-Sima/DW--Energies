@@ -437,11 +437,11 @@ extends	AtomicHIOA {
 				new StringBuffer(ANSI_BLACK_BACKGROUND + "Execute the external event: " + ce.toString() + ")\n" + ANSI_RESET);
 		this.logMessage(message1.toString());
 
-
 		assert	ce instanceof AbstractCookingPlateEvent;
 		// events have a method execute on to perform their effect on this
 		// model
 		ce.executeOn(this);
+		
 	}
 
 	/***********************************************************************************/
@@ -450,7 +450,7 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void endSimulation(Time endTime) {
-		this.logMessage("\n" + (new CookingPlateElectricityReport(URI, Math.round(this.totalConsumption * 100.0)/100.0)).printout("-"));
+		this.logMessage("\n" + (new CookingPlateElectricityReport(URI, (Math.round(this.totalConsumption * 100.0)/100.0) * 1000.00)).printout("-"));
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
 	}
@@ -549,7 +549,7 @@ extends	AtomicHIOA {
 			ret.append(" report\n");
 			ret.append(indent);
 			ret.append('|');
-			ret.append("total consumption in kWh = ");
+			ret.append("total consumption in Wh = ");
 			ret.append(this.totalConsumption);
 			ret.append(".\n");
 			ret.append(indent);

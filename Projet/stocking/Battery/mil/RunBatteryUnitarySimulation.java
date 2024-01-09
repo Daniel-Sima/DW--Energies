@@ -6,12 +6,33 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import equipments.CookingPlate.mil.CookingPlateElectricityModel;
 import equipments.CookingPlate.mil.CookingPlateUserModel;
 import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
 import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
 import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
 import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
+import equipments.Lamp.mil.LampElectricityModel;
+import equipments.Lamp.mil.LampUserModel;
+import equipments.Lamp.mil.events.DecreaseLamp;
+import equipments.Lamp.mil.events.IncreaseLamp;
+import equipments.Lamp.mil.events.SwitchOffLamp;
+import equipments.Lamp.mil.events.SwitchOnLamp;
+import equipments.AirConditioning.mil.AirConditioningElectricityModel;
+import equipments.AirConditioning.mil.AirConditioningTemperatureModel;
+import equipments.AirConditioning.mil.AirConditioningUnitTesterModel;
+import equipments.AirConditioning.mil.ExternalTemperatureModel;
+import equipments.AirConditioning.mil.events.Cool;
+import equipments.AirConditioning.mil.events.DoNotCool;
+import equipments.AirConditioning.mil.events.SetPowerAirConditioning;
+import equipments.AirConditioning.mil.events.SwitchOffAirConditioning;
+import equipments.AirConditioning.mil.events.SwitchOnAirConditioning;
+import equipments.CookingPlate.mil.CookingPlateElectricityModel;
+//import equipments.CookingPlate.mil.CookingPlateUserModel;
+//import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
+//import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
+//import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
+//import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
+import equipments.meter.mil.ElectricMeterElectricityModel;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
@@ -27,6 +48,7 @@ import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import production.aleatory.SolarPanel.mil.ExternalWeatherModel;
 import production.aleatory.SolarPanel.mil.SolarPanelElectricityModel;
+import production.aleatory.SolarPanel.mil.SolarPanelUnitTesterModel;
 import production.intermittent.PetrolGenerator.mil.PetrolGeneratorElectricityModel;
 import production.intermittent.PetrolGenerator.mil.PetrolGeneratorUnitTesterModel;
 import production.intermittent.PetrolGenerator.mil.events.DoNotProduce;
@@ -98,6 +120,7 @@ public class RunBatteryUnitarySimulation {
 			// the heater models simulating its electricity consumption, its
 			// temperatures and the external temperature are atomic HIOA models
 			// hence we use an AtomicHIOA_Descriptor(s)
+			
 			// Battery
 			atomicModelDescriptors.put(
 					BatteryElectricityModel.URI,
@@ -106,6 +129,7 @@ public class RunBatteryUnitarySimulation {
 							BatteryElectricityModel.URI,
 							TimeUnit.HOURS,
 							null));
+			
 			// Solar Panel
 			atomicModelDescriptors.put(
 					SolarPanelElectricityModel.URI,
@@ -121,6 +145,14 @@ public class RunBatteryUnitarySimulation {
 							ExternalWeatherModel.URI,
 							TimeUnit.HOURS,
 							null));
+			atomicModelDescriptors.put(
+					SolarPanelUnitTesterModel.URI,
+					AtomicModelDescriptor.create(
+							SolarPanelUnitTesterModel.class,
+							SolarPanelUnitTesterModel.URI,
+							TimeUnit.HOURS,
+							null));
+
 			// Petrol Generator
 			atomicModelDescriptors.put(
 					PetrolGeneratorElectricityModel.URI,
@@ -129,14 +161,84 @@ public class RunBatteryUnitarySimulation {
 							PetrolGeneratorElectricityModel.URI,
 							TimeUnit.HOURS,
 							null));
+			atomicModelDescriptors.put(
+					PetrolGeneratorUnitTesterModel.URI,
+					AtomicModelDescriptor.create(
+							PetrolGeneratorUnitTesterModel.class,
+							PetrolGeneratorUnitTesterModel.URI,
+							TimeUnit.HOURS,
+							null));
+
+			// Electric Meter Model
+			atomicModelDescriptors.put(
+					ElectricMeterElectricityModel.URI,
+					AtomicHIOA_Descriptor.create(
+							ElectricMeterElectricityModel.class,
+							ElectricMeterElectricityModel.URI,
+							TimeUnit.HOURS,
+							null));
+
 			// Cooking Plate
-//			atomicModelDescriptors.put(
-//					CookingPlateElectricityModel.URI,
-//					AtomicHIOA_Descriptor.create(
-//							CookingPlateElectricityModel.class,
-//							CookingPlateElectricityModel.URI,
-//							TimeUnit.HOURS,
-//							null));
+			atomicModelDescriptors.put(
+					CookingPlateElectricityModel.URI,
+					AtomicHIOA_Descriptor.create(
+							CookingPlateElectricityModel.class,
+							CookingPlateElectricityModel.URI,
+							TimeUnit.HOURS,
+							null));
+			atomicModelDescriptors.put(
+					CookingPlateUserModel.URI,
+					AtomicModelDescriptor.create(
+							CookingPlateUserModel.class,
+							CookingPlateUserModel.URI,
+							TimeUnit.HOURS,
+							null));
+			
+			// Lamp
+			atomicModelDescriptors.put(
+					LampElectricityModel.URI,
+					AtomicHIOA_Descriptor.create(
+							LampElectricityModel.class,
+							LampElectricityModel.URI,
+							TimeUnit.HOURS,
+							null));
+			atomicModelDescriptors.put(
+					LampUserModel.URI,
+					AtomicModelDescriptor.create(
+							LampUserModel.class,
+							LampUserModel.URI,
+							TimeUnit.HOURS,
+							null));
+			
+			// Air Conditioning
+			atomicModelDescriptors.put(
+					AirConditioningElectricityModel.URI,
+					AtomicHIOA_Descriptor.create(
+							AirConditioningElectricityModel.class,
+							AirConditioningElectricityModel.URI,
+							TimeUnit.HOURS,
+							null));
+			atomicModelDescriptors.put(
+					AirConditioningTemperatureModel.URI,
+					AtomicHIOA_Descriptor.create(
+							AirConditioningTemperatureModel.class,
+							AirConditioningTemperatureModel.URI,
+							TimeUnit.HOURS,
+							null));
+			atomicModelDescriptors.put(
+					ExternalTemperatureModel.URI,
+					AtomicHIOA_Descriptor.create(
+							ExternalTemperatureModel.class,
+							ExternalTemperatureModel.URI,
+							TimeUnit.HOURS,
+							null));
+			atomicModelDescriptors.put(
+					AirConditioningUnitTesterModel.URI,
+					AtomicModelDescriptor.create(
+							AirConditioningUnitTesterModel.class,
+							AirConditioningUnitTesterModel.URI,
+							TimeUnit.HOURS,
+							null));
 
 			// the heater unit tester model only exchanges event, an
 			// atomic model hence we use an AtomicModelDescriptor
@@ -148,24 +250,6 @@ public class RunBatteryUnitarySimulation {
 							BatteryUnitTesterModel.URI,
 							TimeUnit.HOURS,
 							null));
-			// Petrol Generator
-			atomicModelDescriptors.put(
-					PetrolGeneratorUnitTesterModel.URI,
-					AtomicModelDescriptor.create(
-							PetrolGeneratorUnitTesterModel.class,
-							PetrolGeneratorUnitTesterModel.URI,
-							TimeUnit.HOURS,
-							null));
-			// Cooking Plate
-//			atomicModelDescriptors.put(
-//					CookingPlateUserModel.URI,
-//					AtomicModelDescriptor.create(
-//							CookingPlateUserModel.class,
-//							CookingPlateUserModel.URI,
-//							TimeUnit.HOURS,
-//							null));
-
-
 
 			// map that will contain the coupled model descriptors to construct
 			// the simulation architecture
@@ -180,12 +264,24 @@ public class RunBatteryUnitarySimulation {
 			// Solar Panel
 			submodels.add(SolarPanelElectricityModel.URI);
 			submodels.add(ExternalWeatherModel.URI);
+			submodels.add(SolarPanelUnitTesterModel.URI);
 			// Petrol Generator
 			submodels.add(PetrolGeneratorElectricityModel.URI);
 			submodels.add(PetrolGeneratorUnitTesterModel.URI);
+			// Electric Meter
+			submodels.add(ElectricMeterElectricityModel.URI);
 			// Cooking Plate
-//			submodels.add(CookingPlateElectricityModel.URI);
-//			submodels.add(CookingPlateUserModel.URI);
+			submodels.add(CookingPlateElectricityModel.URI);
+			submodels.add(CookingPlateUserModel.URI);
+			// Lamp
+			submodels.add(LampElectricityModel.URI);
+			submodels.add(LampUserModel.URI);
+			// Air Conditioning
+			submodels.add(AirConditioningElectricityModel.URI);
+			submodels.add(AirConditioningTemperatureModel.URI);
+			submodels.add(ExternalTemperatureModel.URI);
+			submodels.add(AirConditioningUnitTesterModel.URI);
+			
 
 			// event exchanging connections between exporting and importing
 			// models
@@ -228,30 +324,99 @@ public class RunBatteryUnitarySimulation {
 							});
 
 					// Cooking plate
-//					connections.put(
-//							new EventSource(CookingPlateUserModel.URI, SwitchOnCookingPlate.class),
-//							new EventSink[] {
-//									new EventSink(CookingPlateElectricityModel.URI,
-//											SwitchOnCookingPlate.class)
-//							});
-//					connections.put(
-//							new EventSource(CookingPlateUserModel.URI, SwitchOffCookingPlate.class),
-//							new EventSink[] {
-//									new EventSink(CookingPlateElectricityModel.URI,
-//											SwitchOffCookingPlate.class)
-//							});
-//					connections.put(
-//							new EventSource(CookingPlateUserModel.URI, IncreaseCookingPlate.class),
-//							new EventSink[] {
-//									new EventSink(CookingPlateElectricityModel.URI,
-//											IncreaseCookingPlate.class)
-//							});
-//					connections.put(
-//							new EventSource(CookingPlateUserModel.URI, DecreaseCookingPlate.class),
-//							new EventSink[] {
-//									new EventSink(CookingPlateElectricityModel.URI,
-//											DecreaseCookingPlate.class)
-//							});
+					connections.put(
+							new EventSource(CookingPlateUserModel.URI, SwitchOnCookingPlate.class),
+							new EventSink[] {
+									new EventSink(CookingPlateElectricityModel.URI,
+											SwitchOnCookingPlate.class)
+							});
+					connections.put(
+							new EventSource(CookingPlateUserModel.URI, SwitchOffCookingPlate.class),
+							new EventSink[] {
+									new EventSink(CookingPlateElectricityModel.URI,
+											SwitchOffCookingPlate.class)
+							});
+					connections.put(
+							new EventSource(CookingPlateUserModel.URI, IncreaseCookingPlate.class),
+							new EventSink[] {
+									new EventSink(CookingPlateElectricityModel.URI,
+											IncreaseCookingPlate.class)
+							});
+					connections.put(
+							new EventSource(CookingPlateUserModel.URI, DecreaseCookingPlate.class),
+							new EventSink[] {
+									new EventSink(CookingPlateElectricityModel.URI,
+											DecreaseCookingPlate.class)
+							});
+					
+					// Lamp
+					connections.put(
+							new EventSource(LampUserModel.URI, SwitchOnLamp.class),
+							new EventSink[] {
+									new EventSink(LampElectricityModel.URI,
+												  SwitchOnLamp.class)
+							});
+					connections.put(
+							new EventSource(LampUserModel.URI, SwitchOffLamp.class),
+							new EventSink[] {
+									new EventSink(LampElectricityModel.URI,
+												  SwitchOffLamp.class)
+							});
+					
+					connections.put(
+							new EventSource(LampUserModel.URI, IncreaseLamp.class),
+							new EventSink[] {
+									new EventSink(LampElectricityModel.URI,
+												  IncreaseLamp.class)
+							});
+					connections.put(
+							new EventSource(LampUserModel.URI, DecreaseLamp.class),
+							new EventSink[] {
+									new EventSink(LampElectricityModel.URI,
+												  DecreaseLamp.class)
+							});
+					
+					// Air Conditioning
+					connections.put(
+							new EventSource(AirConditioningUnitTesterModel.URI,
+									SetPowerAirConditioning.class),
+							new EventSink[] {
+									new EventSink(AirConditioningElectricityModel.URI,
+											SetPowerAirConditioning.class)
+							});
+					connections.put(
+							new EventSource(AirConditioningUnitTesterModel.URI,
+									SwitchOnAirConditioning.class),
+							new EventSink[] {
+									new EventSink(AirConditioningElectricityModel.URI,
+											SwitchOnAirConditioning.class)
+							});
+					connections.put(
+							new EventSource(AirConditioningUnitTesterModel.URI,
+									SwitchOffAirConditioning.class),
+							new EventSink[] {
+									new EventSink(AirConditioningElectricityModel.URI,
+											SwitchOffAirConditioning.class),
+									new EventSink(AirConditioningTemperatureModel.URI,
+											SwitchOffAirConditioning.class)
+							});
+					connections.put(
+							new EventSource(AirConditioningUnitTesterModel.URI, Cool.class),
+							new EventSink[] {
+									new EventSink(AirConditioningElectricityModel.URI,
+											Cool.class),
+									new EventSink(AirConditioningTemperatureModel.URI,
+											Cool.class)
+							});
+					connections.put(
+							new EventSource(AirConditioningUnitTesterModel.URI, DoNotCool.class),
+							new EventSink[] {
+									new EventSink(AirConditioningElectricityModel.URI,
+											DoNotCool.class),
+									new EventSink(AirConditioningTemperatureModel.URI,
+											DoNotCool.class)
+							});
+
 
 					// variable bindings between exporting and importing models
 					Map<VariableSource,VariableSink[]> bindings =
@@ -266,35 +431,89 @@ public class RunBatteryUnitarySimulation {
 													Double.class,
 													SolarPanelElectricityModel.URI)
 							});
-
-							bindings.put(new VariableSource("currentPowerProducedSolarPanel",
-									Double.class,
-									SolarPanelElectricityModel.URI),
-									new VariableSink[] {
-											new VariableSink("currentPowerProducedSolarPanel", 
-													Double.class,
-													BatteryElectricityModel.URI)
-							});
-
-							// Petrol Generator
-							bindings.put(new VariableSource("currentPowerProducedPetrolGenerator",
-									Double.class,
-									PetrolGeneratorElectricityModel.URI),
-									new VariableSink[] {
-											new VariableSink("currentPowerProducedPetrolGenerator", 
-													Double.class,
-													BatteryElectricityModel.URI)
-							});
 							
-							// Cooking Plate
-//							bindings.put(new VariableSource("currentPowerConsumed",
-//									Double.class,
-//									CookingPlateElectricityModel.URI),
-//									new VariableSink[] {
-//											new VariableSink("currentPowerConsumedCookingPlate", 
-//													Double.class,
-//													BatteryElectricityModel.URI)
-//							});
+							// Air Conditioning
+							bindings.put(new VariableSource("externalTemperature",
+									Double.class,
+									ExternalTemperatureModel.URI),
+									new VariableSink[] {
+											new VariableSink("externalTemperature",
+													Double.class,
+													AirConditioningTemperatureModel.URI)
+							});
+							bindings.put(new VariableSource("currentCoolingPower",
+									Double.class,
+									AirConditioningElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentCoolingPower",
+													Double.class,
+													AirConditioningTemperatureModel.URI)
+							});
+
+							// bindings between models and the Electric Meter model
+							bindings.put(
+									new VariableSource("currentPowerProducedSolarPanel",
+											Double.class,
+											SolarPanelElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentPowerProducedSolarPanel",
+													Double.class,
+													ElectricMeterElectricityModel.URI)
+									});
+							bindings.put(
+									new VariableSource("currentPowerProducedPetrolGenerator",
+											Double.class,
+											PetrolGeneratorElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentPowerProducedPetrolGenerator",
+													Double.class,
+													ElectricMeterElectricityModel.URI)
+									});
+							bindings.put(
+									new VariableSource("currentTotalPowerProduced",
+											Double.class,
+											ElectricMeterElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentTotalPowerProduced",
+													Double.class,
+													BatteryElectricityModel.URI)
+									});
+							bindings.put(
+									new VariableSource("currentTotalPowerConsumed",
+											Double.class,
+											ElectricMeterElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentTotalPowerConsumed",
+													Double.class,
+													BatteryElectricityModel.URI)
+									});
+							bindings.put(
+									new VariableSource("currentIntensity",
+											Double.class,
+											CookingPlateElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentCookingPlateIntensity",
+													Double.class,
+													ElectricMeterElectricityModel.URI)
+									});
+							bindings.put(
+									new VariableSource("currentIntensity",
+											Double.class,
+											LampElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentLampIntensity",
+													Double.class,
+													ElectricMeterElectricityModel.URI)
+									});
+							bindings.put(
+									new VariableSource("currentIntensity",
+											Double.class,
+											AirConditioningElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentAirConditioningIntensity",
+													Double.class,
+													ElectricMeterElectricityModel.URI)
+									});
 
 							// coupled model descriptor
 							coupledModelDescriptors.put(
@@ -327,7 +546,7 @@ public class RunBatteryUnitarySimulation {
 							SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 							// run a simulation with the simulation beginning at 0.0 and
 							// ending at 24.0
-							se.doStandAloneSimulation(0.0, 6.0);
+							se.doStandAloneSimulation(0.0, 24);
 							System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;

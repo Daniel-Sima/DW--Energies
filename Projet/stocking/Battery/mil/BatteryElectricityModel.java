@@ -21,7 +21,7 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.Pair;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
-import utils.Electricity;
+//import utils.Electricity;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -65,16 +65,15 @@ import utils.Electricity;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-@ModelImportedVariable(name = "currentPowerProducedSolarPanel", type = Double.class)
-@ModelImportedVariable(name = "currentPowerProducedPetrolGenerator", type = Double.class)
-//@ModelImportedVariable(name = "currentPowerConsumedCookingPlate", type = Double.class)
+@ModelImportedVariable(name = "currentTotalPowerProduced", type = Double.class)
+@ModelImportedVariable(name = "currentTotalPowerConsumed", type = Double.class)
 @ModelExportedVariable(name = "totalPowerStored", type = Double.class)
 public class BatteryElectricityModel 
 extends	AtomicHIOA {
 	// Declaring ANSI_RESET so that we can reset the color 
 	public static final String ANSI_RESET = "\u001B[0m"; 
 	// Declaring colors
-	public static final String ANSI_CYAN = "\u001B[36m"; 
+	public static final String PURPLE_BACKGROUND = "\033[45m"; 
 
 	// Declaring the background color 
 	public static final String ANSI_RED_BACKGROUND  = "\u001B[41m"; 
@@ -133,17 +132,13 @@ extends	AtomicHIOA {
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double> totalPowerStored = new Value<Double>(this);
 
-	/** current power produced by the SolarPanel in Wh.						*/
+	/** the current total power produced by the producers					*/
 	@ImportedVariable(type = Double.class)
-	protected Value<Double>	 currentPowerProducedSolarPanel; 
-
-	/** current power produced by the PetrolGenerator in Wh.				*/
+	protected Value<Double>	 currentTotalPowerProduced;
+	
+	/** the current total power consumed by the consumers					*/
 	@ImportedVariable(type = Double.class)
-	protected Value<Double>	 currentPowerProducedPetrolGenerator;
-
-//	/** current intensity consumed by the CookingPlate in Amperes.				*/
-//	@ImportedVariable(type = Double.class)
-//	protected Value<Double>	 currentPowerConsumedCookingPlate; 
+	protected Value<Double>	 currentTotalPowerConsumed;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -288,49 +283,39 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
-		// adding power stored from the Solar Panel
-		this.totalPowerStored.setNewValue(currentPowerProducedSolarPanel.getValue().doubleValue() + 
-				this.totalPowerStored.getValue().doubleValue(), this.totalPowerStored.getTime()); 
-		// adding power stored from the Petrol Generator
-		this.totalPowerStored.setNewValue(currentPowerProducedPetrolGenerator.getValue().doubleValue() + 
+		// adding current power produced by producers from the Electric Meter
+		this.totalPowerStored.setNewValue(currentTotalPowerProduced.getValue().doubleValue() + 
 				this.totalPowerStored.getValue().doubleValue(), this.totalPowerStored.getTime()); 
 
-//		// substract power consumed by the Cooking Plate
-//		this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
-//				this.currentPowerConsumedCookingPlate.getValue().doubleValue()*1000.0, currentStateTime);
+		// substract power consumed by consumers
+		this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
+				this.currentTotalPowerConsumed.getValue().doubleValue(), this.totalPowerStored.getTime());
 		
 		// Tracing
 		StringBuffer message1 = new StringBuffer();	
-		message1.append(ANSI_BLUE_BACKGROUND + "Current power stored from the Solar Panel: ");
-		message1.append((Math.round(currentPowerProducedSolarPanel.getValue().doubleValue()* 100.0) / 100.0) + " Wh");
-		message1.append(" at " + this.currentPowerProducedSolarPanel.getTime());
+		message1.append(ANSI_BLUE_BACKGROUND + "Current power stored: ");
+		message1.append((Math.round(currentTotalPowerProduced.getValue().doubleValue()* 100.0) / 100.0) + " Wh");
+		message1.append(" at " + this.currentTotalPowerProduced.getTime());
 		message1.append("\n" + ANSI_RESET);
 		this.logMessage(message1.toString());
 
-		StringBuffer message2 = new StringBuffer();	
-		message2.append(ANSI_BLUE_BACKGROUND + "Current power stored from the Petrol Generator: ");
-		message2.append((Math.round(currentPowerProducedPetrolGenerator.getValue().doubleValue()* 100.0) / 100.0) + " Wh");
-		message2.append(" at " + this.currentPowerProducedPetrolGenerator.getTime());
-		message2.append("\n" + ANSI_RESET);
-		this.logMessage(message2.toString());
-
-//		StringBuffer message3 = new StringBuffer();	
-//		message3.append(ANSI_BLUE_BACKGROUND + "Current power consumed by Cooking Plate: ");
-//		message3.append((Math.round(currentPowerConsumedCookingPlate.getValue().doubleValue()*1000.0 * 100.0) / 100.0) + " Wh");
-//		message3.append(" at " + this.currentPowerConsumedCookingPlate.getTime());
-//		message3.append("\n" + ANSI_RESET);
-//		this.logMessage(message3.toString());
+		StringBuffer message3 = new StringBuffer();	
+		message3.append(ANSI_RED_BACKGROUND + "Current power consumed: ");
+		message3.append((Math.round(currentTotalPowerConsumed.getValue().doubleValue()* 100.0) / 100.0) + " Wh");
+		message3.append(" at " + this.currentTotalPowerConsumed.getTime());
+		message3.append("\n" + ANSI_RESET);
+		this.logMessage(message3.toString());
 
 		StringBuffer message = new StringBuffer();	
-		message.append(ANSI_BLUE_BACKGROUND + "Total power stored: ");
+		message.append(PURPLE_BACKGROUND + "Total power stored: ");
 		message.append((Math.round(this.totalPowerStored.getValue().doubleValue() * 100.0) / 100.0) + " Wh");
-		message.append(" at " + this.currentPowerProducedSolarPanel.getTime());
+		message.append(" at " + this.currentTotalPowerProduced.getTime());
 		message.append("\n" + ANSI_RESET);
 		this.logMessage(message.toString());
 
 		// reset the energy produced after the battery has stored it
-		this.currentPowerProducedPetrolGenerator.setNewValue(0.0, this.currentPowerProducedPetrolGenerator.getTime());
-//		this.currentPowerConsumedCookingPlate.setNewValue(0.0, this.currentPowerConsumedCookingPlate.getTime());
+		this.currentTotalPowerProduced.setNewValue(0.0, this.currentTotalPowerProduced.getTime());
+		this.currentTotalPowerConsumed.setNewValue(0.0, this.currentTotalPowerConsumed.getTime());
 
 		super.userDefinedInternalTransition(elapsedTime);
 	}
@@ -341,12 +326,12 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void	endSimulation(Time endTime) {
-		this.totalPowerStored.setNewValue(currentPowerProducedSolarPanel.getValue().doubleValue() + 
+		this.totalPowerStored.setNewValue(currentTotalPowerProduced.getValue().doubleValue() + 
 				this.totalPowerStored.getValue().doubleValue(), this.totalPowerStored.getTime()); 
 
 		// substract power consumed by the Cooking Plate
-//		this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
-//				this.currentPowerConsumedCookingPlate.getValue().doubleValue()*1000.0, currentStateTime);
+		this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
+				this.currentTotalPowerConsumed.getValue().doubleValue(), currentStateTime);
 
 		this.logMessage("simulation ends.\n");
 		this.logMessage(new BatteryElectricityReport(URI, Math.round(this.totalPowerStored.getValue().doubleValue() * 100.0) / 100.0).printout("-"));
@@ -438,18 +423,15 @@ extends	AtomicHIOA {
 		public String printout(String indent)
 		{
 			StringBuffer ret = new StringBuffer(indent);
-			ret.append("\n---\n");
-			ret.append(indent);
-			ret.append('|');
+			ret.append("\n===========================================\n");
+			ret.append("||\t");
 			ret.append(this.modelURI);
-			ret.append(" report\n");
-			ret.append(indent);
-			ret.append('|');
+			ret.append(" report\t ||\n");
+			ret.append("||\t");
 			ret.append("total stored in Wh = ");
 			ret.append(this.totalStored);
-			ret.append(".\n");
-			ret.append(indent);
-			ret.append("---\n");
+			ret.append("\t ||\n");
+			ret.append("===========================================\n");
 			return ret.toString();
 		}		
 	}
