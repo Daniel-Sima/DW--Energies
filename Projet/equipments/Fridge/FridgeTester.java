@@ -252,6 +252,7 @@ extends		AbstractComponent
 		}
 		try {
 			this.acop.switchOff();
+			System.out.println("after switchOff");
 		} catch (Exception e) {
 			this.traceMessage("...KO.\n" + e);
 			assertTrue(false);
@@ -459,10 +460,12 @@ extends		AbstractComponent
 					this.acop.getPortURI(),
 					this.FridgeUserInboundPortURI,
 					FridgeUserConnector.class.getCanonicalName());
+		
 			this.doPortConnection(
 					this.acicop.getPortURI(),
 					FridgeInternalControlInboundPortURI,
 					FridgeInternalControlConnector.class.getCanonicalName());
+			
 			this.doPortConnection(
 					this.acecop.getPortURI(),
 					FridgeExternalControlInboundPortURI,
