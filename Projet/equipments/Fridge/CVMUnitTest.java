@@ -78,7 +78,7 @@ extends		AbstractCVM
 	{
 		AbstractComponent.createComponent(
 				Fridge.class.getCanonicalName(),
-				new Object[]{});
+				new Object[]{"FRIDGE-URI"});
 
 		AbstractComponent.createComponent(
 				FridgeTester.class.getCanonicalName(),
