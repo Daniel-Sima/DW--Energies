@@ -60,7 +60,7 @@ public interface		HeaterUserAndControlI
 	 * 
 	 * <pre>
 	 * pre	{@code true}	// no precondition.
-	 * post	{@code return >= -50.0 && return <= 50.0}
+	 * post	{@code return.getData() >= -50.0 && return.getData() <= 50.0}
 	 * </pre>
 	 *
 	 * @return				the current target temperature.
@@ -81,6 +81,6 @@ public interface		HeaterUserAndControlI
 	 * @return				the current temperature measured by the thermostat.
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public double		getCurrentTemperature() throws Exception;
+	public double	getCurrentTemperature() throws Exception;
 }
 // -----------------------------------------------------------------------------

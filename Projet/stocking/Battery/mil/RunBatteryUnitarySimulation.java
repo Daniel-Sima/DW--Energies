@@ -11,6 +11,13 @@ import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
 import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
 import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
 import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
+import equipments.Fridge.mil.FridgeElectricityModel;
+import equipments.Fridge.mil.FridgeTemperatureModel;
+import equipments.Fridge.mil.FridgeUnitTesterModel;
+import equipments.Fridge.mil.InternalTemperatureModel;
+import equipments.Fridge.mil.events.SetPowerFridge;
+import equipments.Fridge.mil.events.SwitchOffFridge;
+import equipments.Fridge.mil.events.SwitchOnFridge;
 import equipments.Lamp.mil.LampElectricityModel;
 import equipments.Lamp.mil.LampUserModel;
 import equipments.Lamp.mil.events.DecreaseLamp;
@@ -239,6 +246,36 @@ public class RunBatteryUnitarySimulation {
 							AirConditioningUnitTesterModel.URI,
 							TimeUnit.HOURS,
 							null));
+			
+			// Fridge
+			atomicModelDescriptors.put(
+					FridgeElectricityModel.URI,
+					AtomicHIOA_Descriptor.create(
+							FridgeElectricityModel.class,
+							FridgeElectricityModel.URI,
+							TimeUnit.HOURS,
+							null));
+			atomicModelDescriptors.put(
+					FridgeTemperatureModel.URI,
+					AtomicHIOA_Descriptor.create(
+							FridgeTemperatureModel.class,
+							FridgeTemperatureModel.URI,
+							TimeUnit.HOURS,
+							null));
+			atomicModelDescriptors.put(
+					InternalTemperatureModel.URI,
+					AtomicHIOA_Descriptor.create(
+							InternalTemperatureModel.class,
+							InternalTemperatureModel.URI,
+							TimeUnit.HOURS,
+							null));
+			atomicModelDescriptors.put(
+					FridgeUnitTesterModel.URI,
+					AtomicModelDescriptor.create(
+							FridgeUnitTesterModel.class,
+							FridgeUnitTesterModel.URI,
+							TimeUnit.HOURS,
+							null));
 
 			// the heater unit tester model only exchanges event, an
 			// atomic model hence we use an AtomicModelDescriptor
@@ -281,6 +318,11 @@ public class RunBatteryUnitarySimulation {
 			submodels.add(AirConditioningTemperatureModel.URI);
 			submodels.add(ExternalTemperatureModel.URI);
 			submodels.add(AirConditioningUnitTesterModel.URI);
+			// Fridge
+			submodels.add(FridgeElectricityModel.URI);
+			submodels.add(FridgeTemperatureModel.URI);
+			submodels.add(InternalTemperatureModel.URI);
+			submodels.add(FridgeUnitTesterModel.URI);
 			
 
 			// event exchanging connections between exporting and importing
@@ -416,6 +458,47 @@ public class RunBatteryUnitarySimulation {
 									new EventSink(AirConditioningTemperatureModel.URI,
 											DoNotCool.class)
 							});
+					
+					// Fridge 
+					connections.put(
+							new EventSource(FridgeUnitTesterModel.URI,
+									SetPowerFridge.class),
+							new EventSink[] {
+									new EventSink(FridgeElectricityModel.URI,
+											SetPowerFridge.class)
+							});
+					connections.put(
+							new EventSource(FridgeUnitTesterModel.URI,
+									SwitchOnFridge.class),
+							new EventSink[] {
+									new EventSink(FridgeElectricityModel.URI,
+											SwitchOnFridge.class)
+							});
+					connections.put(
+							new EventSource(FridgeUnitTesterModel.URI,
+									SwitchOffFridge.class),
+							new EventSink[] {
+									new EventSink(FridgeElectricityModel.URI,
+											SwitchOffFridge.class),
+									new EventSink(FridgeTemperatureModel.URI,
+											SwitchOffFridge.class)
+							});
+					connections.put(
+							new EventSource(FridgeUnitTesterModel.URI, equipments.Fridge.mil.events.Cool.class),
+							new EventSink[] {
+									new EventSink(FridgeElectricityModel.URI,
+											equipments.Fridge.mil.events.Cool.class),
+									new EventSink(FridgeTemperatureModel.URI,
+											equipments.Fridge.mil.events.Cool.class)
+							});
+					connections.put(
+							new EventSource(FridgeUnitTesterModel.URI, equipments.Fridge.mil.events.DoNotCool.class),
+							new EventSink[] {
+									new EventSink(FridgeElectricityModel.URI,
+											equipments.Fridge.mil.events.DoNotCool.class),
+									new EventSink(FridgeTemperatureModel.URI,
+											equipments.Fridge.mil.events.DoNotCool.class)
+							});
 
 
 					// variable bindings between exporting and importing models
@@ -448,6 +531,24 @@ public class RunBatteryUnitarySimulation {
 											new VariableSink("currentCoolingPower",
 													Double.class,
 													AirConditioningTemperatureModel.URI)
+							});
+							
+							// Fridge 
+							bindings.put(new VariableSource("internalTemperature",
+									Double.class,
+									InternalTemperatureModel.URI),
+									new VariableSink[] {
+											new VariableSink("internalTemperature",
+													Double.class,
+													FridgeTemperatureModel.URI)
+							});
+							bindings.put(new VariableSource("currentCoolingPower",
+									Double.class,
+									FridgeElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentCoolingPower",
+													Double.class,
+													FridgeTemperatureModel.URI)
 							});
 
 							// bindings between models and the Electric Meter model
@@ -514,6 +615,15 @@ public class RunBatteryUnitarySimulation {
 													Double.class,
 													ElectricMeterElectricityModel.URI)
 									});
+							bindings.put(
+									new VariableSource("currentIntensity",
+											Double.class,
+											FridgeElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentFridgeIntensity",
+													Double.class,
+													ElectricMeterElectricityModel.URI)
+									});
 
 							// coupled model descriptor
 							coupledModelDescriptors.put(
@@ -546,7 +656,7 @@ public class RunBatteryUnitarySimulation {
 							SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 							// run a simulation with the simulation beginning at 0.0 and
 							// ending at 24.0
-							se.doStandAloneSimulation(0.0, 24);
+							se.doStandAloneSimulation(0.0, 12);
 							System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;

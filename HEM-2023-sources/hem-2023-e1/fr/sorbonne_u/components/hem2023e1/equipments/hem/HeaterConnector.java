@@ -79,7 +79,8 @@ implements	AdjustableCI
 	// -------------------------------------------------------------------------
 
 	/** modes will be defined by five power levels, including a power
-	 *  level of 0.0 watts.													*/
+	 *  level of 0.0 watts; note that modes go from 1 (0.0 watts) to
+	 *  6 (2000.0 watts).													*/
 	protected static final int		MAX_MODE = 6;
 	/** the minimum admissible temperature from which the heater should
 	 *  be resumed in priority after being suspended to save energy.		*/

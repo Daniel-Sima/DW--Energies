@@ -3,8 +3,9 @@ package fr.sorbonne_u.components.hem2023e1.equipments.meter;
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
-// This software is a computer program whose purpose is to implement a mock-up
-// of household energy management system.
+// This software is a computer program whose purpose is to provide a
+// basic component programming model to program with components
+// real time distributed applications in the Java programming language.
 //
 // This software is governed by the CeCILL-C license under French law and
 // abiding by the rules of distribution of free software.  You can use,
@@ -32,6 +33,9 @@ package fr.sorbonne_u.components.hem2023e1.equipments.meter;
 // The fact that you are presently reading this means that you have had
 // knowledge of the CeCILL-C license and that you accept its terms.
 
+import fr.sorbonne_u.components.hem2023e3.utils.SensorData;
+import fr.sorbonne_u.components.hem2023e3.utils.Measure;
+
 // -----------------------------------------------------------------------------
 /**
  * The interface <code>ElectricMeterImplementationI</code> defines the services
@@ -58,13 +62,17 @@ public interface		ElectricMeterImplementationI
 	 * 
 	 * <pre>
 	 * pre	{@code true}	// no precondition.
-	 * post	{@code return >= 0.0}
+	 * post	{@code return != null}
+	 * post	{@code return.getMeasure().isScalar()}
+	 * post	{@code ((Measure<?>)return.getMeasure()).getData() instanceof Double}
+	 * post	{@code ((Measure<Double>)return.getMeasure()).getData() >= 0.0}
+	 * post	{@code ((Measure<?>)return.getMeasure()).getMeasurementUnit().equals(MeasurementUnit.AMPERES)}
 	 * </pre>
 	 *
 	 * @return				the current total electric consumption in watts.
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public double		getCurrentConsumption() throws Exception;
+	public SensorData<Measure<Double>>	getCurrentConsumption() throws Exception;
 
 	/**
 	 * return the current total electric power production in watts.
@@ -73,12 +81,16 @@ public interface		ElectricMeterImplementationI
 	 * 
 	 * <pre>
 	 * pre	{@code true}	// no precondition.
-	 * post	{@code return >= 0.0}
+	 * post	{@code return != null}
+	 * post	{@code return.getMeasure().isScalar()}
+	 * post	{@code ((Measure<?>)return.getMeasure()).getData() instanceof Double}
+	 * post	{@code ((Measure<Double>)return.getMeasure()).getData() >= 0.0}
+	 * post	{@code ((Measure<?>)return.getMeasure()).getMeasurementUnit().equals(MeasurementUnit.WATTS)}
 	 * </pre>
 	 *
 	 * @return				the current total electric power production in watts.
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public double		getCurrentProduction() throws Exception;
+	public SensorData<Measure<Double>>	getCurrentProduction() throws Exception;
 }
 // -----------------------------------------------------------------------------

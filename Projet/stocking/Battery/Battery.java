@@ -33,12 +33,12 @@ import stocking.Battery.connections.BatteryExternalControlInboundPort;
  */
 @OfferedInterfaces(offered={BatteryExternalControlCI.class})
 public class Battery 
-extends		AbstractComponent
+extends AbstractComponent
 implements BatteryExternalControlI{
 	// -------------------------------------------------------------------------
 	// Inner interfaces and types
 	// -------------------------------------------------------------------------
-	/***********************************************************************************/
+
 	/**
 	 * The enumeration <code>BatteryState</code> describes the operation
 	 * states of the Battery.
@@ -50,40 +50,43 @@ implements BatteryExternalControlI{
 	 * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
 	 */
 	public static enum BatteryState {
-		/** Battery is producing (destocking energy).								*/
+		/** Battery is producing (destocking energy).						*/
 		PRODUCING,
-		/** Battery is consuming (stocking energy).									*/
+		/** Battery is consuming (stocking energy).							*/
 		CONSUMING,
+		/** Battery is consuming and producing at the same time 			*/
+		PRODUCING_AND_CONSUMING,
 	}
 
+	/***********************************************************************************/
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
-	/***********************************************************************************/
-	/** max power capacity of the Battery, in W/h.				   					*/
+	/** max power capacity of the Battery, in W/h.				   			*/
 	protected static final double MAX_POWER_CAPACITY = 5000.0; // 5 kW
 
-	/** URI of the petrol generator port for external control.						*/
+	/** URI of the petrol generator port for external control.				*/
 	public static final String EXTERNAL_CONTROL_INBOUND_PORT_URI =			
 			"BATTERY-EXTERNAL-CONTROL-INBOUND-PORT-URI";
 
-	/** when true, methods trace their actions.										*/
+	/** when true, methods trace their actions.								*/
 	public static final boolean	VERBOSE = true;
 
-	/** current state (PRODUCING, CONSUMING) of the Battery.						*/
+	/** current state (PRODUCING, CONSUMING, PRODUCING_AND_CONSUMING) 
+	 * of the Battery.														*/
 	protected BatteryState currentState;
 	/**	current power level produced (destocking) or consumed by (stocking) 
-	 *  of the Battery, depending of the currentState								*/
+	 *  of the Battery, depending of the currentState						*/
 	protected double currentPowerLevel;
-	/** inbound port offering the <code>BatteryExternalControlCI</code> interface	*/
+	/** inbound port offering the BatteryExternalControlCI interface		*/
 	protected BatteryExternalControlInboundPort	batteryExternalControlInboundPort; 
 
+	/***********************************************************************************/
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
-	/***********************************************************************************/
 	/**
-	 * create a new heater.
+	 * create a new Battery.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -92,7 +95,7 @@ implements BatteryExternalControlI{
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 * 
-	 * @throws Exception <i>to do</i>.
+	 * @throws Exception
 	 */
 	protected Battery() throws Exception{
 		this(EXTERNAL_CONTROL_INBOUND_PORT_URI);
@@ -100,7 +103,7 @@ implements BatteryExternalControlI{
 
 	/***********************************************************************************/
 	/**
-	 * create a new heater.
+	 * create a new Battery.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -120,7 +123,7 @@ implements BatteryExternalControlI{
 
 	/***********************************************************************************/
 	/**
-	 * create a new heater.
+	 * create a new Battery.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -176,10 +179,10 @@ implements BatteryExternalControlI{
 		}
 	}
 
+	/***********************************************************************************/
 	// -------------------------------------------------------------------------
 	// Component life-cycle
 	// -------------------------------------------------------------------------
-	/***********************************************************************************/
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
 	 */
@@ -194,10 +197,10 @@ implements BatteryExternalControlI{
 		super.shutdown();
 	}
 
+	/***********************************************************************************/
 	// -------------------------------------------------------------------------
 	// Component services implementation
 	// -------------------------------------------------------------------------
-	/***********************************************************************************/
 	/**
 	 * @see
 	 */
@@ -221,9 +224,11 @@ implements BatteryExternalControlI{
 			if (this.currentState == BatteryState.PRODUCING) {
 				this.traceMessage("Battery returns its current power production level " + 
 						this.currentPowerLevel + "W.\n");
-			} else {
+			} else if (this.currentState == BatteryState.CONSUMING) {
 				this.traceMessage("Battery returns its current power consumption level " + 
 						this.currentPowerLevel + "W.\n");
+			} else {
+				this.traceMessage("Battery returns its current power level " + this.currentPowerLevel + "W.\n");
 			}
 		}
 
@@ -265,6 +270,7 @@ implements BatteryExternalControlI{
 	/***********************************************************************************/
 	/**
 	 * @see
+	 * TODO a supprimer
 	 */
 	@Override
 	public void addPowerBattery(double powerValue) throws Exception {
@@ -287,6 +293,7 @@ implements BatteryExternalControlI{
 	/***********************************************************************************/
 	/**
 	 * @see
+ 	 * TODO a supprimer
 	 */
 	@Override
 	public void pullPowerBattery(double powerValue) throws Exception {

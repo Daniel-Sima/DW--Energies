@@ -1,5 +1,8 @@
 package fr.sorbonne_u.components.hem2023e1.equipments.meter;
 
+import fr.sorbonne_u.components.hem2023e3.utils.Measure;
+import fr.sorbonne_u.components.hem2023e3.utils.SensorData;
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -61,12 +64,12 @@ extends		ElectricMeterImplementationI,
 	 * @see fr.sorbonne_u.components.hem2023e1.equipments.meter.ElectricMeterImplementationI#getCurrentConsumption()
 	 */
 	@Override
-	public double		getCurrentConsumption() throws Exception;
+	public SensorData<Measure<Double>>	getCurrentConsumption() throws Exception;
 
 	/**
 	 * @see fr.sorbonne_u.components.hem2023e1.equipments.meter.ElectricMeterImplementationI#getCurrentProduction()
 	 */
 	@Override
-	public double		getCurrentProduction() throws Exception;
+	public SensorData<Measure<Double>>	getCurrentProduction() throws Exception;
 }
 // -----------------------------------------------------------------------------

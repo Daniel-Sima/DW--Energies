@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
-import java.io.Serializable;
 
 import equipments.Lamp.mil.events.DecreaseLamp;
 import equipments.Lamp.mil.events.IncreaseLamp;
@@ -340,7 +339,7 @@ extends		AtomicES_Model
 	 */
 	@Override
 	public void			setSimulationRunParameters(
-		Map<String, Serializable> simParams
+		Map<String, Object> simParams
 		) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);

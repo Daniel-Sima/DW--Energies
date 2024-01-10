@@ -33,6 +33,8 @@ package fr.sorbonne_u.components.hem2023e1.equipments.meter;
 // knowledge of the CeCILL-C license and that you accept its terms.
 
 import fr.sorbonne_u.components.ComponentI;
+import fr.sorbonne_u.components.hem2023e3.utils.Measure;
+import fr.sorbonne_u.components.hem2023e3.utils.SensorData;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
 // -----------------------------------------------------------------------------
@@ -92,7 +94,7 @@ implements	ElectricMeterCI
 	 * @see fr.sorbonne_u.components.hem2023e1.equipments.meter.ElectricMeterCI#getCurrentConsumption()
 	 */
 	@Override
-	public double		getCurrentConsumption() throws Exception
+	public SensorData<Measure<Double>>	getCurrentConsumption() throws Exception
 	{
 		return this.getOwner().handleRequest(
 				o -> ((ElectricMeterImplementationI)o).getCurrentConsumption());
@@ -102,7 +104,7 @@ implements	ElectricMeterCI
 	 * @see fr.sorbonne_u.components.hem2023e1.equipments.meter.ElectricMeterCI#getCurrentProduction()
 	 */
 	@Override
-	public double		getCurrentProduction() throws Exception
+	public SensorData<Measure<Double>>	getCurrentProduction() throws Exception
 	{
 		return this.getOwner().handleRequest(
 				o -> ((ElectricMeterImplementationI)o).getCurrentProduction());

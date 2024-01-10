@@ -110,7 +110,7 @@ implements	HeaterUserImplI,
 	/** URI of the heater port for internal control.						*/
 	public static final String		INTERNAL_CONTROL_INBOUND_PORT_URI =
 									"HEATER-INTERNAL-CONTROL-INBOUND-PORT-URI";
-	/** URI of the heater port for external control.						*/
+	/** URI of the heater port for internal control.						*/
 	public static final String		EXTERNAL_CONTROL_INBOUND_PORT_URI =
 									"HEATER-EXTERNAL-CONTROL-INBOUND-PORT-URI";
 
@@ -120,9 +120,9 @@ implements	HeaterUserImplI,
 	public static final double		FAKE_CURRENT_TEMPERATURE = 10.0;
 
 	/** current state (on, off) of the heater.								*/
-	protected HeaterState		currentState;
+	protected HeaterState			currentState;
 	/**	current power level of the heater.									*/
-	protected double			currentPowerLevel;
+	protected double				currentPowerLevel;
 	/** inbound port offering the <code>HeaterUserCI</code> interface.		*/
 	protected HeaterUserInboundPort	hip;
 	/** inbound port offering the <code>HeaterInternalControlCI</code>
@@ -132,7 +132,7 @@ implements	HeaterUserImplI,
 	 *  interface.															*/
 	protected HeaterExternalControlInboundPort	hecip;
 	/** target temperature for the heating.	*/
-	protected double			targetTemperature;
+	protected double				targetTemperature;
 
 	// -------------------------------------------------------------------------
 	// Constructors

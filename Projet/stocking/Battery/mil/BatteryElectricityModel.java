@@ -1,6 +1,5 @@
 package stocking.Battery.mil;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -80,7 +79,12 @@ extends	AtomicHIOA {
 	public static final String ANSI_BLACK_BACKGROUND  = "\033[40m"; 
 	public static final String ANSI_GREY_BACKGROUND  = "\033[0;100m"; 
 	public static final String ANSI_BLUE_BACKGROUND  = "\u001B[44m"; 
-
+	
+	// Bold High Intensity
+    public static final String BLACK_BOLD_BRIGHT = "\033[1;90m"; // BLACK
+    public static final String RED_BOLD_BRIGHT = "\033[1;91m";   // RED
+    public static final String GREEN_BOLD_BRIGHT = "\033[1;92m"; // GREEN
+    
 	// -------------------------------------------------------------------------
 	// Inner classes and types
 	// -------------------------------------------------------------------------
@@ -97,6 +101,8 @@ extends	AtomicHIOA {
 		PRODUCING,
 		/** Battery is consuming (stocking energy).							*/
 		CONSUMING,
+		/** Battery is consuming and producing at the same time 			*/
+		PRODUCING_AND_CONSUMING,
 	}
 
 	// -------------------------------------------------------------------------
@@ -211,7 +217,7 @@ extends	AtomicHIOA {
 	public BatteryState getState() {
 		return this.currentState;
 	}
-
+	
 	// -------------------------------------------------------------------------
 	// DEVS simulation protocol
 	// -------------------------------------------------------------------------
@@ -283,13 +289,21 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void userDefinedInternalTransition(Duration elapsedTime) {
-		// adding current power produced by producers from the Electric Meter
-		this.totalPowerStored.setNewValue(currentTotalPowerProduced.getValue().doubleValue() + 
-				this.totalPowerStored.getValue().doubleValue(), this.totalPowerStored.getTime()); 
-
-		// substract power consumed by consumers
-		this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
-				this.currentTotalPowerConsumed.getValue().doubleValue(), this.totalPowerStored.getTime());
+		if (currentTotalPowerProduced.getValue().doubleValue() + this.totalPowerStored.getValue().doubleValue() < BatteryElectricityModel.MAX_POWER_CAPACITY) {
+			// adding current power produced by producers frotm he Electric Meter
+			this.totalPowerStored.setNewValue(currentTotalPowerProduced.getValue().doubleValue() + 
+					this.totalPowerStored.getValue().doubleValue(), this.totalPowerStored.getTime()); 
+		} else {
+			this.logMessage(GREEN_BOLD_BRIGHT + "The energy stored in the battery is already at maximum.\n" + ANSI_RESET);
+		}
+		
+		if (this.totalPowerStored.getValue().doubleValue() - this.currentTotalPowerConsumed.getValue().doubleValue() > 0) {
+			// substract power consumed by consumers
+			this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
+					this.currentTotalPowerConsumed.getValue().doubleValue(), this.totalPowerStored.getTime());
+		} else {
+			this.logMessage(RED_BOLD_BRIGHT + "The energy stored in the battery is not enough.\n" + ANSI_RESET);
+		}
 		
 		// Tracing
 		StringBuffer message1 = new StringBuffer();	
@@ -326,12 +340,21 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void	endSimulation(Time endTime) {
-		this.totalPowerStored.setNewValue(currentTotalPowerProduced.getValue().doubleValue() + 
-				this.totalPowerStored.getValue().doubleValue(), this.totalPowerStored.getTime()); 
-
-		// substract power consumed by the Cooking Plate
-		this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
-				this.currentTotalPowerConsumed.getValue().doubleValue(), currentStateTime);
+		if (currentTotalPowerProduced.getValue().doubleValue() + this.totalPowerStored.getValue().doubleValue() < BatteryElectricityModel.MAX_POWER_CAPACITY) {
+			// adding current power produced by producers frotm he Electric Meter
+			this.totalPowerStored.setNewValue(currentTotalPowerProduced.getValue().doubleValue() + 
+					this.totalPowerStored.getValue().doubleValue(), this.totalPowerStored.getTime()); 
+		} else {
+			this.logMessage(GREEN_BOLD_BRIGHT + "The energy stored in the battery is already at maximum.\n" + ANSI_RESET);
+		}
+		
+		if (this.totalPowerStored.getValue().doubleValue() - this.currentTotalPowerConsumed.getValue().doubleValue() > 0) {
+			// substract power consumed by consumers
+			this.totalPowerStored.setNewValue(this.totalPowerStored.getValue().doubleValue() -
+					this.currentTotalPowerConsumed.getValue().doubleValue(), this.totalPowerStored.getTime());
+		} else {
+			this.logMessage(RED_BOLD_BRIGHT + "The energy stored in the battery is not enough.\n" + ANSI_RESET);
+		}
 
 		this.logMessage("simulation ends.\n");
 		this.logMessage(new BatteryElectricityReport(URI, Math.round(this.totalPowerStored.getValue().doubleValue() * 100.0) / 100.0).printout("-"));
@@ -352,7 +375,7 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void	setSimulationRunParameters(
-			Map<String, Serializable> simParams
+			Map<String, Object> simParams
 			) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);

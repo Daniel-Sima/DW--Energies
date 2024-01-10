@@ -35,6 +35,9 @@ package fr.sorbonne_u.components.hem2023e1.equipments.meter;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
+import fr.sorbonne_u.components.hem2023e3.utils.Measure;
+import fr.sorbonne_u.components.hem2023e3.utils.MeasurementUnit;
+import fr.sorbonne_u.components.hem2023e3.utils.SensorData;
 import fr.sorbonne_u.exceptions.PostconditionException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 
@@ -251,16 +254,32 @@ implements	ElectricMeterImplementationI
 	 * @see fr.sorbonne_u.components.hem2023e1.equipments.meter.ElectricMeterImplementationI#getCurrentConsumption()
 	 */
 	@Override
-	public double		getCurrentConsumption() throws Exception
+	public SensorData<Measure<Double>>	getCurrentConsumption() throws Exception
 	{
 		if (VERBOSE) {
 			this.traceMessage("Electric meter returns its current consumption.\n");
 		}
 
-		// TODO will need a computation.
-		double ret = 0.0;
+		SensorData<Measure<Double>> ret =
+				new SensorData<>(
+							new Measure<Double>(0.0, MeasurementUnit.AMPERES));
 
-		assert	ret >= 0.0 : new PostconditionException("ret >= 0.0");
+		assert	ret != null : new PostconditionException("return != null");
+		assert	ret.getMeasure().isScalar() :
+				new PostconditionException("return.getMeasure().isScalar()");
+		assert	((Measure<?>)ret.getMeasure()).getData() instanceof Double :
+				new PostconditionException(
+						"((Measure)return.getMeasure()).getData() "
+						+ "instanceof Double");
+		assert	((Measure<Double>)ret.getMeasure()).getData() >= 0.0 :
+				new PostconditionException(
+						"((Double)((Measure)return.getMeasure())."
+						+ "getData()) >= 0.0");
+		assert	((Measure<?>)ret.getMeasure()).getMeasurementUnit().
+											equals(MeasurementUnit.AMPERES) :
+				new PostconditionException(
+						"((Measure)return.getMeasure()).getMeasurementUnit()."
+						+ "equals(MeasurementUnit.AMPERES)");
 
 		return ret;
 	}
@@ -269,16 +288,32 @@ implements	ElectricMeterImplementationI
 	 * @see fr.sorbonne_u.components.hem2023e1.equipments.meter.ElectricMeterImplementationI#getCurrentProduction()
 	 */
 	@Override
-	public double		getCurrentProduction() throws Exception
+	public SensorData<Measure<Double>>	getCurrentProduction() throws Exception
 	{
 		if (VERBOSE) {
 			this.traceMessage("Electric meter returns its current production.\n");
 		}
 
-		// TODO will need a computation.
-		double ret = 0.0;
+		SensorData<Measure<Double>> ret =
+				new SensorData<>(
+							new Measure<Double>(0.0, MeasurementUnit.WATTS));
 
-		assert	ret >= 0.0 : new PostconditionException("ret >= 0.0");
+		assert	ret != null : new PostconditionException("return != null");
+		assert	ret.getMeasure().isScalar() :
+				new PostconditionException("return.getMeasure().isScalar()");
+		assert	((Measure<?>)ret.getMeasure()).getData() instanceof Double :
+				new PostconditionException(
+						"((Measure)return.getMeasure()).getData() "
+						+ "instanceof Double");
+		assert	((Measure<Double>)ret.getMeasure()).getData() >= 0.0 :
+				new PostconditionException(
+						"((Double)((Measure)return.getMeasure())."
+						+ "getData()) >= 0.0");
+		assert	((Measure<?>)ret.getMeasure()).getMeasurementUnit().
+											equals(MeasurementUnit.WATTS) :
+				new PostconditionException(
+						"((Measure)return.getMeasure()).getMeasurementUnit()."
+						+ "equals(MeasurementUnit.WATTS)");
 
 		return ret;
 	}

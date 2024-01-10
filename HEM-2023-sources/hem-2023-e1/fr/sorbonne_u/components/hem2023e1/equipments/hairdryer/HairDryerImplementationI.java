@@ -1,7 +1,5 @@
 package fr.sorbonne_u.components.hem2023e1.equipments.hairdryer;
 
-import equipments.CookingPlate.CookingPlate;
-
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //

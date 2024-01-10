@@ -226,7 +226,7 @@ public class RunFridgeUnitarySimulation {
 							SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 							// run a simulation with the simulation beginning at 0.0 and
 							// ending at 24.0
-							se.doStandAloneSimulation(0.0, 24.0);
+							se.doStandAloneSimulation(0.0, 12.0);
 							System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;

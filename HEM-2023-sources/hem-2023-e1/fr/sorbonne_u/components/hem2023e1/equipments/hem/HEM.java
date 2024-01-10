@@ -97,7 +97,7 @@ extends		AbstractComponent
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a household energy manager compoenent.
+	 * create a household energy manager component.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 

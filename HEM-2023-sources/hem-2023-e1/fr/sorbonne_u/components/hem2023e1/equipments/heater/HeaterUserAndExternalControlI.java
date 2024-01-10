@@ -76,7 +76,6 @@ public interface		HeaterUserAndExternalControlI
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code on()}
 	 * pre	{@code powerLevel >= 0.0}
 	 * post	{@code powerLevel > getMaxPowerLevel() || getCurrentPowerLevel() == powerLevel}
 	 * </pre>
@@ -93,7 +92,7 @@ public interface		HeaterUserAndExternalControlI
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code on()}
+	 * pre	{@code true}	// no precondition.
 	 * post	{@code return >= 0.0 && return <= getMaxPowerLevel()}
 	 * </pre>
 	 *

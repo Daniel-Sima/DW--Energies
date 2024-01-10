@@ -1,6 +1,5 @@
 package equipments.CookingPlate.mil;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -469,7 +468,7 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void setSimulationRunParameters(
-			Map<String, Serializable> simParams
+			Map<String, Object> simParams
 			) throws MissingRunParameterException {
 		super.setSimulationRunParameters(simParams);
 

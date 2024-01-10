@@ -1,6 +1,5 @@
 package equipments.Fridge.mil;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -374,7 +373,7 @@ extends AtomicHIOA {
 
 		StringBuffer sb = new StringBuffer(ANSI_BLUE_BACKGROUND + "Current consumption: ");
 		sb.append((Math.round(this.currentIntensity.getValue() * 100.0) / 100.0));
-		sb.append(" Amperes (" + (Math.round(this.totalConsumption * 100.0) / 100.0) + " kWh) at ");
+		sb.append(" Amperes (" + (Math.round(this.totalConsumption * 100.0) / 100.0) + " kWh) at "); // TODO AR totalConsumption
 		sb.append(this.currentIntensity.getTime());
 		sb.append("\n" + ANSI_RESET);
 		this.logMessage(sb.toString());
@@ -430,7 +429,7 @@ extends AtomicHIOA {
 						TENSION*this.currentIntensity.getValue());
 
 		this.logMessage("simulation ends.\n");
-		this.logMessage(new FridgeElectricityReport(URI, Math.round(this.totalConsumption * 100.0) / 100.0).printout("-"));
+		this.logMessage(new FridgeElectricityReport(URI, (Math.round(this.totalConsumption * 100.0) / 100.0) * 1000.0).printout("-"));
 		super.endSimulation(endTime);
 	}
 
@@ -451,7 +450,7 @@ extends AtomicHIOA {
 	 */
 	@Override
 	public void setSimulationRunParameters(
-			Map<String, Serializable> simParams
+			Map<String, Object> simParams
 			) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);
@@ -530,7 +529,7 @@ extends AtomicHIOA {
 			ret.append(" report\n");
 			ret.append(indent);
 			ret.append('|');
-			ret.append("total consumption in kWh = ");
+			ret.append("total consumption in Wh = ");
 			ret.append(this.totalConsumption);
 			ret.append(".\n");
 			ret.append(indent);

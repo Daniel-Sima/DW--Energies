@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import equipments.CookingPlate.mil.CookingPlateElectricityModel.CookingPlateElectricityReport;
 import equipments.HEM.simulation.HEM_ReportI;
 import equipments.Lamp.mil.events.AbstractLampEvent;
 import equipments.Lamp.mil.events.DecreaseLamp;
@@ -59,8 +58,6 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import utils.Electricity;
-
-import java.io.Serializable;
 
 // -----------------------------------------------------------------------------
 /**
@@ -478,7 +475,7 @@ extends		AtomicHIOA
 	 */
 	@Override
 	public void			setSimulationRunParameters(
-		Map<String, Serializable> simParams
+		Map<String, Object> simParams
 		) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);

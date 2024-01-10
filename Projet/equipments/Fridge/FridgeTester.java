@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.jupiter.api.Test;
-
 import equipments.Fridge.connections.FridgeExternalControlConnector;
 import equipments.Fridge.connections.FridgeExternalControlOutboundPort;
 import equipments.Fridge.connections.FridgeInternalControlConnector;

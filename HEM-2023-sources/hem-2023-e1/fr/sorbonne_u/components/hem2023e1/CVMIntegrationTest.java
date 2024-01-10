@@ -3,8 +3,8 @@ package fr.sorbonne_u.components.hem2023e1;
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
-// This software is a computer program whose purpose is to provide a basic
-// household management systems as an example of a cyber-physical system.
+// This software is a computer program whose purpose is to implement a mock-up
+// of household energy management system.
 //
 // This software is governed by the CeCILL-C license under French law and
 // abiding by the rules of distribution of free software.  You can use,

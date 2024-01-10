@@ -61,7 +61,7 @@ import utils.Electricity;
 @ModelImportedVariable(name = "currentCookingPlateIntensity", type = Double.class)
 @ModelImportedVariable(name = "currentLampIntensity", type = Double.class)
 @ModelImportedVariable(name = "currentAirConditioningIntensity", type = Double.class)
-//@ModelImportedVariable(name = "currentFridgeIntensity", type = Double.class) ddadadz
+@ModelImportedVariable(name = "currentFridgeIntensity", type = Double.class)
 
 @ModelImportedVariable(name = "currentPowerProducedSolarPanel", type = Double.class)
 @ModelImportedVariable(name = "currentPowerProducedPetrolGenerator", type = Double.class)
@@ -104,8 +104,8 @@ extends AtomicHIOA {
 	protected Value<Double> currentAirConditioningIntensity;
 	
 	/** current intensity of the Fridge amperes.							*/
-//	@ImportedVariable(type = Double.class)
-//	protected Value<Double> currentFridgeIntensity;
+	@ImportedVariable(type = Double.class)
+	protected Value<Double> currentFridgeIntensity;
 	
 	/** current power produce by the Solar Panel in Wh.						*/
 	@ImportedVariable(type = Double.class)
@@ -225,13 +225,10 @@ extends AtomicHIOA {
 	 */
 	protected double computeTotalIntensity() {
 		// simple sum of all incoming intensities
-//		double i = this.currentCookingPlateIntensity.getValue() +
-//				this.currentLampIntensity.getValue() +
-//				this.currentAirConditioningIntensity.getValue() + 
-//				this.currentFridgeIntensity.getValue();
 		double i = this.currentCookingPlateIntensity.getValue() + 
 				this.currentLampIntensity.getValue() +
-				this.currentAirConditioningIntensity.getValue();
+				this.currentAirConditioningIntensity.getValue() +
+				this.currentFridgeIntensity.getValue();
 				
 		// Tracing
 		if (this.currentIntensity.isInitialised()) {
@@ -270,7 +267,7 @@ extends AtomicHIOA {
 				this.currentCookingPlateIntensity.isInitialised() &&
 				this.currentLampIntensity.isInitialised() && 
 				this.currentAirConditioningIntensity.isInitialised() && 
-//				this.currentFridgeIntensity.isInitialised() && 
+				this.currentFridgeIntensity.isInitialised() && 
 				this.currentPowerProducedSolarPanel.isInitialised() && 
 				this.currentPowerProducedPetrolGenerator.isInitialised()) {
 			double i = this.computeTotalIntensity();
