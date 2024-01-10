@@ -164,6 +164,7 @@ public class			ConfigurationFileParser
 		Validator validator = schema.newValidator();
 		// And finally, validate the file.
 		try {
+			System.out.println(configFile);
 			validator.validate(new StreamSource(configFile));
 		} catch (SAXException e) {
 			throw new ConfigurationException(
@@ -442,7 +443,6 @@ public class			ConfigurationFileParser
 					body);
 		}
 		
-		//System.out.println(internal.equipmentRef);
 		
 		Node maxModeNode;
 		try{
@@ -471,7 +471,6 @@ public class			ConfigurationFileParser
 			}
 			 operations.add(new Operation("maxMode","int",null,new Body(null,null,maxModeBody)));
 		}
-		//System.out.println(operations.get("maxMode"));
 		
 		Node upModeNode;
 		try{
@@ -500,7 +499,6 @@ public class			ConfigurationFileParser
 			}
 			 operations.add(new Operation("upMode","boolean",null,new Body(null,null,upModeBody)));
 		}
-		//System.out.println(operations.get("upMode"));
 
 		Node downModeNode;
 		try{
@@ -529,7 +527,6 @@ public class			ConfigurationFileParser
 			}
 			 operations.add(new Operation("downMode","boolean",null,new Body(null,null,downModeBody)));
 		}
-		//System.out.println(operations.get("downMode"));
 		
 		Node setModeNode;
 		try{
@@ -577,7 +574,6 @@ public class			ConfigurationFileParser
 			}
 			 operations.add(new Operation("setMode","boolean", opParameter ,new Body(null,null,setModeBody)));
 		}
-		//System.out.println(operations.get("setMode"));
 		
 		Node currentModeNode;
 		try{
@@ -606,7 +602,6 @@ public class			ConfigurationFileParser
 			}
 			 operations.add(new Operation("currentMode","int",null,new Body(null,null,currentModeBody)));
 		}
-		//System.out.println(operations.get("currentMode"));
 		
 		Node suspendedNode;
 		try{
@@ -635,7 +630,6 @@ public class			ConfigurationFileParser
 			}
 			 operations.add(new Operation("suspended","boolean",null,new Body(null,null,suspendedBody)));
 		}
-		//System.out.println(operations.get("suspended"));
 		
 		Node suspendNode;
 		try{
@@ -678,7 +672,6 @@ public class			ConfigurationFileParser
 			}
 			 operations.add(new Operation("suspend","boolean",null,new Body(null,equipmentRef,body)));
 		}
-		//System.out.println(operations.get("suspend"));
 		
 		Node resumeNode;
 		try{
@@ -764,7 +757,9 @@ public class			ConfigurationFileParser
 			}
 			operations.add(new Operation("emergency","double",null,new Body(null,equipmentRef,body)));
 		}
-		//System.out.println(operations.get(8).body.equipmentRef);
+		
+//		for(Operation o : operations)
+//			System.out.println(o.name+": "+o.body.text);
 		
 		return new ConfigurationParameters(identificationUid,
 				identificationOffered,

@@ -77,70 +77,70 @@ extends	AbstractCVM {
 		// At this stage, the tester for the Cooking Plate is added only
 		// to show the Cooking Plate functioning; later on, it will be replaced
 		// by a simulation of users' actions.
-		AbstractComponent.createComponent(
-				CookingPlate.class.getCanonicalName(),
-				new Object[]{});
-
-		AbstractComponent.createComponent(
-				CookingPlateTester.class.getCanonicalName(),
-				new Object[]{true});
+//		AbstractComponent.createComponent(
+//				CookingPlate.class.getCanonicalName(),
+//				new Object[]{});
+//
+//		AbstractComponent.createComponent(
+//				CookingPlateTester.class.getCanonicalName(),
+//				new Object[]{true});
 		
 		// At this stage, the tester for the Lamp is added only
 		// to show the Lamp functioning; later on, it will be replaced
-		// by a simulation of users' actions.
-		AbstractComponent.createComponent(
-				Lamp.class.getCanonicalName(),
-				new Object[]{});
+//		// by a simulation of users' actions.
+//		AbstractComponent.createComponent(
+//				Lamp.class.getCanonicalName(),
+//				new Object[]{});
 
-		AbstractComponent.createComponent(
-				LampTester.class.getCanonicalName(),
-				new Object[]{true});
+//		AbstractComponent.createComponent(
+//				LampTester.class.getCanonicalName(),
+//				new Object[]{true});
 
 		// At this stage, the tester for the Air Conditioning is added only
 		// to switch on and off the Air Conditioning; later on, it will be replaced
 		// by a simulation of users' actions.
-		AbstractComponent.createComponent(
-				AirConditioning.class.getCanonicalName(),
-				new Object[]{});
+//		AbstractComponent.createComponent(
+//				AirConditioning.class.getCanonicalName(),
+//				new Object[]{});
 
-		AbstractComponent.createComponent(
-				AirConditioningTester.class.getCanonicalName(),
-				new Object[]{false});
+//		AbstractComponent.createComponent(
+//				AirConditioningTester.class.getCanonicalName(),
+//				new Object[]{false});
 
 		// At this stage, the tester for the Fridge is added only
-		// to switch on and off the Air Conditioning; later on, it will be replaced
+		// to switch on and off the Fridge; later on, it will be replaced
 		// by a simulation of users' actions.
 		AbstractComponent.createComponent(
 				Fridge.class.getCanonicalName(),
-				new Object[]{});
+				new Object[]{true});
 
 		AbstractComponent.createComponent(
 				FridgeTester.class.getCanonicalName(),
 				new Object[]{false});
 		
-		AbstractComponent.createComponent(
-				SolarPanel.class.getCanonicalName(),
-				new Object[]{});
+//		AbstractComponent.createComponent(
+//				SolarPanel.class.getCanonicalName(),
+//				new Object[]{});
 
-		AbstractComponent.createComponent(
-				SolarPanelTester.class.getCanonicalName(),
-				new Object[]{true}); // TODO a voir 
+//		AbstractComponent.createComponent(
+//				SolarPanelTester.class.getCanonicalName(),
+//				new Object[]{true}); // TODO a voir 
+	
+//		AbstractComponent.createComponent(
+//				PetrolGenerator.class.getCanonicalName(),
+//				new Object[]{});
+
+//		AbstractComponent.createComponent(
+//				PetrolGeneratorTester.class.getCanonicalName(),
+//				new Object[]{true}); // TODO a voir 
 		
-		AbstractComponent.createComponent(
-				PetrolGenerator.class.getCanonicalName(),
-				new Object[]{});
+//		AbstractComponent.createComponent(
+//				Battery.class.getCanonicalName(),
+//				new Object[]{});
 
-		AbstractComponent.createComponent(
-				PetrolGeneratorTester.class.getCanonicalName(),
-				new Object[]{true}); // TODO a voir 
-		
-		AbstractComponent.createComponent(
-				Battery.class.getCanonicalName(),
-				new Object[]{});
-
-		AbstractComponent.createComponent(
-				BatteryTester.class.getCanonicalName(),
-				new Object[]{true}); // TODO a voir 
+//		AbstractComponent.createComponent(
+//				BatteryTester.class.getCanonicalName(),
+//				new Object[]{true}); // TODO a voir 
 
 		AbstractComponent.createComponent(
 				HEM_descriptors.class.getCanonicalName(),
@@ -153,8 +153,8 @@ extends	AbstractCVM {
 	public static void	main(String[] args) {
 		try {
 			CVMIntegrationTest cvm = new CVMIntegrationTest();
-			cvm.startStandardLifeCycle(120000L);
-			Thread.sleep(300000L);
+			cvm.startStandardLifeCycle(12000L);
+			Thread.sleep(30000L);
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();

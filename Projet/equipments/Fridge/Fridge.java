@@ -1,15 +1,22 @@
 package equipments.Fridge;
 
+import java.util.Random;
+
 import equipments.Fridge.connections.FridgeExternalControlInboundPort;
 import equipments.Fridge.connections.FridgeInternalControlInboundPort;
 import equipments.Fridge.connections.FridgeUserInboundPort;
-
+import equipments.HEM.registration.RegistrationOutboundPort;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
+import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
+import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.exceptions.PostconditionException;
 import fr.sorbonne_u.exceptions.PreconditionException;
-
+import equipments.HEM.registration.RegistrationOutboundPort;
+import equipments.HEM.registration.RegistrationConnector;
+import equipments.HEM.registration.RegistrationInboundPort;
+import equipments.HEM.HEM_descriptors;
 // -----------------------------------------------------------------------------
 /**
  * The class <code>Fridge</code> a Fridge component.
@@ -34,11 +41,12 @@ import fr.sorbonne_u.exceptions.PreconditionException;
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
-@OfferedInterfaces(offered={FridgeUserCI.class, FridgeInternalControlCI.class,
-							FridgeExternalControlCI.class})
+@OfferedInterfaces(offered={FridgeUserCI.class, FridgeInternalControlCI.class, FridgeExternalControlCI.class})
+@RequiredInterfaces(required={RegistrationOutboundPort.class, RegistrationConnector.class, RegistrationInboundPort.class})
 public class			Fridge
 extends		AbstractComponent
 implements	FridgeUserImplI,
+			FridgeUserAndControlI,
 			FridgeInternalControlI
 {
 	// -------------------------------------------------------------------------
@@ -63,6 +71,8 @@ implements	FridgeUserImplI,
 		COOLER_COOLING,
 		/** Freezer is cooling.												*/
 		FREEZER_COOLING,
+		/** Both freezer and cooler are cooling								*/
+		BOTH_COOLING,
 		/** Fridge is off.													*/
 		OFF
 	}
@@ -91,6 +101,8 @@ implements	FridgeUserImplI,
 
 	/** max power level of the Fridge, in watts.							*/
 	protected static final double	MAX_POWER_LEVEL = 2000.0;
+	/** registration required boolean 										*/
+	protected boolean registrationRequired = true;
 
 	/** URI of the Fridge port for user interactions.						*/
 	public static final String		USER_INBOUND_PORT_URI =
@@ -101,6 +113,12 @@ implements	FridgeUserImplI,
 	/** URI of the Fridge port for external control.						*/
 	public static final String		EXTERNAL_CONTROL_INBOUND_PORT_URI =
 									"Fridge-EXTERNAL-CONTROL-INBOUND-PORT-URI";
+	/** URI of the Registration outbound port.								*/
+	public static final String 		REGISTRATION_OUTBOUND_PORT = 
+									"REGISTRATION-OUTBOUND-PORT-URI";
+
+	public static String Uri = "FRIDGE-URI";
+
 
 	/** when true, methods trace their actions.								*/
 	public static boolean		VERBOSE = true;
@@ -125,11 +143,15 @@ implements	FridgeUserImplI,
 	/** inbound port offering the <code>FridgeExternalControlCI</code>
 	 *  interface.															*/
 	protected FridgeExternalControlInboundPort	fecip;
+	/** outbound port offering <code>RegistrationCI</code>
+	 *  interface															*/														
+	protected RegistrationOutboundPort	regop;
 	/** target temperature for the cooler compartment.	*/
 	protected double			targetCoolerTemperature;
 	/** target temperature for the freezer compartment.	*/
 	protected double			targetFreezerTemperature;
-
+	/** Connector descriptor file path **/
+	protected String			path2xmlDescriptor;
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -148,39 +170,9 @@ implements	FridgeUserImplI,
 	 */
 	protected			Fridge() throws Exception
 	{
-		this(USER_INBOUND_PORT_URI, INTERNAL_CONTROL_INBOUND_PORT_URI,
-			 EXTERNAL_CONTROL_INBOUND_PORT_URI);
+		this(true);
 	}
-
-	/**
-	 * create a new Fridge.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code FridgeUserInboundPortURI != null && !FridgeUserInboundPortURI.isEmpty()}
-	 * pre	{@code FridgeInternalControlInboundPortURI != null && !FridgeInternalControlInboundPortURI.isEmpty()}
-	 * pre	{@code FridgeExternalControlInboundPortURI != null && !FridgeExternalControlInboundPortURI.isEmpty()}
-	 * post	{@code true}	// no postcondition.
-	 * </pre>
-	 * 
-	 * @param FridgeUserInboundPortURI				URI of the inbound port to call the Fridge component for user interactions.
-	 * @param FridgeInternalControlInboundPortURI	URI of the inbound port to call the Fridge component for internal control.
-	 * @param FridgeExternalControlInboundPortURI	URI of the inbound port to call the Fridge component for external control.
-	 * @throws Exception							<i>to do</i>.
-	 */
-	protected			Fridge(
-		String FridgeUserInboundPortURI,
-		String FridgeInternalControlInboundPortURI,
-		String FridgeExternalControlInboundPortURI
-		) throws Exception
-	{
-		super(1, 0);
-		this.initialise(FridgeUserInboundPortURI,
-						FridgeInternalControlInboundPortURI,
-						FridgeExternalControlInboundPortURI);
-	}
-
+	
 	/**
 	 * create a new Fridge.
 	 * 
@@ -188,29 +180,21 @@ implements	FridgeUserImplI,
 	 * 
 	 * <pre>
 	 * pre	{@code reflectionInboundPortURI != null && !reflectionInboundPortURI.isEmpty()}
-	 * pre	{@code FridgeUserInboundPortURI != null && !FridgeUserInboundPortURI.isEmpty()}
-	 * pre	{@code FridgeInternalControlInboundPortURI != null && !FridgeInternalControlInboundPortURI.isEmpty()}
-	 * pre	{@code FridgeExternalControlInboundPortURI != null && !FridgeExternalControlInboundPortURI.isEmpty()}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 * 
 	 * @param reflectionInboundPortURI				URI of the reflection inbound port of the component.
-	 * @param FridgeUserInboundPortURI				URI of the inbound port to call the Fridge component for user interactions.
-	 * @param FridgeInternalControlInboundPortURI	URI of the inbound port to call the Fridge component for internal control.
-	 * @param FridgeExternalControlInboundPortURI	URI of the inbound port to call the Fridge component for external control.
+	 * @param registrationRequired					required param.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected			Fridge(
-		String reflectionInboundPortURI,
-		String FridgeUserInboundPortURI,
-		String FridgeInternalControlInboundPortURI,
-		String FridgeExternalControlInboundPortURI
+		boolean registrationRequired
 		) throws Exception
 	{
-		super(reflectionInboundPortURI, 1, 0);
-		this.initialise(FridgeUserInboundPortURI,
-						FridgeInternalControlInboundPortURI,
-						FridgeExternalControlInboundPortURI);
+		super(1, 0);
+		this.registrationRequired = registrationRequired;
+		this.path2xmlDescriptor = "fridgeci-descriptor.xml";
+		this.initialise();
 	}
 
 	/**
@@ -219,40 +203,31 @@ implements	FridgeUserImplI,
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
-	 * pre	{@code FridgeUserInboundPortURI != null && !FridgeUserInboundPortURI.isEmpty()}
-	 * pre	{@code FridgeInternalControlInboundPortURI != null && !FridgeInternalControlInboundPortURI.isEmpty()}
-	 * pre	{@code FridgeExternalControlInboundPortURI != null && !FridgeExternalControlInboundPortURI.isEmpty()}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param FridgeUserInboundPortURI				URI of the inbound port to call the Fridge component for user interactions.
-	 * @param FridgeInternalControlInboundPortURI	URI of the inbound port to call the Fridge component for internal control.
-	 * @param FridgeExternalControlInboundPortURI	URI of the inbound port to call the Fridge component for external control.
+	 * @param registrationRequired					required param.
 	 * @throws Exception							<i>to do</i>.
 	 */
-	protected void		initialise(
-		String FridgeUserInboundPortURI,
-		String FridgeInternalControlInboundPortURI,
-		String FridgeExternalControlInboundPortURI
-		) throws Exception
+	protected void		initialise() 
+	throws Exception
 	{
-		assert	FridgeUserInboundPortURI != null && !FridgeUserInboundPortURI.isEmpty();
-		assert	FridgeInternalControlInboundPortURI != null && !FridgeInternalControlInboundPortURI.isEmpty();
-		assert	FridgeExternalControlInboundPortURI != null && !FridgeExternalControlInboundPortURI.isEmpty();
-
 		this.currentState = FridgeState.OFF;
 		this.currentPowerLevel = MAX_POWER_LEVEL;
 		this.targetCoolerTemperature = STANDARD_TARGET_COOLER_TEMPERATURE;
 		this.targetFreezerTemperature = STANDARD_TARGET_FREEZER_TEMPERATURE;
 
-		this.fip = new FridgeUserInboundPort(FridgeUserInboundPortURI, this);
+		this.fip = new FridgeUserInboundPort(USER_INBOUND_PORT_URI, this);
 		this.fip.publishPort();
+		
 		this.ficip = new FridgeInternalControlInboundPort(
-									FridgeInternalControlInboundPortURI, this);
+									INTERNAL_CONTROL_INBOUND_PORT_URI, this);
 		this.ficip.publishPort();
+		
 		this.fecip = new FridgeExternalControlInboundPort(
-									FridgeExternalControlInboundPortURI, this);
+									EXTERNAL_CONTROL_INBOUND_PORT_URI, this);
 		this.fecip.publishPort();
+		
 
 		if (VERBOSE) {
 			this.tracer.get().setTitle("Fridge component");
@@ -265,6 +240,49 @@ implements	FridgeUserImplI,
 	// Component life-cycle
 	// -------------------------------------------------------------------------
 
+	@Override 
+	public synchronized void start() throws ComponentStartException {
+		super.start();
+		try {
+			if(VERBOSE)
+				this.traceMessage("Connexion des ports\n\n");
+		
+			if(registrationRequired) {
+				this.regop = new RegistrationOutboundPort(REGISTRATION_OUTBOUND_PORT, this);
+				this.regop.publishPort();
+				this.doPortConnection(regop.getPortURI(), HEM_descriptors.URI_REGISTRATION_INBOUND_PORT, 
+						RegistrationConnector.class.getCanonicalName());
+				if(VERBOSE)
+					this.traceMessage("Inscription of Fridge\n\n");
+			}
+			
+		} catch(Exception e) {
+			throw new ComponentStartException(e);
+		}
+	}
+	
+	@Override
+	public synchronized void execute() throws Exception {
+		if(VERBOSE)
+			this.traceMessage("Test if the fridge is registered\n\n");
+		if(!this.registered())
+			this.traceMessage("Fridge unregistered\n\n");
+		super.execute();
+	}
+	
+	@Override 
+	public synchronized void finalise() throws Exception {
+		if(VERBOSE) 
+			this.traceMessage("Disconection of ports bounds\n\n");
+		
+		if(this.registrationRequired) {
+			this.doPortDisconnection(this.regop.getPortURI());
+		}
+		
+		super.finalise();
+	}
+	
+	
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
 	 */
@@ -272,12 +290,19 @@ implements	FridgeUserImplI,
 	public synchronized void	shutdown() throws ComponentShutdownException
 	{
 		try {
+			if(VERBOSE)
+				this.traceMessage("Disconection of fridge ports\n\n");
+			
 			this.fip.unpublishPort();
 			this.ficip.unpublishPort();
 			this.fecip.unpublishPort();
+			if(this.registrationRequired)
+				this.regop.unpublishPort();
+			
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}
+		
 		super.shutdown();
 	}
 
@@ -317,6 +342,7 @@ implements	FridgeUserImplI,
 
 		assert	!(this.currentState == FridgeState.ON) : new PreconditionException("!(this.currentState == FridgeState.ON)");
 
+		this.register();
 		this.currentState = FridgeState.ON;
 
 		assert	 this.currentState == FridgeState.ON : new PostconditionException("this.currentState == FridgeState.ON");
@@ -337,6 +363,8 @@ implements	FridgeUserImplI,
 		this.currentState = FridgeState.OFF;
 
 		assert	 !(this.currentState == FridgeState.ON) : new PostconditionException("!(this.currentState == FridgeState.ON)");
+	
+		this.unregister();
 	}
 	
 	/**
@@ -618,6 +646,36 @@ implements	FridgeUserImplI,
 	 */
 	public void printSeparator(String title) throws Exception {
 		this.traceMessage("**********"+ title +"**********\n");
+	}
+	
+	/**
+	 * 		Registering and unregistering
+	 */
+	
+	/**
+	 * test registration
+	 * @return true if already registered else false
+	 * @throws Exception
+	 */
+	public boolean registered() throws Exception {
+		return this.regop.registered(Uri);
+	}
+
+	/**
+	 * registers equipment
+	 * @return true if register else false
+	 * @throws Exception
+	 */
+	public boolean register() throws Exception {
+		return this.regop.register(Uri, INTERNAL_CONTROL_INBOUND_PORT_URI, this.path2xmlDescriptor);
+	}
+
+	/**
+	 * unregisters equipment
+	 * @throws Exception
+	 */
+	public void unregister() throws Exception {
+		this.regop.unregister(Uri);
 	}
 }
 // -----------------------------------------------------------------------------

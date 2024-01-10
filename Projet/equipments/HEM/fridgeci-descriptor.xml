@@ -28,7 +28,11 @@
 	      Fridge.setCurrentPowerLevel(newPowerLevel);
 	    </body>
   </internal>
-  <maxMode><body>return MAX_MODE;</body></maxMode>
+  <maxMode>
+  	<body>
+  		return MAX_MODE;
+  	</body>
+  </maxMode>
   <upMode>
     <body>
       try {
