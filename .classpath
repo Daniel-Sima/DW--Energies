@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="hem-2023-e1"/>
+	<classpathentry kind="src" path="hem-2023-e2"/>
+	<classpathentry kind="src" path="hem-2023-e3"/>
+	<classpathentry kind="src" path="hem-adapter"/>
+	<classpathentry kind="src" path="Projet"/>
+	<classpathentry kind="src" path="hem-2023-base"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="commons-math3-3.6.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="BCM4Java-28112023.jar"/>
+	<classpathentry kind="lib" path="BCM4Java-CyPhy-06122023.jar"/>
+	<classpathentry kind="lib" path="NeoSim4Java-06122023.jar"/>
+	<classpathentry kind="lib" path="C:/Users/walte/Desktop/MASTER/ALASCA/DW--Energies/jing-20181222/bin/jing.jar"/>
+	<classpathentry kind="lib" path="C:/Users/walte/Desktop/MASTER/ALASCA/DW--Energies/javassist/javassist.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
