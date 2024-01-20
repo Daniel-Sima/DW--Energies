@@ -496,21 +496,21 @@ implements 	AirConditioningPushImplementationI {
 						}
 					}, delayToSwitchOn, TimeUnit.NANOSECONDS);
 			
-			long delayToSwitchOff =
-					this.clock.nanoDelayUntilInstant(switchOffInstant);
-			this.scheduleTaskOnComponent(
-					new AbstractComponent.AbstractTask() {
-						@Override
-						public void run() {
-							try {
-								act.traceMessage(
-									"User switches the air conditioning off\n.");
-								o.switchOff();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					}, delayToSwitchOff, TimeUnit.NANOSECONDS);
+			// long delayToSwitchOff =
+			// 		this.clock.nanoDelayUntilInstant(switchOffInstant);
+			// this.scheduleTaskOnComponent(
+			// 		new AbstractComponent.AbstractTask() {
+			// 			@Override
+			// 			public void run() {
+			// 				try {
+			// 					act.traceMessage(
+			// 						"User switches the air conditioning off\n.");
+			// 					o.switchOff();
+			// 				} catch (Exception e) {
+			// 					e.printStackTrace();
+			// 				}
+			// 			}
+			// 		}, delayToSwitchOff, TimeUnit.NANOSECONDS);
 		}
 	}
 

@@ -151,9 +151,12 @@ implements 	ElectricMeterImplementationI {
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
+	 * @param reflectionInboundPortURI		URI of the reflection innbound port of the component.
 	 * @param electricMeterInboundPortURI	URI of the electric meter inbound port.
-	 * @param nbThreads						number of standard threads.
-	 * @param nbSchedulableThreads			number of schedulable threads.
+	 * @param currentExecutionType		current execution type for the next run.
+	 * @param simArchitectureURI		URI of the simulation architecture to be created or the empty string if the component does not execute as a simulation.
+	 * @param localSimulatorURI			URI of the local simulator to be used in the simulation architecture.
+	 * @param accFactor					acceleration factor for the simulation.
 	 * @throws Exception					<i>to do</i>.
 	 */
 	protected			ElectricMeter(
@@ -444,6 +447,7 @@ implements 	ElectricMeterImplementationI {
 	@Override
 	public void			execute() throws Exception
 	{
+		System.out.println("Electric execute");
 		// In the electric meter, the accelerated clock is only used to get
 		// properly time stamped sensor data in simulated time instants.
 		this.clock = null;
@@ -486,15 +490,44 @@ implements 	ElectricMeterImplementationI {
 	 * @see
 	 */
 	@Override
-	public double getCurrentConsumption() throws Exception {
+	public SensorData<Measure<Double>> getCurrentConsumption() throws Exception {
 		if (VERBOSE) {
 			this.traceMessage("Electric meter returns its current consumption.\n");
 		}
 
 		// TODO will need a computation.
-		double ret = 0.0;
+		SensorData<Measure<Double>> ret = null;
+		if(this.currentExecutionType.isSIL()) {
+			ret = this.currentPowerConsumption.get();
+		} else {
+			if(this.clock != null) {
+				ret = new SensorData<Measure<Double>>(
+					this.clock, 
+					new Measure<Double>(this.clock,
+										0.0,
+										MeasurementUnit.AMPERES));
+			} else {
+				ret = new SensorData<Measure<Double>>(
+							new Measure<Double>(0.0, MeasurementUnit.AMPERES));
+			}
+		}
 
-		assert ret >= 0.0 : new PostconditionException("ret >= 0.0");
+		assert	ret != null : new PostconditionException("ret != null");
+		assert	ret.getMeasure().isScalar() :
+				new PostconditionException("return.getMeasure().isScalar()");
+		assert	((Measure<?>)ret.getMeasure()).getData() instanceof Double :
+				new PostconditionException(
+						"((Measure<?>)return.getMeasure()).getData() "
+						+ "instanceof Double");
+		assert	((Measure<Double>)ret.getMeasure()).getData() >= 0.0 :
+				new PostconditionException(
+						"((Measure<Double>)return.getMeasure())."
+						+ "getData() >= 0.0");
+		assert	((Measure<?>)ret.getMeasure()).getMeasurementUnit().
+											equals(MeasurementUnit.AMPERES) :
+				new PostconditionException(
+						"((Measure<?>)return.getMeasure()).getMeasurementUnit()."
+						+ "equals(MeasurementUnit.AMPERES)");
 
 		return ret;
 	}
@@ -504,15 +537,43 @@ implements 	ElectricMeterImplementationI {
 	 * @see
 	 */
 	@Override
-	public double getCurrentProduction() throws Exception {
+	public SensorData<Measure<Double>> getCurrentProduction() throws Exception {
 		if (VERBOSE) {
 			this.traceMessage("Electric meter returns its current production.\n");
 		}
 
-		// TODO will need a computation.
-		double ret = 0.0;
+		SensorData<Measure<Double>> ret = null;
+		if (this.currentExecutionType.isSIL()) {
+			ret = this.currentPowerProduction.get();
+		} else {
+			if (this.clock != null) {
+				ret = new SensorData<>(
+						this.clock,
+						new Measure<Double>(this.clock,
+											0.0,
+											MeasurementUnit.WATTS));
+			} else {
+				ret = new SensorData<>(
+							new Measure<Double>(0.0, MeasurementUnit.WATTS));
+			}
+		}
 
-		assert	ret >= 0.0 : new PostconditionException("ret >= 0.0");
+		assert	ret != null : new PostconditionException("return != null");
+		assert	ret.getMeasure().isScalar() :
+				new PostconditionException("return.getMeasure().isScalar()");
+		assert	((Measure<?>)ret.getMeasure()).getData() instanceof Double :
+				new PostconditionException(
+						"((Measure<?>)return.getMeasure()).getData() "
+						+ "instanceof Double");
+		assert	((Measure<Double>)ret.getMeasure()).getData() >= 0.0 :
+				new PostconditionException(
+						"((Measure<Double>)return.getMeasure())."
+						+ "getData() >= 0.0");
+		assert	((Measure<?>)ret.getMeasure()).getMeasurementUnit().
+											equals(MeasurementUnit.WATTS) :
+				new PostconditionException(
+						"((Measure<?>)return.getMeasure()).getMeasurementUnit()."
+						+ "equals(MeasurementUnit.WATTS)");
 
 		return ret;
 	}

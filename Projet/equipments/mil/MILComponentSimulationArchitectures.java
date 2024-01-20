@@ -29,6 +29,7 @@ import fr.sorbonne_u.components.cyphy.plugins.devs.CoordinatorPlugin;
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentAtomicModelDescriptor;
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentCoupledModelDescriptor;
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentModelArchitecture;
+import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.RTComponentAtomicModelDescriptor;
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.RTComponentCoupledModelDescriptor;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.RTAtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
@@ -255,6 +256,23 @@ public abstract class MILComponentSimulationArchitectures {
 		return architecture;
 	}
 	
+	/**
+	 * create the global MIL real time component simulation architecture for the
+	 * HEM application.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code true}	// no precondition.
+	 * post	{@code true}	// no postcondition.
+	 * </pre>
+	 *
+	 * @param architectureURI		URI of the component model architecture to be created.
+	 * @param accelerationFactor	acceleration factor for this run.
+	 * @return						the global MIL real time simulation  architecture for the HEM application.
+	 * @throws Exception			<i>to do</i>.
+	 */
+	@SuppressWarnings("unchecked")
 	public static ComponentModelArchitecture
 									createMILRTComponentSimulationArchitectures(
 		String architectureURI,
@@ -297,22 +315,32 @@ public abstract class MILComponentSimulationArchitectures {
 //						LampUser.REFLECTION_INBOUND_PORT_URI));
 
 		atomicModelDescriptors.put(
-				ElectricMeterElectricityModel.MIL_RT_URI,
-				RTAtomicHIOA_Descriptor.create(
-						ElectricMeterElectricityModel.class,
-						ElectricMeterElectricityModel.MIL_RT_URI,
-						TimeUnit.HOURS,
+				AirConditioningCoupledModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						AirConditioningCoupledModel.MIL_RT_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SetPowerAirConditioning.class,
+							SwitchOnAirConditioning.class,
+							SwitchOffAirConditioning.class,
+							Cool.class,
+							DoNotCool.class},
 						null,
-						accelerationFactor));
-		
+						TimeUnit.HOURS,
+						AirConditioning.REFLECTION_INBOUND_PORT_URI));
+
 		atomicModelDescriptors.put(
-				AirConditioningElectricityModel.MIL_RT_URI,
-				RTAtomicHIOA_Descriptor.create(
-						AirConditioningElectricityModel.class,
-						AirConditioningElectricityModel.MIL_RT_URI,
-						TimeUnit.HOURS,
+				ElectricMeterCoupledModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						ElectricMeterCoupledModel.MIL_RT_URI,
+						// (Class<? extends EventI>[]) new Class<?>[]{
+//							SwitchOnLamp.class,
+//							SwitchOffLamp.class,
+//							DecreaseLamp.class,
+//							IncreaseLamp.class,},
+						(Class<? extends EventI>[]) new Class<?>[]{},
 						null,
-						accelerationFactor));
+						TimeUnit.HOURS,
+						ElectricMeter.REFLECTION_INBOUND_PORT_URI));
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture

@@ -4,6 +4,11 @@ import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 import equipments.AirConditioning.AirConditioning;
+import equipments.AirConditioning.connections.AirConditioningSensorDataConnector;
+import equipments.AirConditioning.connections.AirConditioningSensorDataOutboundPort;
+import equipments.AirConditioning.measures.AirConditioningCompoundMeasure;
+import equipments.AirConditioning.measures.AirConditioningMeasureI;
+import equipments.AirConditioning.measures.AirConditioningSensorData;
 import equipments.meter.ElectricMeter;
 import equipments.meter.ElectricMeterCI;
 import equipments.meter.ElectricMeterConnector;
@@ -19,6 +24,8 @@ import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 import global.CVMGlobalTest;
 import utils.ExecutionType;
+import utils.Measure;
+import utils.SensorData;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -55,17 +62,38 @@ extends AbstractComponent
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
-
+	
+	/** URI of the sensor inbound port on the {@code ThermostatedAirConditiong}.	*/
+	protected String								sensorIBP_URI;
+	
 	/** port to connect to the electric meter.								*/
 	protected ElectricMeterOutboundPort 	electricMeterOutboundPort;
 	/** port to connect to the Air Conditioning.							*/
 	protected AdjustableOutboundPort 		adjustableOutboundPortAirConditioning; 
 	/** port to connect the Fridge 											*/
 	protected AdjustableOutboundPort 		adjustableOutboundPortFridge;
-
+	/** sensor data outbound port connected to the {@code AirConditioning}.	*/
+	protected AirConditioningSensorDataOutboundPort			sensorOutboundPort;
+	
 	/** period of the HEM control loop.										*/
 	protected final long					PERIOD_IN_SECONDS = 60L;
 
+
+    /** Température minimale pour laquelle le HEM doit 
+	 * 	suspendre AirConditioning.											*/
+    private static final double SUSPEND_TEMP = 16.0;
+	/** Température maximale pour laquelle le HEM doit
+	 * 	resume AirConditioning.												*/
+	private static final double RESUME_TEMP = 21.0;
+	/** Consommation maximale pour laquelle le HEM doit 
+	 *	suspendre AirConditioning.											*/
+	private static final double CONSUMPTION_THRESHOLD = 1000.0;
+
+	/** flag to print or not debug messages.								*/
+	private static final boolean DEBUG = false;
+
+	/** total consumption of the household.									*/
+	private double totalConsumption = 0.0;
 	
 	// Execution / Simulation
 	/** port to connect to the clocks server.								*/
@@ -95,6 +123,15 @@ extends AbstractComponent
 		super(1, 1);
 		
 		this.currentExecutionType = currentExecutionType;
+		this.sensorIBP_URI = AirConditioning.SENSOR_INBOUND_PORT_URI_HEM;
+
+		try {
+			this.sensorOutboundPort =
+					new AirConditioningSensorDataOutboundPort(this);
+			this.sensorOutboundPort.publishPort();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		this.tracer.get().setTitle("Home Energy Manager component");
 		this.tracer.get().setRelativePosition(0, 0);
@@ -134,9 +171,20 @@ extends AbstractComponent
 			this.scheduleTask(
 				o -> {
 					try	{
+						// Appeler la méthode de décision pour la consommation
+						evaluateConsumptionAndTakeAction();
 						o.traceMessage(
 								"Electric meter current consumption: " +
-								electricMeterOutboundPort.getCurrentConsumption() + "\n");
+								electricMeterOutboundPort.getCurrentConsumption()
+														 .getMeasure()
+														 .getData() + "\n");
+						o.traceMessage(
+								"Electric meter total consumption: " +
+								totalConsumption + "\n");
+
+						// Appeler la méthode de décision pour la température
+						evaluateTemperatureAndTakeAction();
+
 //						o.traceMessage(
 //								"Electric meter current production: " +
 //								electricMeterOutboundPort.getCurrentProduction() + "\n");
@@ -147,6 +195,52 @@ extends AbstractComponent
 				}, delayInNanos, TimeUnit.NANOSECONDS);
 		}
 	}
+
+	private void evaluateTemperatureAndTakeAction() {
+		try {
+			@SuppressWarnings("unchecked")
+			AirConditioningSensorData<AirConditioningCompoundMeasure> td =
+						(AirConditioningSensorData<AirConditioningCompoundMeasure>)
+										this.sensorOutboundPort.request();
+			if(DEBUG) {
+				this.traceMessage(td + "\n");	
+			}
+
+			double currentTemp = td.getMeasure().getCurrentTemperature();
+
+			this.traceMessage(
+					"Home current temperature : " +
+					currentTemp + " degrés CELCIUS\n"
+			);
+
+			if(currentTemp < SUSPEND_TEMP) {
+				adjustableOutboundPortAirConditioning.suspend();
+			}
+			else if (currentTemp > RESUME_TEMP) {
+				if(adjustableOutboundPortAirConditioning.suspended())
+					adjustableOutboundPortAirConditioning.resume();
+				else if (adjustableOutboundPortAirConditioning.currentMode() == 0)
+					adjustableOutboundPortAirConditioning.upMode();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void evaluateConsumptionAndTakeAction() {
+        try {
+            SensorData<Measure<Double>> currentConsumption = electricMeterOutboundPort.getCurrentConsumption();
+            totalConsumption += currentConsumption.getMeasure().getData();
+            if (totalConsumption > CONSUMPTION_THRESHOLD) {
+                // Le taux de consommation est trop élevé, suspendre le climatiseur
+                adjustableOutboundPortAirConditioning.suspend();
+                // Vous pouvez également notifier d'autres composants ou prendre d'autres actions nécessaires.
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 	// -------------------------------------------------------------------------
 	// Component life-cycle
@@ -172,6 +266,13 @@ extends AbstractComponent
 					this.adjustableOutboundPortAirConditioning.getPortURI(),
 					AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 					AirConditioningConnector.class.getCanonicalName());
+
+			System.out.println("HEM sensor outbound port uri : " + this.sensorOutboundPort.getPortURI());
+			this.doPortConnection(
+					this.sensorOutboundPort.getPortURI(),
+					sensorIBP_URI,
+					AirConditioningSensorDataConnector.class.getCanonicalName());
+			
 			
 //			this.adjustableOutboundPortFridge = new AdjustableOutboundPort(this);
 //			this.adjustableOutboundPortFridge.publishPort();
@@ -191,6 +292,7 @@ extends AbstractComponent
 	 */
 	@Override
 	public synchronized void execute() throws Exception {
+		System.out.println("HEM execute");
 		AcceleratedClock ac = null;
 		if (this.currentExecutionType.isIntegrationTest() ||
 											this.currentExecutionType.isSIL()) {
@@ -227,7 +329,8 @@ extends AbstractComponent
 			this.logMessage("HEM schedules the SIL integration test.");
 			this.loop(first, endInstant, ac);
 			
-		} else if (this.currentExecutionType.isIntegrationTest()) {
+		} 
+		else if (this.currentExecutionType.isIntegrationTest()) {
 			System.out.println("is integration test");
 			// Integration test for the meter and the heater
 			Instant meterTest = ac.getStartInstant().plusSeconds(60L);
@@ -346,7 +449,6 @@ extends AbstractComponent
 						}
 					}, delay, TimeUnit.NANOSECONDS);
 		}
-			
 	}
 
 	/***********************************************************************************/
@@ -358,6 +460,7 @@ extends AbstractComponent
 	{
 		this.logMessage("HEM ends.");
 		this.doPortDisconnection(this.electricMeterOutboundPort.getPortURI());
+		this.doPortDisconnection(this.sensorOutboundPort.getPortURI());
 		this.doPortDisconnection(this.adjustableOutboundPortAirConditioning.getPortURI());
 //		this.doPortDisconnection(this.adjustableOutboundPortFridge.getPortURI());
 		
@@ -374,14 +477,13 @@ extends AbstractComponent
 		try {
 			this.electricMeterOutboundPort.unpublishPort();
 			this.adjustableOutboundPortAirConditioning.unpublishPort();
+			this.sensorOutboundPort.unpublishPort();
 //			this.adjustableOutboundPortFridge.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}
 		super.shutdown();
 	}
-
-
 }
 /***********************************************************************************/
 /***********************************************************************************/

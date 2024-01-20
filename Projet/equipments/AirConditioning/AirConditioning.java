@@ -135,8 +135,12 @@ implements	AirConditioningUserImplI,
 	/** URI of the AirConditioning port for external control.						*/
 	public static final String		EXTERNAL_CONTROL_INBOUND_PORT_URI =
 										"AIRCONDITIONING-EXTERNAL-CONTROL-INBOUND-PORT-URI";
-	public static final String		SENSOR_INBOUND_PORT_URI =
-										"AIRCONDITIONING-SENSOR-INBOUND-PORT-URI";
+	/** URI of the AirConditioning port for USER sensors.							*/
+	public static final String		SENSOR_INBOUND_PORT_URI_USER =
+										"AIRCONDITIONING-SENSOR-INBOUND-PORT-URI-USER";
+	/** URI of the AirConditioning port for HEM sensors.							*/
+	public static final String		SENSOR_INBOUND_PORT_URI_HEM =
+										"AIRCONDITIONING-SENSOR-INBOUND-PORT-URI-HEM";
 	public static final String		ACTUATOR_INBOUND_PORT_URI =
 										"AIRCONDITIONING-ACTUATOR-INBOUND-PORT-URI";
 	// ----------------
@@ -163,7 +167,9 @@ implements	AirConditioningUserImplI,
 	
 	// Sensors/actuators
 	/** the inbound port through which the sensors are called.				*/
-	protected AirConditioningSensorDataInboundPort	sensorInboundPort;
+	protected AirConditioningSensorDataInboundPort	sensorInboundPort1;
+	/** the inbound port through which the sensors are called.				*/
+	protected AirConditioningSensorDataInboundPort	sensorInboundPort2;
 	/** the inbound port through which the actuators are called.			*/
 	protected AirConditioningActuatorInboundPort	actuatorInboundPort;
 
@@ -212,7 +218,7 @@ implements	AirConditioningUserImplI,
 	protected			AirConditioning() throws Exception
 	{
 		this(USER_INBOUND_PORT_URI, INTERNAL_CONTROL_INBOUND_PORT_URI,
-			 EXTERNAL_CONTROL_INBOUND_PORT_URI, SENSOR_INBOUND_PORT_URI,
+			 EXTERNAL_CONTROL_INBOUND_PORT_URI, SENSOR_INBOUND_PORT_URI_USER,
 			 ACTUATOR_INBOUND_PORT_URI);
 	}
 	
@@ -339,9 +345,15 @@ implements	AirConditioningUserImplI,
 		this.acecip = new AirConditioningExternalControlInboundPort(
 									airConditioningExternalControlInboundPortURI, this);
 		this.acecip.publishPort();
-		this.sensorInboundPort = new AirConditioningSensorDataInboundPort(
+		
+		this.sensorInboundPort1 = new AirConditioningSensorDataInboundPort(
 						airConditioningSensorInboundPortURI, this);
-		this.sensorInboundPort.publishPort();
+		this.sensorInboundPort1.publishPort();
+		
+		this.sensorInboundPort2 = new AirConditioningSensorDataInboundPort(
+						AirConditioning.SENSOR_INBOUND_PORT_URI_HEM, this);
+		this.sensorInboundPort2.publishPort();
+
 		this.actuatorInboundPort = new AirConditioningActuatorInboundPort(
 						airConditioningActuatorInboundPortURI, this);
 		this.actuatorInboundPort.publishPort();
@@ -470,6 +482,7 @@ implements	AirConditioningUserImplI,
 	@Override
 	public void			execute() throws Exception
 	{
+		System.out.println("AirConditioning execute");
 		if (!this.currentExecutionType.isStandard()) {
 			this.clockServerOBP = new ClocksServerOutboundPort(this);
 			this.clockServerOBP.publishPort();
@@ -495,7 +508,8 @@ implements	AirConditioningUserImplI,
 			this.acip.unpublishPort();
 			this.acicip.unpublishPort();
 			this.acecip.unpublishPort();
-			this.sensorInboundPort.unpublishPort();
+			this.sensorInboundPort1.unpublishPort();
+			this.sensorInboundPort2.unpublishPort();
 			this.actuatorInboundPort.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
@@ -547,7 +561,10 @@ implements	AirConditioningUserImplI,
 												t -> new SwitchOnAirConditioning(t));
 		}
 
-		this.sensorInboundPort.send(
+		this.sensorInboundPort1.send(
+				new AirConditioningSensorData<AirConditioningStateMeasure>(
+						new AirConditioningStateMeasure(this.currentState)));
+		this.sensorInboundPort2.send(
 				new AirConditioningSensorData<AirConditioningStateMeasure>(
 						new AirConditioningStateMeasure(this.currentState)));
 
@@ -563,7 +580,7 @@ implements	AirConditioningUserImplI,
 		assert	this.on() : new PreconditionException("on()");
 
 		if (AirConditioning.VERBOSE) {
-			this.traceMessage("Heater switches off.\n");
+			this.traceMessage("AirConditioning switches off.\n");
 		}
 
 		this.currentState = AirConditioningState.OFF;
@@ -578,7 +595,10 @@ implements	AirConditioningUserImplI,
 												t -> new SwitchOffAirConditioning(t));
 		}
 
-		this.sensorInboundPort.send(
+		this.sensorInboundPort1.send(
+				new AirConditioningSensorData<AirConditioningStateMeasure>(
+						new AirConditioningStateMeasure(this.currentState)));
+		this.sensorInboundPort2.send(
 				new AirConditioningSensorData<AirConditioningStateMeasure>(
 						new AirConditioningStateMeasure(this.currentState)));
 
@@ -692,9 +712,12 @@ implements	AirConditioningUserImplI,
 		}
 		
 
-		this.sensorInboundPort.send(
+		this.sensorInboundPort1.send(
 				new AirConditioningSensorData<AirConditioningStateMeasure>(
 						new AirConditioningStateMeasure(this.currentState)));
+		this.sensorInboundPort2.send(
+			new AirConditioningSensorData<AirConditioningStateMeasure>(
+					new AirConditioningStateMeasure(this.currentState)));
 
 		assert	this.cooling() : new PostconditionException("cooling()");
 	}
@@ -723,9 +746,12 @@ implements	AirConditioningUserImplI,
 												t -> new DoNotCool(t));
 		}
 
-		this.sensorInboundPort.send(
+		this.sensorInboundPort1.send(
 				new AirConditioningSensorData<AirConditioningStateMeasure>(
 						new AirConditioningStateMeasure(this.currentState)));
+		this.sensorInboundPort2.send(
+			new AirConditioningSensorData<AirConditioningStateMeasure>(
+					new AirConditioningStateMeasure(this.currentState)));
 
 
 		assert	!(this.cooling()) : new PostconditionException("!cooling()");
@@ -973,11 +999,17 @@ implements	AirConditioningUserImplI,
 	 */
 	protected void		temperaturesPushSensor() throws Exception
 	{
-		this.sensorInboundPort.send(
+		this.sensorInboundPort1.send(
 					new AirConditioningSensorData<AirConditioningCompoundMeasure>(
 						new AirConditioningCompoundMeasure(
 							this.targetTemperaturePullSensor().getMeasure(),
 							this.currentTemperaturePullSensor().getMeasure())));
+
+		this.sensorInboundPort2.send(
+			new AirConditioningSensorData<AirConditioningCompoundMeasure>(
+				new AirConditioningCompoundMeasure(
+					this.targetTemperaturePullSensor().getMeasure(),
+					this.currentTemperaturePullSensor().getMeasure())));
 	}
 }
 // -----------------------------------------------------------------------------

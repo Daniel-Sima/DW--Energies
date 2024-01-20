@@ -377,7 +377,7 @@ implements 	AirConditioningPushImplementationI{
 	protected void pushControlLoop(AirConditioningCompoundMeasure acm)
 	{
 		try {
-			// execute the control only of the heater is still ON
+			// execute the control only if the heater is still ON
 			AirConditioningState s = AirConditioningState.OFF;
 			synchronized (this.stateLock) {
 				s = this.currentState;
@@ -477,7 +477,6 @@ implements 	AirConditioningPushImplementationI{
 
 				double current = td.getMeasure().getCurrentTemperature();
 				double target = td.getMeasure().getTargetTemperature();
-				System.out.println("currentTemp: "+ current + " | targetTemp: "+ target + this.hysteresis);
 				this.oneControlStep(current, target, s);
 
 				// schedule the next execution of the loop
