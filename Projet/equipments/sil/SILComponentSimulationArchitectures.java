@@ -87,25 +87,23 @@ public abstract class	SILComponentSimulationArchitectures
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
 															new HashMap<>();
 		
-//		atomicModelDescriptors.put(
-//				LampStateModel.SIL_URI,
-//				RTComponentAtomicModelDescriptor.create(
-//						LampStateModel.SIL_URI,
-//						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class
-//						},
-//						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class
-//						},
-//						TimeUnit.HOURS,
-//						Lamp.REFLECTION_INBOUND_PORT_URI
-//						));
+		atomicModelDescriptors.put(
+				LampStateModel.SIL_URI,
+				RTComponentAtomicModelDescriptor.create(
+						LampStateModel.SIL_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class},
+						TimeUnit.HOURS,
+						Lamp.REFLECTION_INBOUND_PORT_URI
+						));
 
 		atomicModelDescriptors.put(
 				AirConditioningCoupledModel.SIL_URI,
@@ -127,10 +125,10 @@ public abstract class	SILComponentSimulationArchitectures
 				RTComponentAtomicModelDescriptor.create(
 						ElectricMeterCoupledModel.SIL_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class,
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class,
 							SetPowerAirConditioning.class,
 							SwitchOnAirConditioning.class,
 							SwitchOffAirConditioning.class,
@@ -147,7 +145,7 @@ public abstract class	SILComponentSimulationArchitectures
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
-//		submodels.add(LampStateModel.SIL_URI);
+		submodels.add(LampStateModel.SIL_URI);
 		submodels.add(AirConditioningCoupledModel.SIL_URI);
 		submodels.add(ElectricMeterCoupledModel.SIL_URI);
 
@@ -158,34 +156,34 @@ public abstract class	SILComponentSimulationArchitectures
 
 		// first, the events going from the cooking plate to the electric meter
 		// LAMP connections
-//		connections.put(
-//				new EventSource(LampStateModel.SIL_URI,
-//								SwitchOnLamp.class),
-//				new EventSink[] {
-//					new EventSink(ElectricMeterCoupledModel.SIL_URI,
-//								  SwitchOnLamp.class)
-//				});
-//			connections.put(
-//				new EventSource(LampStateModel.SIL_URI,
-//								SwitchOffLamp.class),
-//				new EventSink[] {
-//					new EventSink(ElectricMeterCoupledModel.SIL_URI,
-//								  SwitchOffLamp.class)
-//				});
-//			connections.put(
-//				new EventSource(LampStateModel.SIL_URI,
-//								DecreaseLamp.class),
-//				new EventSink[] {
-//					new EventSink(ElectricMeterCoupledModel.SIL_URI,
-//								  DecreaseLamp.class)
-//				});
-//			connections.put(
-//				new EventSource(LampStateModel.SIL_URI,
-//								IncreaseLamp.class),
-//				new EventSink[] {
-//					new EventSink(ElectricMeterCoupledModel.SIL_URI,
-//								  IncreaseLamp.class)
-//				});
+		connections.put(
+				new EventSource(LampStateModel.SIL_URI,
+								SwitchOnLamp.class),
+				new EventSink[] {
+					new EventSink(ElectricMeterCoupledModel.SIL_URI,
+								  SwitchOnLamp.class)
+				});
+			connections.put(
+				new EventSource(LampStateModel.SIL_URI,
+								SwitchOffLamp.class),
+				new EventSink[] {
+					new EventSink(ElectricMeterCoupledModel.SIL_URI,
+								  SwitchOffLamp.class)
+				});
+			connections.put(
+				new EventSource(LampStateModel.SIL_URI,
+								DecreaseLamp.class),
+				new EventSink[] {
+					new EventSink(ElectricMeterCoupledModel.SIL_URI,
+								  DecreaseLamp.class)
+				});
+			connections.put(
+				new EventSource(LampStateModel.SIL_URI,
+								IncreaseLamp.class),
+				new EventSink[] {
+					new EventSink(ElectricMeterCoupledModel.SIL_URI,
+								  IncreaseLamp.class)
+				});
 
 		// second, the events going from the AirConditioning to the electric meter
 		connections.put(

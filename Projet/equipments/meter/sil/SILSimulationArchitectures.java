@@ -12,7 +12,14 @@ import equipments.AirConditioning.mil.events.DoNotCool;
 import equipments.AirConditioning.mil.events.SetPowerAirConditioning;
 import equipments.AirConditioning.mil.events.SwitchOffAirConditioning;
 import equipments.AirConditioning.mil.events.SwitchOnAirConditioning;
+import equipments.Lamp.mil.LampElectricityModel;
+import equipments.Lamp.mil.events.DecreaseLamp;
+import equipments.Lamp.mil.events.IncreaseLamp;
+import equipments.Lamp.mil.events.SwitchOffLamp;
+import equipments.Lamp.mil.events.SwitchOnLamp;
 import equipments.meter.mil.ElectricMeterCoupledModel;
+import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.HairDryerElectricityModel;
+import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.events.SwitchOnHairDryer;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.RTArchitecture;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.HIOA_Composer;
@@ -89,6 +96,14 @@ public abstract class	SILSimulationArchitectures
 						null,
 						accelerationFactor));
 		atomicModelDescriptors.put(
+				LampElectricityModel.SIL_URI,
+				RTAtomicHIOA_Descriptor.create(
+						LampElectricityModel.class,
+						LampElectricityModel.SIL_URI,
+						TimeUnit.HOURS,
+						null,
+						accelerationFactor));
+		atomicModelDescriptors.put(
 				AirConditioningElectricityModel.SIL_URI,
 				RTAtomicHIOA_Descriptor.create(
 						AirConditioningElectricityModel.class,
@@ -105,10 +120,34 @@ public abstract class	SILSimulationArchitectures
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(ElectricMeterElectricitySILModel.SIL_URI);
-//		submodels.add(LampElectricityModel.SIL_URI);
+		submodels.add(LampElectricityModel.SIL_URI);
 		submodels.add(AirConditioningElectricityModel.SIL_URI);
 
 		Map<Class<? extends EventI>,EventSink[]> imported = new HashMap<>();
+		imported.put(
+				SwitchOnLamp.class,
+				new EventSink[] {
+					new EventSink(LampElectricityModel.SIL_URI,
+								  SwitchOnLamp.class)
+				});
+		imported.put(
+			SwitchOffLamp.class,
+			new EventSink[] {
+				new EventSink(LampElectricityModel.SIL_URI,
+								SwitchOffLamp.class)
+			});
+		imported.put(
+			DecreaseLamp.class,
+			new EventSink[] {
+				new EventSink(LampElectricityModel.SIL_URI,
+								DecreaseLamp.class)
+			});
+		imported.put(
+			IncreaseLamp.class,
+			new EventSink[] {
+				new EventSink(LampElectricityModel.SIL_URI,
+								IncreaseLamp.class)
+			});
 
 		imported.put(
 				SetPowerAirConditioning.class,
@@ -144,15 +183,15 @@ public abstract class	SILSimulationArchitectures
 		// variable bindings between exporting and importing models
 		Map<VariableSource,VariableSink[]> bindings =
 								new HashMap<VariableSource,VariableSink[]>();
-//		bindings.put(
-//				new VariableSource("currentIntensity",
-//								   Double.class,
-//								   HairDryerElectricityModel.SIL_URI),
-//				new VariableSink[] {
-//					new VariableSink("currentHairDryerIntensity",
-//									 Double.class,
-//									 ElectricMeterElectricitySILModel.SIL_URI)
-//				});
+		bindings.put(
+				new VariableSource("currentIntensity",
+								   Double.class,
+								   LampElectricityModel.SIL_URI),
+				new VariableSink[] {
+					new VariableSink("currentLampIntensity",
+									 Double.class,
+									 ElectricMeterElectricitySILModel.SIL_URI)
+				});
 
 		bindings.put(
 				new VariableSource("currentIntensity",

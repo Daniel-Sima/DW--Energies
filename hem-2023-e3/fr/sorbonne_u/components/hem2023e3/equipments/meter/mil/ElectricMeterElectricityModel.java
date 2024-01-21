@@ -194,7 +194,7 @@ extends		AtomicHIOA
 	{
 		double c = this.currentCumulativeConsumption.getValue();
 		c += Electricity.computeConsumption(
-							d, TENSION*this.currentPowerConsumption.getValue());
+				d, TENSION*this.currentPowerConsumption.getValue());
 		Time t = this.currentCumulativeConsumption.getTime().add(d);
 		this.currentCumulativeConsumption.setNewValue(c, t);
 	}

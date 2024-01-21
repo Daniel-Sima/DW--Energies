@@ -127,8 +127,8 @@ extends		AbstractCVM
 		// execution that is required.
 		// URI of the simulation architecture for the current run, if relevant.
 		String architectureURI = "";
-//		String lampLocalSimulatorURI = "";
-//		String lampUserLocalSimulatorURI = "";
+		String lampLocalSimulatorURI = "";
+		String lampUserLocalSimulatorURI = "";
 		String airConditioningLocalSimulatorURI = "";
 		String meterLocalSimulatorURI = "";
 		// acceleration factor for the current run, if relevant.
@@ -146,8 +146,8 @@ extends		AbstractCVM
 		switch (CURRENT_EXECUTION_TYPE) {
 		case MIL_SIMULATION:
 			architectureURI = GlobalSupervisor.MIL_SIM_ARCHITECTURE_URI;
-//			lampLocalSimulatorURI = LampStateModel.MIL_URI;
-//			lampUserLocalSimulatorURI = LampUserModel.MIL_URI;
+			lampLocalSimulatorURI = LampStateModel.MIL_URI;
+			lampUserLocalSimulatorURI = LampUserModel.MIL_URI;
 			airConditioningLocalSimulatorURI = AirConditioningCoupledModel.MIL_URI;
 			meterLocalSimulatorURI = ElectricMeterCoupledModel.MIL_URI;
 			accelerationFactor = ACCELERATION_FACTOR;
@@ -158,8 +158,8 @@ extends		AbstractCVM
 			break;
 		case MIL_RT_SIMULATION:
 			architectureURI = GlobalSupervisor.MIL_SIM_ARCHITECTURE_URI;
-//			lampLocalSimulatorURI = LampStateModel.MIL_RT_URI;
-//			lampUserLocalSimulatorURI = LampUserModel.MIL_RT_URI;
+			lampLocalSimulatorURI = LampStateModel.MIL_RT_URI;
+			lampUserLocalSimulatorURI = LampUserModel.MIL_RT_URI;
 			airConditioningLocalSimulatorURI = AirConditioningCoupledModel.MIL_RT_URI;
 			meterLocalSimulatorURI = ElectricMeterCoupledModel.MIL_RT_URI;
 			accelerationFactor = ACCELERATION_FACTOR;
@@ -170,8 +170,8 @@ extends		AbstractCVM
 			break;
 		case SIL_SIMULATION:
 			architectureURI = GlobalSupervisor.SIL_SIM_ARCHITECTURE_URI;
-//			lampLocalSimulatorURI = LampStateModel.SIL_URI;
-//			lampUserLocalSimulatorURI = "not-used";
+			lampLocalSimulatorURI = LampStateModel.SIL_URI;
+			lampUserLocalSimulatorURI = "not-used";
 			airConditioningLocalSimulatorURI = AirConditioningCoupledModel.SIL_URI;
 			meterLocalSimulatorURI = ElectricMeterCoupledModel.SIL_URI;
 			accelerationFactor = ACCELERATION_FACTOR;
@@ -190,22 +190,22 @@ extends		AbstractCVM
 		default:
 		}
 
-//		AbstractComponent.createComponent(
-//				Lamp.class.getCanonicalName(),
-//				new Object[]{Lamp.REFLECTION_INBOUND_PORT_URI,
-//							 Lamp.INBOUND_PORT_URI,
-//							 CURRENT_EXECUTION_TYPE,
-//							 architectureURI,
-//							 lampLocalSimulatorURI,
-//							 accelerationFactor});
-//		AbstractComponent.createComponent(
-//				LampUser.class.getCanonicalName(),
-//				new Object[]{LampUser.REFLECTION_INBOUND_PORT_URI,
-//							 Lamp.INBOUND_PORT_URI,
-//							 CURRENT_EXECUTION_TYPE,
-//							 architectureURI,
-//							 lampUserLocalSimulatorURI,
-//							 accelerationFactor});
+		AbstractComponent.createComponent(
+				Lamp.class.getCanonicalName(),
+				new Object[]{Lamp.REFLECTION_INBOUND_PORT_URI,
+							 Lamp.INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 architectureURI,
+							 lampLocalSimulatorURI,
+							 accelerationFactor});
+		AbstractComponent.createComponent(
+				LampUser.class.getCanonicalName(),
+				new Object[]{LampUser.REFLECTION_INBOUND_PORT_URI,
+							 Lamp.INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 architectureURI,
+							 lampUserLocalSimulatorURI,
+							 accelerationFactor});
 
 		AbstractComponent.createComponent(
 				AirConditioning.class.getCanonicalName(),

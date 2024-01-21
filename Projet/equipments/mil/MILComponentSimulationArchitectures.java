@@ -42,6 +42,21 @@ import global.GlobalSupervisor;
 
 public abstract class MILComponentSimulationArchitectures {
 
+	/**
+	 * create the global MIL component simulation architecture for the HEM
+	 * application.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code true}	// no precondition.
+	 * post	{@code true}	// no postcondition.
+	 * </pre>
+	 *
+	 * @param architectureURI	URI of the component model architecture to be created.
+	 * @return					the global MIL simulation  architecture for the HEM application.
+	 * @throws Exception		<i>to do</i>.
+	 */
 	@SuppressWarnings("unchecked")
 	public static ComponentModelArchitecture createMILComponentSimulationArchitectures(
 				String architectureURI
@@ -52,35 +67,35 @@ public abstract class MILComponentSimulationArchitectures {
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
 									new HashMap<>();
 
-//		atomicModelDescriptors.put(
-//				LampStateModel.MIL_URI,
-//				ComponentAtomicModelDescriptor.create(
-//						LampStateModel.MIL_URI,
-//						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class},
-//						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class},
-//						TimeUnit.HOURS,
-//						Lamp.REFLECTION_INBOUND_PORT_URI
-//						));
-//		atomicModelDescriptors.put(
-//				LampUserModel.MIL_URI,
-//				ComponentAtomicModelDescriptor.create(
-//						LampUserModel.MIL_URI,
-//						null,
-//						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class},
-//						TimeUnit.HOURS,
-//						LampUser.REFLECTION_INBOUND_PORT_URI));
+		atomicModelDescriptors.put(
+				LampStateModel.MIL_URI,
+				ComponentAtomicModelDescriptor.create(
+						LampStateModel.MIL_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class},
+						TimeUnit.HOURS,
+						Lamp.REFLECTION_INBOUND_PORT_URI
+						));
+		atomicModelDescriptors.put(
+				LampUserModel.MIL_URI,
+				ComponentAtomicModelDescriptor.create(
+						LampUserModel.MIL_URI,
+						null,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class},
+						TimeUnit.HOURS,
+						LampUser.REFLECTION_INBOUND_PORT_URI));
 		atomicModelDescriptors.put(
 				AirConditioningCoupledModel.MIL_URI,
 				ComponentAtomicModelDescriptor.create(
@@ -99,10 +114,10 @@ public abstract class MILComponentSimulationArchitectures {
 				ComponentAtomicModelDescriptor.create(
 						ElectricMeterCoupledModel.MIL_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class,
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class,
 							SetPowerAirConditioning.class,
 							SwitchOnAirConditioning.class,
 							SwitchOffAirConditioning.class,
@@ -121,8 +136,8 @@ public abstract class MILComponentSimulationArchitectures {
 		// TODO
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
-//		submodels.add(LampStateModel.MIL_URI);
-//		submodels.add(LampUserModel.MIL_URI);
+		submodels.add(LampStateModel.MIL_URI);
+		submodels.add(LampUserModel.MIL_URI);
 		submodels.add(AirConditioningCoupledModel.MIL_URI);
 		submodels.add(ElectricMeterCoupledModel.MIL_URI);
 		
@@ -135,63 +150,63 @@ public abstract class MILComponentSimulationArchitectures {
 		// first, the events going from the lamp to the electric meter
 		
 	    // LAMP connections
-//		connections.put(
-//				new EventSource(LampUserModel.MIL_URI,
-//								SwitchOnLamp.class),
-//				new EventSink[] {
-//					new EventSink(LampStateModel.MIL_URI,
-//								  SwitchOnLamp.class)
-//				});
-//			connections.put(
-//				new EventSource(LampUserModel.MIL_URI,
-//								SwitchOffLamp.class),
-//				new EventSink[] {
-//					new EventSink(LampStateModel.MIL_URI,
-//								  SwitchOffLamp.class)
-//				});
-//			connections.put(
-//				new EventSource(LampUserModel.MIL_URI,
-//								DecreaseLamp.class),
-//					new EventSink[] {
-//					new EventSink(LampStateModel.MIL_URI,
-//							DecreaseLamp.class)
-//				});
-//			connections.put(
-//				new EventSource(LampUserModel.MIL_URI,
-//								IncreaseLamp.class),
-//				new EventSink[] {
-//					new EventSink(LampStateModel.MIL_URI,
-//							IncreaseLamp.class)
-//				});
-//
-//			connections.put(
-//				new EventSource(LampStateModel.MIL_URI,
-//								SwitchOnLamp.class),
-//				new EventSink[] {
-//					new EventSink(ElectricMeterCoupledModel.MIL_URI,
-//								  SwitchOnLamp.class)
-//				});
-//			connections.put(
-//				new EventSource(LampStateModel.MIL_URI,
-//								SwitchOffLamp.class),
-//				new EventSink[] {
-//					new EventSink(ElectricMeterCoupledModel.MIL_URI,
-//								  SwitchOffLamp.class)
-//				});
-//			connections.put(
-//				new EventSource(LampStateModel.MIL_URI,
-//						DecreaseLamp.class),
-//				new EventSink[] {
-//					new EventSink(ElectricMeterCoupledModel.MIL_URI,
-//							DecreaseLamp.class)
-//				});
-//			connections.put(
-//				new EventSource(LampStateModel.MIL_URI,
-//						IncreaseLamp.class),
-//				new EventSink[] {
-//					new EventSink(ElectricMeterCoupledModel.MIL_URI,
-//							IncreaseLamp.class)
-//				});
+		connections.put(
+				new EventSource(LampUserModel.MIL_URI,
+								SwitchOnLamp.class),
+				new EventSink[] {
+					new EventSink(LampStateModel.MIL_URI,
+								  SwitchOnLamp.class)
+				});
+			connections.put(
+				new EventSource(LampUserModel.MIL_URI,
+								SwitchOffLamp.class),
+				new EventSink[] {
+					new EventSink(LampStateModel.MIL_URI,
+								  SwitchOffLamp.class)
+				});
+			connections.put(
+				new EventSource(LampUserModel.MIL_URI,
+								DecreaseLamp.class),
+					new EventSink[] {
+					new EventSink(LampStateModel.MIL_URI,
+							DecreaseLamp.class)
+				});
+			connections.put(
+				new EventSource(LampUserModel.MIL_URI,
+								IncreaseLamp.class),
+				new EventSink[] {
+					new EventSink(LampStateModel.MIL_URI,
+							IncreaseLamp.class)
+				});
+
+			connections.put(
+				new EventSource(LampStateModel.MIL_URI,
+								SwitchOnLamp.class),
+				new EventSink[] {
+					new EventSink(ElectricMeterCoupledModel.MIL_URI,
+								  SwitchOnLamp.class)
+				});
+			connections.put(
+				new EventSource(LampStateModel.MIL_URI,
+								SwitchOffLamp.class),
+				new EventSink[] {
+					new EventSink(ElectricMeterCoupledModel.MIL_URI,
+								  SwitchOffLamp.class)
+				});
+			connections.put(
+				new EventSource(LampStateModel.MIL_URI,
+						DecreaseLamp.class),
+				new EventSink[] {
+					new EventSink(ElectricMeterCoupledModel.MIL_URI,
+							DecreaseLamp.class)
+				});
+			connections.put(
+				new EventSource(LampStateModel.MIL_URI,
+						IncreaseLamp.class),
+				new EventSink[] {
+					new EventSink(ElectricMeterCoupledModel.MIL_URI,
+							IncreaseLamp.class)
+				});
 									
 		// AIR CONDITIONING conditions
 		connections.put(
@@ -284,35 +299,35 @@ public abstract class MILComponentSimulationArchitectures {
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
 															new HashMap<>();
 
-//		atomicModelDescriptors.put(
-//				LampStateModel.MIL_RT_URI,
-//				RTComponentAtomicModelDescriptor.create(
-//						LampStateModel.MIL_RT_URI,
-//						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class},
-//						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class},
-//						TimeUnit.HOURS,
-//						Lamp.REFLECTION_INBOUND_PORT_URI
-//						));
-//		atomicModelDescriptors.put(
-//				LampUserModel.MIL_RT_URI,
-//				RTComponentAtomicModelDescriptor.create(
-//						LampUserModel.MIL_RT_URI,
-//						(Class<? extends EventI>[]) new Class<?>[]{},
-//						(Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class},
-//						TimeUnit.HOURS,
-//						LampUser.REFLECTION_INBOUND_PORT_URI));
+		atomicModelDescriptors.put(
+				LampStateModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						LampStateModel.MIL_RT_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class},
+						TimeUnit.HOURS,
+						Lamp.REFLECTION_INBOUND_PORT_URI
+						));
+		atomicModelDescriptors.put(
+				LampUserModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						LampUserModel.MIL_RT_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class},
+						TimeUnit.HOURS,
+						LampUser.REFLECTION_INBOUND_PORT_URI));
 
 		atomicModelDescriptors.put(
 				AirConditioningCoupledModel.MIL_RT_URI,
@@ -332,13 +347,12 @@ public abstract class MILComponentSimulationArchitectures {
 				ElectricMeterCoupledModel.MIL_RT_URI,
 				RTComponentAtomicModelDescriptor.create(
 						ElectricMeterCoupledModel.MIL_RT_URI,
-						// (Class<? extends EventI>[]) new Class<?>[]{
-//							SwitchOnLamp.class,
-//							SwitchOffLamp.class,
-//							DecreaseLamp.class,
-//							IncreaseLamp.class,},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnLamp.class,
+							SwitchOffLamp.class,
+							DecreaseLamp.class,
+							IncreaseLamp.class},
 						(Class<? extends EventI>[]) new Class<?>[]{},
-						null,
 						TimeUnit.HOURS,
 						ElectricMeter.REFLECTION_INBOUND_PORT_URI));
 
@@ -349,8 +363,8 @@ public abstract class MILComponentSimulationArchitectures {
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
-//		submodels.add(LampStateModel.MIL_RT_URI);
-//		submodels.add(LampUserModel.MIL_RT_URI);
+		submodels.add(LampStateModel.MIL_RT_URI);
+		submodels.add(LampUserModel.MIL_RT_URI);
 		submodels.add(AirConditioningElectricityModel.MIL_RT_URI);
 		submodels.add(ElectricMeterElectricityModel.MIL_RT_URI);
 
@@ -358,63 +372,63 @@ public abstract class MILComponentSimulationArchitectures {
 		// models
 		Map<EventSource,EventSink[]> connections =
 									new HashMap<EventSource,EventSink[]>();
-//		connections.put(
-//			new EventSource(LampUserModel.MIL_RT_URI,
-//							SwitchOnLamp.class),
-//			new EventSink[] {
-//				new EventSink(LampStateModel.MIL_RT_URI,
-//							  SwitchOnLamp.class)
-//			});
-//		connections.put(
-//			new EventSource(LampUserModel.MIL_RT_URI,
-//							SwitchOffLamp.class),
-//			new EventSink[] {
-//				new EventSink(LampStateModel.MIL_RT_URI,
-//							  SwitchOffLamp.class)
-//			});
-//		connections.put(
-//			new EventSource(LampUserModel.MIL_RT_URI,
-//							DecreaseLamp.class),
-//				new EventSink[] {
-//				new EventSink(LampStateModel.MIL_RT_URI,
-//							  DecreaseLamp.class)
-//			});
-//		connections.put(
-//			new EventSource(LampUserModel.MIL_RT_URI,
-//							IncreaseLamp.class),
-//			new EventSink[] {
-//				new EventSink(LampStateModel.MIL_RT_URI,
-//							  IncreaseLamp.class)
-//			});
+		connections.put(
+			new EventSource(LampUserModel.MIL_RT_URI,
+							SwitchOnLamp.class),
+			new EventSink[] {
+				new EventSink(LampStateModel.MIL_RT_URI,
+							  SwitchOnLamp.class)
+			});
+		connections.put(
+			new EventSource(LampUserModel.MIL_RT_URI,
+							SwitchOffLamp.class),
+			new EventSink[] {
+				new EventSink(LampStateModel.MIL_RT_URI,
+							  SwitchOffLamp.class)
+			});
+		connections.put(
+			new EventSource(LampUserModel.MIL_RT_URI,
+							DecreaseLamp.class),
+				new EventSink[] {
+				new EventSink(LampStateModel.MIL_RT_URI,
+							  DecreaseLamp.class)
+			});
+		connections.put(
+			new EventSource(LampUserModel.MIL_RT_URI,
+							IncreaseLamp.class),
+			new EventSink[] {
+				new EventSink(LampStateModel.MIL_RT_URI,
+							  IncreaseLamp.class)
+			});
 //
-//		connections.put(
-//			new EventSource(LampStateModel.MIL_RT_URI,
-//							SwitchOnLamp.class),
-//			new EventSink[] {
-//				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-//							  SwitchOnLamp.class)
-//			});
-//		connections.put(
-//			new EventSource(LampStateModel.MIL_RT_URI,
-//							SwitchOffLamp.class),
-//			new EventSink[] {
-//				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-//							  SwitchOffLamp.class)
-//			});
-//		connections.put(
-//			new EventSource(LampStateModel.MIL_RT_URI,
-//							DecreaseLamp.class),
-//			new EventSink[] {
-//				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-//							  DecreaseLamp.class)
-//			});
-//		connections.put(
-//			new EventSource(LampStateModel.MIL_RT_URI,
-//							IncreaseLamp.class),
-//			new EventSink[] {
-//				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-//							  IncreaseLamp.class)
-//			});
+		connections.put(
+			new EventSource(LampStateModel.MIL_RT_URI,
+							SwitchOnLamp.class),
+			new EventSink[] {
+				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+							  SwitchOnLamp.class)
+			});
+		connections.put(
+			new EventSource(LampStateModel.MIL_RT_URI,
+							SwitchOffLamp.class),
+			new EventSink[] {
+				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+							  SwitchOffLamp.class)
+			});
+		connections.put(
+			new EventSource(LampStateModel.MIL_RT_URI,
+							DecreaseLamp.class),
+			new EventSink[] {
+				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+							  DecreaseLamp.class)
+			});
+		connections.put(
+			new EventSource(LampStateModel.MIL_RT_URI,
+							IncreaseLamp.class),
+			new EventSink[] {
+				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+							  IncreaseLamp.class)
+			});
 
 		connections.put(
 				new EventSource(AirConditioningCoupledModel.MIL_RT_URI,

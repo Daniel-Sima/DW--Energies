@@ -48,6 +48,10 @@ extends AtomicModel {
 	private static final long serialVersionUID = 1L;
 	/** URI for a model; works when only one instance is created.			*/
 	public static final String	URI = SolarPanelUnitTesterModel.class.getSimpleName();
+	/** URI for a model; works when the MIL RT instance is created.			*/
+	public static final String	MIL_RT_URI = URI + "-MIL-RT";
+	/** URI for a model; works when the SIL instance is created.			*/
+	public static final String	SIL_URI = URI + "-SIL";
 
 	/** steps in the test scenario.											*/
 	protected int step;

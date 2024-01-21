@@ -64,15 +64,18 @@ import utils.Electricity;
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
 //@ModelImportedVariable(name = "currentCookingPlateIntensity", type = Double.class)
-//@ModelImportedVariable(name = "currentLampIntensity", type = Double.class)
-@ModelImportedVariable(name = "currentAirConditioningIntensity", type = Double.class)
+@ModelImportedVariable(name = "currentLampIntensity", 
+						type = Double.class)
+@ModelImportedVariable(name = "currentAirConditioningIntensity", 
+						type = Double.class)
 ////@ModelImportedVariable(name = "currentFridgeIntensity", type = Double.class) 
 //
 //@ModelImportedVariable(name = "currentPowerProducedSolarPanel", type = Double.class)
 //@ModelImportedVariable(name = "currentPowerProducedPetrolGenerator", type = Double.class)
 //
 //@ModelExportedVariable(name = "currentTotalPowerProduced", type = Double.class)
-@ModelExportedVariable(name = "currentTotalPowerConsumed", type = Double.class)
+@ModelExportedVariable(name = "currentTotalPowerConsumed", 
+						type = Double.class)
 public class ElectricMeterElectricityModel 
 extends AtomicHIOA {
 	// -------------------------------------------------------------------------
@@ -111,8 +114,8 @@ extends AtomicHIOA {
 //	protected Value<Double> currentCookingPlateIntensity;
 	
 	/** current intensity of the Lamp in amperes.							*/
-//	@ImportedVariable(type = Double.class)
-//	protected Value<Double> currentLampIntensity;
+	@ImportedVariable(type = Double.class)
+	protected Value<Double> currentLampIntensity;
 
 	/** current intensity of the Air Conditioning amperes.					*/
 	@ImportedVariable(type = Double.class)
@@ -140,7 +143,8 @@ extends AtomicHIOA {
 	
 	/** the current total power produced by the producers					*/
 	@ExportedVariable(type = Double.class)
-	protected final Value<Double> currentTotalPowerConsumed = new Value<Double>(this);
+	protected final Value<Double> currentTotalPowerConsumed = 
+											new Value<Double>(this);
 	
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -186,7 +190,8 @@ extends AtomicHIOA {
 	 *
 	 * @param d	duration for which the intensity has been maintained.
 	 */
-	protected void updateConsumption(Duration d) {
+	protected void updateConsumption(Duration d) 
+	{
 		double c = this.currentTotalPowerConsumed.getValue();
 		c += Electricity.computeConsumption(
 				d, TENSION*this.currentIntensity.getValue()*1000.0);
@@ -240,13 +245,9 @@ extends AtomicHIOA {
 	 */
 	protected double computeTotalIntensity() {
 		// simple sum of all incoming intensities
-//		double i = this.currentCookingPlateIntensity.getValue() +
-//				this.currentLampIntensity.getValue() +
-//				this.currentAirConditioningIntensity.getValue() + 
-//				this.currentFridgeIntensity.getValue();
-		double i = /*this.currentCookingPlateIntensity.getValue() +*/ 
-//				this.currentLampIntensity.getValue();
-				this.currentAirConditioningIntensity.getValue();
+		double i = 	this.currentLampIntensity.getValue() +
+					this.currentAirConditioningIntensity.getValue();
+					/*this.currentCookingPlateIntensity.getValue() +*/
 				
 		// Tracing
 		if (this.currentIntensity.isInitialised()) {
@@ -277,17 +278,18 @@ extends AtomicHIOA {
 	 * @see fr.sorbonne_u.devs_simulation.hioa.models.interfaces.VariableInitialisationI#fixpointInitialiseVariables()
 	 */
 	@Override
-	public Pair<Integer, Integer> fixpointInitialiseVariables() {
+	public Pair<Integer, Integer> fixpointInitialiseVariables() 
+	{
 		int justInitialised = 0;
 		int notInitialisedYet = 0;
 
-		if (!this.currentIntensity.isInitialised() &&
-//				this.currentCookingPlateIntensity.isInitialised() &&
-//				this.currentLampIntensity.isInitialised() &&
-				this.currentAirConditioningIntensity.isInitialised()
-//				&& this.currentFridgeIntensity.isInitialised() && 
-//				this.currentPowerProducedSolarPanel.isInitialised() && 
-//				this.currentPowerProducedPetrolGenerator.isInitialised()
+		if (!this.currentIntensity.isInitialised()
+//				&& this.currentCookingPlateIntensity.isInitialised() 
+				&& this.currentLampIntensity.isInitialised() 
+				&& this.currentAirConditioningIntensity.isInitialised()
+//				&& this.currentFridgeIntensity.isInitialised()
+//				&& this.currentPowerProducedSolarPanel.isInitialised()
+//				&& this.currentPowerProducedPetrolGenerator.isInitialised()
 				) {
 			double i = this.computeTotalIntensity();
 			this.currentIntensity.initialise(i);
@@ -323,10 +325,10 @@ extends AtomicHIOA {
 	/***********************************************************************************/
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
-	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedInternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
 	 */
 	@Override
-	public void userDefinedInternalTransition(Duration elapsedTime) {
+	public void userDefinedInternalTransition(Duration elapsedTime) 
+	{
 		super.userDefinedInternalTransition(elapsedTime);
 
 		// update the current consumption since the last consumption update.
@@ -352,8 +354,9 @@ extends AtomicHIOA {
 		// must capture the current consumption before the finalisation
 		// reinitialise the internal model variable.
 		this.finalReport = new ElectricMeterElectricityReport(
-				MIL_URI,
-				this.currentTotalPowerConsumed.getValue()/1000.0,0 // TODO AV
+				this.getURI(),
+				this.currentTotalPowerConsumed.getValue()/1000.0,
+				0.0
 //				this.currentTotalPowerProduced.getValue()/1000.0  // TODO AV
 				);
 
@@ -446,8 +449,8 @@ extends AtomicHIOA {
 			ret.append('|');
 			ret.append("total consumption in kwh = ");
 			ret.append(this.totalConsumption);
-			ret.append("\n  |total production in kwh = ");
-			ret.append(this.totalProduction);
+			// ret.append("\n  |total production in kwh = ");
+			// ret.append(this.totalProduction);
 			ret.append(".\n");
 			ret.append(indent);
 			ret.append("---\n");

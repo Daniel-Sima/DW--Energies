@@ -42,7 +42,6 @@ import equipments.Lamp.mil.events.DecreaseLamp;
 import equipments.Lamp.mil.events.IncreaseLamp;
 import equipments.Lamp.mil.events.SwitchOffLamp;
 import equipments.Lamp.mil.events.SwitchOnLamp;
-import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.HairDryerUserModel;
 import fr.sorbonne_u.devs_simulation.es.events.ES_EventI;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;

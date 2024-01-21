@@ -10,11 +10,13 @@ import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.CoupledHIOA_Descriptor;
+import fr.sorbonne_u.devs_simulation.hioa.architectures.RTCoupledHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.VariableSink;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.VariableSource;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.AtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor;
+import fr.sorbonne_u.devs_simulation.models.architectures.RTAtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 
@@ -65,44 +67,49 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
  * invariant	{@code true}	// no more invariant
  * </pre>
  * 
- * <p>Created on : 2023-11-11</p>
- * 
- * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
+ * @author <a href="mailto:walter.abeles@etu.sorbonne-universite.fr">Walter ABELES</a>
  */
-public class RunSolarPanelUnitarySimulation {
+public class        RunSolarPanelUnitaryMILRTSimulation 
+{
+	public static final double			ACCELERATION_FACTOR = 1800.0;
+
 	public static void main(String[] args)
 	{
 		try {
 			// map that will contain the atomic model descriptors to construct
 			// the simulation architecture
-			Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors = new HashMap<>();
+			Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
+                                                             new HashMap<>();
 
 			// the solar panel models simulating its electricity consumption
 			//	and the external weather are atomic HIOA models
 			// hence we use an AtomicHIOA_Descriptor(s)
 			atomicModelDescriptors.put(
-					SolarPanelElectricityModel.URI,
-					AtomicHIOA_Descriptor.create(
+					SolarPanelElectricityModel.MIL_RT_URI,
+					RTAtomicModelDescriptor.create(
 							SolarPanelElectricityModel.class,
-							SolarPanelElectricityModel.URI,
+							SolarPanelElectricityModel.MIL_RT_URI,
 							TimeUnit.HOURS,
-							null));
+							null,
+							ACCELERATION_FACTOR));
 			atomicModelDescriptors.put(
-					ExternalWeatherModel.URI,
-					AtomicHIOA_Descriptor.create(
+					ExternalWeatherModel.MIL_RT_URI,
+					RTAtomicModelDescriptor.create(
 							ExternalWeatherModel.class,
-							ExternalWeatherModel.URI,
+							ExternalWeatherModel.MIL_RT_URI,
 							TimeUnit.HOURS,
-							null));
+							null,
+							ACCELERATION_FACTOR));
 			// the solar panel unit tester model only exchanges event, an
 			// atomic model hence we use an AtomicModelDescriptor
 			atomicModelDescriptors.put(
-					SolarPanelUnitTesterModel.URI,
-					AtomicModelDescriptor.create(
+					SolarPanelUnitTesterModel.MIL_RT_URI,
+					RTAtomicModelDescriptor.create(
 							SolarPanelUnitTesterModel.class,
-							SolarPanelUnitTesterModel.URI,
+							SolarPanelUnitTesterModel.MIL_RT_URI,
 							TimeUnit.HOURS,
-							null));
+							null,
+							ACCELERATION_FACTOR));
 
 			// map that will contain the coupled model descriptors to construct
 			// the simulation architecture
@@ -111,29 +118,31 @@ public class RunSolarPanelUnitarySimulation {
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
-			submodels.add(SolarPanelElectricityModel.URI);
-			submodels.add(ExternalWeatherModel.URI);
-			submodels.add(SolarPanelUnitTesterModel.URI);
+			submodels.add(SolarPanelElectricityModel.MIL_RT_URI);
+			submodels.add(ExternalWeatherModel.MIL_RT_URI);
+			submodels.add(SolarPanelUnitTesterModel.MIL_RT_URI);
 
 			// variable bindings between exporting and importing models
 			Map<VariableSource,VariableSink[]> bindings =
 					new HashMap<VariableSource,VariableSink[]>();
 
-			bindings.put(new VariableSource("externalSolarIrradiance",
-					Double.class,
-					ExternalWeatherModel.URI),
-					new VariableSink[] {
-							new VariableSink("externalSolarIrradiance",
+			bindings.put(new VariableSource(
+									"externalSolarIrradiance",
 									Double.class,
-									SolarPanelElectricityModel.URI)
-			});
+									ExternalWeatherModel.MIL_RT_URI),
+						 new VariableSink[] {
+								new VariableSink(
+									"externalSolarIrradiance",
+									Double.class,
+									SolarPanelElectricityModel.MIL_RT_URI)
+						});
 
 			// coupled model descriptor
 			coupledModelDescriptors.put(
-					SolarPanelCoupledModel.URI,
-					new CoupledHIOA_Descriptor(
+					SolarPanelCoupledModel.MIL_RT_URI,
+					new RTCoupledHIOA_Descriptor(
 							SolarPanelCoupledModel.class,
-							SolarPanelCoupledModel.URI,
+							SolarPanelCoupledModel.MIL_RT_URI,
 							submodels,
 							null,
 							null,
@@ -141,24 +150,28 @@ public class RunSolarPanelUnitarySimulation {
 							null,
 							null,
 							null,
-							bindings));
+							bindings,
+							ACCELERATION_FACTOR));
 
 			// simulation architecture
 			ArchitectureI architecture =
 					new Architecture(
-							SolarPanelCoupledModel.URI,
+							SolarPanelCoupledModel.MIL_RT_URI,
 							atomicModelDescriptors,
 							coupledModelDescriptors,
 							TimeUnit.HOURS);
 
 			// create the simulator from the simulation architecture
 			SimulatorI se = architecture.constructSimulator();
-			// this add additional time at each simulation step in
-			// standard simulations (useful when debugging)
-			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 			// run a simulation with the simulation beginning at 0.0 and
 			// ending at 24.0
-			se.doStandAloneSimulation(0.0, 24.0);
+			long start = System.currentTimeMillis() + 100;
+			double simulationDuration = 24.1;
+			se.startRTSimulation(start, 0.0, simulationDuration);
+			long sleepTime =
+				(long)(TimeUnit.HOURS.toMillis(1) *
+								(simulationDuration/ACCELERATION_FACTOR));
+			Thread.sleep(sleepTime + 10000L);
 			System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;

@@ -92,13 +92,13 @@ public abstract class	MILSimulationArchitectures
 		// the ElectricMeter simulator to be able to share the variables
 		// containing their power consumptions.
 		
-//		atomicModelDescriptors.put(
-//				LampElectricityModel.MIL_URI,
-//				AtomicHIOA_Descriptor.create(
-//						LampElectricityModel.class,
-//						LampElectricityModel.MIL_URI,
-//						TimeUnit.HOURS,
-//						null));
+		atomicModelDescriptors.put(
+				LampElectricityModel.MIL_URI,
+				AtomicHIOA_Descriptor.create(
+						LampElectricityModel.class,
+						LampElectricityModel.MIL_URI,
+						TimeUnit.HOURS,
+						null));
 		
 		atomicModelDescriptors.put(
 				AirConditioningElectricityModel.MIL_URI,
@@ -116,36 +116,36 @@ public abstract class	MILSimulationArchitectures
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(ElectricMeterElectricityModel.MIL_URI);
-//		submodels.add(LampElectricityModel.MIL_URI);
+		submodels.add(LampElectricityModel.MIL_URI);
 		submodels.add(AirConditioningElectricityModel.MIL_URI);
 
 		// events imported from the HairDryer component model architecture
 		Map<Class<? extends EventI>,EventSink[]> imported = new HashMap<>();
 		
-//		imported.put(
-//				SwitchOnLamp.class,
-//				new EventSink[] {
-//					new EventSink(LampElectricityModel.MIL_URI,
-//								  SwitchOnLamp.class)
-//				});
-//		imported.put(
-//				SwitchOffLamp.class,
-//				new EventSink[] {
-//					new EventSink(LampElectricityModel.MIL_URI,
-//								  SwitchOffLamp.class)
-//				});
-//		imported.put(
-//				DecreaseLamp.class,
-//				new EventSink[] {
-//					new EventSink(LampElectricityModel.MIL_URI,
-//								  DecreaseLamp.class)
-//				});
-//		imported.put(
-//				IncreaseLamp.class,
-//				new EventSink[] {
-//					new EventSink(LampElectricityModel.MIL_URI,
-//								  IncreaseLamp.class)
-//				});
+		imported.put(
+				SwitchOnLamp.class,
+				new EventSink[] {
+					new EventSink(LampElectricityModel.MIL_URI,
+								  SwitchOnLamp.class)
+				});
+		imported.put(
+				SwitchOffLamp.class,
+				new EventSink[] {
+					new EventSink(LampElectricityModel.MIL_URI,
+								  SwitchOffLamp.class)
+				});
+		imported.put(
+				DecreaseLamp.class,
+				new EventSink[] {
+					new EventSink(LampElectricityModel.MIL_URI,
+								  DecreaseLamp.class)
+				});
+		imported.put(
+				IncreaseLamp.class,
+				new EventSink[] {
+					new EventSink(LampElectricityModel.MIL_URI,
+								  IncreaseLamp.class)
+				});
 		
 		
 		imported.put(
@@ -182,15 +182,15 @@ public abstract class	MILSimulationArchitectures
 		// variable bindings between exporting and importing models
 		Map<VariableSource,VariableSink[]> bindings =
 								new HashMap<VariableSource,VariableSink[]>();
-//		bindings.put(
-//				new VariableSource("currentIntensity",
-//								   Double.class,
-//								   LampElectricityModel.MIL_URI),
-//				new VariableSink[] {
-//					new VariableSink("currentLampIntensity",
-//									 Double.class,
-//									 ElectricMeterElectricityModel.MIL_URI)
-//				});
+		bindings.put(
+				new VariableSource("currentIntensity",
+								   Double.class,
+								   LampElectricityModel.MIL_URI),
+				new VariableSink[] {
+					new VariableSink("currentLampIntensity",
+									 Double.class,
+									 ElectricMeterElectricityModel.MIL_URI)
+				});
 		bindings.put(
 				new VariableSource("currentIntensity",
 								   Double.class,
@@ -264,14 +264,14 @@ public abstract class	MILSimulationArchitectures
 		// The electricity models of all appliances will need to be put within
 		// the ElectricMeter simulator to be able to share the variables
 		// containing their power consumptions.
-//		atomicModelDescriptors.put(
-//				LampElectricityModel.MIL_RT_URI,
-//				RTAtomicHIOA_Descriptor.create(
-//						LampElectricityModel.class,
-//						LampElectricityModel.MIL_RT_URI,
-//						TimeUnit.HOURS,
-//						null,
-//						accelerationFactor));
+		atomicModelDescriptors.put(
+				LampElectricityModel.MIL_RT_URI,
+				RTAtomicHIOA_Descriptor.create(
+						LampElectricityModel.class,
+						LampElectricityModel.MIL_RT_URI,
+						TimeUnit.HOURS,
+						null,
+						accelerationFactor));
 		atomicModelDescriptors.put(
 				AirConditioningElectricityModel.MIL_RT_URI,
 				RTAtomicHIOA_Descriptor.create(
@@ -289,35 +289,35 @@ public abstract class	MILSimulationArchitectures
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(ElectricMeterElectricityModel.MIL_RT_URI);
-//		submodels.add(LampElectricityModel.MIL_RT_URI);
+		submodels.add(LampElectricityModel.MIL_RT_URI);
 		submodels.add(AirConditioningElectricityModel.MIL_RT_URI);
 
 		Map<Class<? extends EventI>,EventSink[]> imported = new HashMap<>();
 
-//		imported.put(
-//				SwitchOnLamp.class,
-//				new EventSink[] {
-//						new EventSink(LampElectricityModel.MIL_RT_URI,
-//									  SwitchOnLamp.class)
-//				});
-//		imported.put(
-//				SwitchOffLamp.class,
-//				new EventSink[] {
-//						new EventSink(LampElectricityModel.MIL_RT_URI,
-//									  SwitchOffLamp.class)
-//				});
-//		imported.put(
-//				DecreaseLamp.class,
-//				new EventSink[] {
-//						new EventSink(LampElectricityModel.MIL_RT_URI,
-//									  DecreaseLamp.class)
-//				});
-//		imported.put(
-//				IncreaseLamp.class,
-//				new EventSink[] {
-//						new EventSink(LampElectricityModel.MIL_RT_URI,
-//									  IncreaseLamp.class)
-//				});
+		imported.put(
+				SwitchOnLamp.class,
+				new EventSink[] {
+						new EventSink(LampElectricityModel.MIL_RT_URI,
+									  SwitchOnLamp.class)
+				});
+		imported.put(
+				SwitchOffLamp.class,
+				new EventSink[] {
+						new EventSink(LampElectricityModel.MIL_RT_URI,
+									  SwitchOffLamp.class)
+				});
+		imported.put(
+				DecreaseLamp.class,
+				new EventSink[] {
+						new EventSink(LampElectricityModel.MIL_RT_URI,
+									  DecreaseLamp.class)
+				});
+		imported.put(
+				IncreaseLamp.class,
+				new EventSink[] {
+						new EventSink(LampElectricityModel.MIL_RT_URI,
+									  IncreaseLamp.class)
+				});
 		
 		imported.put(
 			SetPowerAirConditioning.class,
@@ -353,15 +353,15 @@ public abstract class	MILSimulationArchitectures
 		// variable bindings between exporting and importing models
 		Map<VariableSource,VariableSink[]> bindings =
 								new HashMap<VariableSource,VariableSink[]>();
-//		bindings.put(
-//				new VariableSource("currentIntensity",
-//								   Double.class,
-//								   LampElectricityModel.MIL_RT_URI),
-//				new VariableSink[] {
-//					new VariableSink("currentLampIntensity",
-//									 Double.class,
-//									 ElectricMeterElectricityModel.MIL_RT_URI)
-//				});
+		bindings.put(
+				new VariableSource("currentIntensity",
+								   Double.class,
+								   LampElectricityModel.MIL_RT_URI),
+				new VariableSink[] {
+					new VariableSink("currentLampIntensity",
+									 Double.class,
+									 ElectricMeterElectricityModel.MIL_RT_URI)
+				});
 		bindings.put(
 				new VariableSource("currentIntensity",
 								   Double.class,
