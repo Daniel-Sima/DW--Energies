@@ -388,6 +388,7 @@ implements	HairDryerOperationI
 	@Override
 	public void			userDefinedInternalTransition(Duration elapsedTime)
 	{
+		System.out.println("HairDryerElectricityModel::userDefinedInternalTransition");
 		super.userDefinedInternalTransition(elapsedTime);
 
 		// set the current electricity consumption from the current state
@@ -419,6 +420,7 @@ implements	HairDryerOperationI
 	@Override
 	public void			userDefinedExternalTransition(Duration elapsedTime)
 	{
+		System.out.println("HairDryerElectricityModel::userDefinedExternalTransition");
 		super.userDefinedExternalTransition(elapsedTime);
 
 		// get the vector of currently received external events
@@ -455,6 +457,7 @@ implements	HairDryerOperationI
 	@Override
 	public void			endSimulation(Time endTime)
 	{
+		System.out.println("HairDryerElectricityModel::endSimulation");
 		Duration d = endTime.subtract(this.getCurrentStateTime());
 		this.totalConsumption +=
 				Electricity.computeConsumption(

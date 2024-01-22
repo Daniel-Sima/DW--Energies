@@ -87,9 +87,9 @@ public interface LampImplementationI {
 	 * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
 	public static enum LampMode {
-		MODE_1, // 10%
-		MODE_2, // 50%
-		MODE_3	// 100%
+		LOW, // 10%
+		MEDIUM, // 50%
+		HIGH	// 100%
 	}
 	/***********************************************************************************/
 	// -------------------------------------------------------------------------

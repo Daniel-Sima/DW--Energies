@@ -1,5 +1,6 @@
 package equipments.Lamp.mil.events;
 
+import equipments.Lamp.LampOperationI;
 import equipments.Lamp.mil.LampElectricityModel;
 import equipments.Lamp.mil.LampElectricityModel.State;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
@@ -82,21 +83,9 @@ extends AbstractLampEvent {
 	 */
 	@Override
 	public void executeOn(AtomicModelI model) {
-		assert model instanceof LampElectricityModel;
+		assert model instanceof LampOperationI;
 
-		LampElectricityModel m = (LampElectricityModel)model;
-
-		// a Increase event can only be executed when the state of Lamp
-		// model is in the state LOW or MEDIUM
-		if (m.getState() == LampElectricityModel.State.LOW) {
-			// then put it in the state MEDIUM
-			m.setState(State.MEDIUM);
-			m.toggleConsumptionHasChanged(); 
-		} else if (m.getState() == LampElectricityModel.State.MEDIUM) {
-			// then put it in the state HIGH
-			m.setState(State.HIGH); 
-			m.toggleConsumptionHasChanged();
-		}
+		((LampOperationI)model).increaseMode(); 
 	}
 }
 /***********************************************************************************/

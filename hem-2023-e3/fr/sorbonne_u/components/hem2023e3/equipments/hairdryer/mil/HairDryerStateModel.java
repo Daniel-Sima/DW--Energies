@@ -278,6 +278,7 @@ implements	HairDryerOperationI
 	@Override
 	public void			userDefinedExternalTransition(Duration elapsedTime)
 	{
+		System.out.println("HairDryerStateModel::userDefinedExternalTransition");
 		super.userDefinedExternalTransition(elapsedTime);
 
 		// get the vector of current external events

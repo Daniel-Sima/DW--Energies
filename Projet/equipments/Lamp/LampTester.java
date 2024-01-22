@@ -146,7 +146,7 @@ extends		AbstractComponent
 	{
 		this.logMessage("testGetMode()... ");
 		try {
-			assertEquals(LampMode.MODE_1, this.lop.getMode());
+			assertEquals(LampMode.LOW, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -160,7 +160,7 @@ extends		AbstractComponent
 			assertEquals(LampState.OFF, this.lop.getState());
 			this.lop.turnOn();
 			assertEquals(LampState.ON, this.lop.getState());
-			assertEquals(LampMode.MODE_1, this.lop.getMode());
+			assertEquals(LampMode.LOW, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -193,14 +193,14 @@ extends		AbstractComponent
 			this.lop.turnOn();
 			assertEquals(LampState.ON, this.lop.getState());
 			this.lop.increaseMode();
-			assertEquals(LampMode.MODE_2, this.lop.getMode());
+			assertEquals(LampMode.MEDIUM, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
 		try {
 			this.lop.increaseMode();
 			assertEquals(LampState.ON, this.lop.getState());
-			assertEquals(LampMode.MODE_3, this.lop.getMode());
+			assertEquals(LampMode.HIGH, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -221,9 +221,9 @@ extends		AbstractComponent
 		try {
 			this.lop.decreaseMode();
 			assertEquals(LampState.ON, this.lop.getState());
-			assertEquals(LampMode.MODE_2, this.lop.getMode());
+			assertEquals(LampMode.MEDIUM, this.lop.getMode());
 			this.lop.decreaseMode();
-			assertEquals(LampMode.MODE_1, this.lop.getMode());
+			assertEquals(LampMode.LOW, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -236,7 +236,7 @@ extends		AbstractComponent
 		}
 		try {
 			assertEquals(LampState.ON, this.lop.getState());
-			assertEquals(LampMode.MODE_1, this.lop.getMode());
+			assertEquals(LampMode.LOW, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}

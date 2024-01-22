@@ -18,8 +18,6 @@ import equipments.Lamp.mil.events.IncreaseLamp;
 import equipments.Lamp.mil.events.SwitchOffLamp;
 import equipments.Lamp.mil.events.SwitchOnLamp;
 import equipments.meter.mil.ElectricMeterCoupledModel;
-import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.HairDryerElectricityModel;
-import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.events.SwitchOnHairDryer;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.RTArchitecture;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.HIOA_Composer;

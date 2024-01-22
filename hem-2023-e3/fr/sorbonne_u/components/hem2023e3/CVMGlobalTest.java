@@ -108,8 +108,8 @@ extends		AbstractCVM
 	public static final ExecutionType	CURRENT_EXECUTION_TYPE =
 //											ExecutionType.INTEGRATION_TEST;
 											// ExecutionType.MIL_SIMULATION;
-											ExecutionType.MIL_RT_SIMULATION;
-											// ExecutionType.SIL_SIMULATION;
+											// ExecutionType.MIL_RT_SIMULATION;
+											ExecutionType.SIL_SIMULATION;
 	/** the control mode of the heater controller for the next run.			*/
 	public static final ControlMode		CONTROL_MODE = ControlMode.PULL;
 

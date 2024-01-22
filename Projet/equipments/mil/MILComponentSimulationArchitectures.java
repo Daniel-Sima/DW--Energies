@@ -31,7 +31,6 @@ import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentCouple
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.ComponentModelArchitecture;
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.RTComponentAtomicModelDescriptor;
 import fr.sorbonne_u.components.cyphy.plugins.devs.architectures.RTComponentCoupledModelDescriptor;
-import fr.sorbonne_u.devs_simulation.hioa.architectures.RTAtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
@@ -133,7 +132,6 @@ public abstract class MILComponentSimulationArchitectures {
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
 															new HashMap<>();
 		
-		// TODO
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(LampStateModel.MIL_URI);
@@ -400,7 +398,7 @@ public abstract class MILComponentSimulationArchitectures {
 				new EventSink(LampStateModel.MIL_RT_URI,
 							  IncreaseLamp.class)
 			});
-//
+
 		connections.put(
 			new EventSource(LampStateModel.MIL_RT_URI,
 							SwitchOnLamp.class),

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import equipments.HEM.simulation.HEM_ReportI;
+import equipments.Lamp.LampOperationI;
 import equipments.Lamp.mil.events.AbstractLampEvent;
 import equipments.Lamp.mil.events.DecreaseLamp;
 import equipments.Lamp.mil.events.IncreaseLamp;
@@ -84,10 +85,11 @@ import utils.Electricity;
 		 					     SwitchOnLamp.class,
 								 IncreaseLamp.class,
 								 DecreaseLamp.class})
-@ModelExportedVariable(name = "currentIntensity", type = Double.class)
+@ModelExportedVariable(name = "currentLampIntensity", type = Double.class)
 // -----------------------------------------------------------------------------
 public class			LampElectricityModel
 extends		AtomicHIOA
+implements LampOperationI
 {
 	// -------------------------------------------------------------------------
 		// Color for prints
@@ -217,37 +219,81 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * set the state of the lamp.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code s != null}
-	 * post	{@code getState() == s}
-	 * </pre>
-	 *
-	 * @param s		the new state.
+	 * @see equipments.Lamp.mil.LampOperationI#turnOn()
 	 */
-	public void			setState(State s)
+	@Override
+	public void			turnOn()
 	{
-		this.currentState = s;
+		if (this.currentState == LampElectricityModel.State.OFF) {
+			// then put it in the state LOW
+			this.currentState = LampElectricityModel.State.LOW;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
 	}
 
 	/**
-	 * return the state of the lamp.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code true}	// no precondition.
-	 * post	{@code ret != null}
-	 * </pre>
-	 *
-	 * @return	the state of the lamp.
+	 * @see equipments.Lamp.mil.LampOperationI#turnOff()
 	 */
-	public State		getState()
+	@Override
+	public void			turnOff()
 	{
-		return this.currentState;
+		// a SwitchOff event can be executed when the state of the hair
+		// dryer model is *not* in the state OFF
+		if (this.currentState != LampElectricityModel.State.OFF) {
+			// then put it in the state OFF
+			this.currentState = LampElectricityModel.State.OFF;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
+	}
+
+	/**
+	 * @see equipments.Lamp.mil.LampOperationI#increaseMode()
+	 */
+	@Override
+	public void			increaseMode()
+	{
+		// a IncreaseLamp event can be executed when the state of the lamp
+		// model is *not* in the state OFF
+		if (this.currentState != LampElectricityModel.State.OFF) {
+			// then put it in the next state
+			switch (this.currentState) {
+				case LOW : this.currentState = LampElectricityModel.State.MEDIUM;
+							break;
+				case MEDIUM : this.currentState = LampElectricityModel.State.HIGH;
+							break;
+				default : break;
+			}
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
+	}
+	
+	/**
+	 * @see equipments.Lamp.mil.LampOperationI#decreaseMode()
+	 */
+	@Override
+	public void			decreaseMode()
+	{
+		// a DecreaseLamp event can be executed when the state of the lamp
+		// model is *not* in the state OFF
+		if (this.currentState != LampElectricityModel.State.OFF) {
+			// then put it in the next state
+			switch (this.currentState) {
+				case MEDIUM : this.currentState = LampElectricityModel.State.LOW;
+							break;
+				case HIGH : this.currentState = LampElectricityModel.State.MEDIUM;
+							break;
+				default : break;
+			}
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
 	}
 
 	/**
@@ -360,7 +406,6 @@ extends		AtomicHIOA
 							setNewValue(LampEnergyConsumption.get(State.HIGH)/TENSION, t);
 		}
 
-		
 		// Tracing
 		StringBuffer message =
 				new StringBuffer(ANSI_RED_BACKGROUND +"Current consumption ");

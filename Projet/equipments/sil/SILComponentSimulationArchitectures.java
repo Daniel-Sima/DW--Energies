@@ -133,7 +133,8 @@ public abstract class	SILComponentSimulationArchitectures
 							SwitchOnAirConditioning.class,
 							SwitchOffAirConditioning.class,
 							Cool.class,
-							DoNotCool.class},
+							DoNotCool.class
+						},
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						TimeUnit.HOURS,
 						ElectricMeter.REFLECTION_INBOUND_PORT_URI));

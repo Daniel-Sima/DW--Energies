@@ -179,7 +179,7 @@ public abstract class	MILSimulationArchitectures
 									  DoNotCool.class)
 				});
 
-		// variable bindings between exporting and importing models
+		// // variable bindings between exporting and importing models
 		Map<VariableSource,VariableSink[]> bindings =
 								new HashMap<VariableSource,VariableSink[]>();
 		bindings.put(

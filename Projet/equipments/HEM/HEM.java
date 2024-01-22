@@ -7,7 +7,6 @@ import equipments.AirConditioning.AirConditioning;
 import equipments.AirConditioning.connections.AirConditioningSensorDataConnector;
 import equipments.AirConditioning.connections.AirConditioningSensorDataOutboundPort;
 import equipments.AirConditioning.measures.AirConditioningCompoundMeasure;
-import equipments.AirConditioning.measures.AirConditioningMeasureI;
 import equipments.AirConditioning.measures.AirConditioningSensorData;
 import equipments.meter.ElectricMeter;
 import equipments.meter.ElectricMeterCI;
@@ -87,7 +86,10 @@ extends AbstractComponent
 	private static final double RESUME_TEMP = 21.0;
 	/** Consommation maximale pour laquelle le HEM doit 
 	 *	suspendre AirConditioning.											*/
-	private static final double CONSUMPTION_THRESHOLD = 1000.0;
+	private static final double CONSUMPTION_THRESHOLD = 600.0;
+
+	/** Restart flag														*/
+	private boolean restart = true;
 
 	/** flag to print or not debug messages.								*/
 	private static final boolean DEBUG = false;
@@ -208,19 +210,12 @@ extends AbstractComponent
 
 			double currentTemp = td.getMeasure().getCurrentTemperature();
 
-			this.traceMessage(
-					"Home current temperature : " +
-					currentTemp + " degrés CELCIUS\n"
-			);
-
 			if(currentTemp < SUSPEND_TEMP) {
 				adjustableOutboundPortAirConditioning.suspend();
 			}
 			else if (currentTemp > RESUME_TEMP) {
-				if(adjustableOutboundPortAirConditioning.suspended())
-					adjustableOutboundPortAirConditioning.resume();
-				else if (adjustableOutboundPortAirConditioning.currentMode() == 0)
-					adjustableOutboundPortAirConditioning.upMode();
+				adjustableOutboundPortAirConditioning.resume();
+				restart = false;
 			}
 
 		} catch (Exception e) {
@@ -232,7 +227,7 @@ extends AbstractComponent
         try {
             SensorData<Measure<Double>> currentConsumption = electricMeterOutboundPort.getCurrentConsumption();
             totalConsumption += currentConsumption.getMeasure().getData();
-            if (totalConsumption > CONSUMPTION_THRESHOLD) {
+            if (totalConsumption > CONSUMPTION_THRESHOLD && restart) {
                 // Le taux de consommation est trop élevé, suspendre le climatiseur
                 adjustableOutboundPortAirConditioning.suspend();
                 // Vous pouvez également notifier d'autres composants ou prendre d'autres actions nécessaires.

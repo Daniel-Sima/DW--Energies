@@ -341,7 +341,7 @@ implements	LampOperationI
 	{
 		this.logMessage("testGetMode()... ");
 		try {
-			assertEquals(LampMode.MODE_1, this.lop.getMode());
+			assertEquals(LampMode.LOW, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -355,7 +355,7 @@ implements	LampOperationI
 			assertEquals(LampState.OFF, this.lop.getState());
 			this.lop.turnOn();
 			assertEquals(LampState.ON, this.lop.getState());
-			assertEquals(LampMode.MODE_1, this.lop.getMode());
+			assertEquals(LampMode.LOW, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -387,14 +387,14 @@ implements	LampOperationI
 			this.lop.turnOn();
 			this.lop.increaseMode();
 			assertEquals(LampState.ON, this.lop.getState());
-			assertEquals(LampMode.MODE_2, this.lop.getMode());
+			assertEquals(LampMode.MEDIUM, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
 		try {
 			this.lop.increaseMode();
 			assertEquals(LampState.ON, this.lop.getState());
-			assertEquals(LampMode.MODE_3, this.lop.getMode());
+			assertEquals(LampMode.HIGH, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -407,14 +407,14 @@ implements	LampOperationI
 		try {
 			this.lop.decreaseMode();
 			assertEquals(LampState.ON, this.lop.getState());
-			assertEquals(LampMode.MODE_2, this.lop.getMode());
+			assertEquals(LampMode.MEDIUM, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
 		try {
 			this.lop.decreaseMode();
 			assertEquals(LampState.ON, this.lop.getState());
-			assertEquals(LampMode.MODE_1, this.lop.getMode());
+			assertEquals(LampMode.LOW, this.lop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -558,12 +558,12 @@ implements	LampOperationI
 	{
 		// Define the instants of the different actions in the scenario.
 		Instant startInstant = Instant.parse(CVMGlobalTest.START_INSTANT);
-		Instant switchOn = startInstant.plusSeconds(3600L);
-		Instant increaseMode = startInstant.plusSeconds(3800L);
-		Instant increaseMode2 = startInstant.plusSeconds(4500L);
-		Instant decreaseMode = startInstant.plusSeconds(5000L);
-		Instant decreaseMode2 = startInstant.plusSeconds(5500L);
-		Instant switchOff = startInstant.plusSeconds(6000L);
+		Instant switchOn = startInstant.plusSeconds(1200L);
+		Instant increaseToMedium = startInstant.plusSeconds(2400L);
+		Instant increaseToHigh = startInstant.plusSeconds(3600L);
+		Instant decreaseToMedium = startInstant.plusSeconds(4800L);
+		Instant decreaseToLow = startInstant.plusSeconds(6000L);
+		Instant switchOff = startInstant.plusSeconds(7200L);
 
 		// For each action, compute the waiting time for this action using the
 		// above instant and the clock, and then schedule the rask that will
@@ -579,46 +579,46 @@ implements	LampOperationI
 				o -> ((LampUser)o).turnOn(),
 				delayInNanos, TimeUnit.NANOSECONDS);
 		
-		delayInNanos = this.acceleratedClock.nanoDelayUntilInstant(increaseMode);
+		delayInNanos = this.acceleratedClock.nanoDelayUntilInstant(increaseToMedium);
 		this.logMessage(
 				"Lamp#silTestScenario waits for " + delayInNanos
 				+ " " + TimeUnit.NANOSECONDS + " i.e., "
 				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
 												+ " " + TimeUnit.MILLISECONDS
-				+ " to reach " + increaseMode);
+				+ " to reach " + increaseToMedium);
 		this.scheduleTask(
 				o -> ((LampUser)o).increaseMode(),
 				delayInNanos, TimeUnit.NANOSECONDS);
 		
-		delayInNanos = this.acceleratedClock.nanoDelayUntilInstant(increaseMode2);
+		delayInNanos = this.acceleratedClock.nanoDelayUntilInstant(increaseToHigh);
 		this.logMessage(
 				"Lamp#silTestScenario waits for " + delayInNanos
 				+ " " + TimeUnit.NANOSECONDS + " i.e., "
 				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
 												+ " " + TimeUnit.MILLISECONDS
-				+ " to reach " + increaseMode2);
+				+ " to reach " + increaseToHigh);
 		this.scheduleTask(
 				o -> ((LampUser)o).increaseMode(),
 				delayInNanos, TimeUnit.NANOSECONDS);
 		
-		delayInNanos = this.acceleratedClock.nanoDelayUntilInstant(decreaseMode);
+		delayInNanos = this.acceleratedClock.nanoDelayUntilInstant(decreaseToMedium);
 		this.logMessage(
 				"Lamp#silTestScenario waits for " + delayInNanos
 				+ " " + TimeUnit.NANOSECONDS + " i.e., "
 				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
 												+ " " + TimeUnit.MILLISECONDS
-				+ " to reach " + decreaseMode);
+				+ " to reach " + decreaseToMedium);
 		this.scheduleTask(
 				o -> ((LampUser)o).decreaseMode(),
 				delayInNanos, TimeUnit.NANOSECONDS);
-		
-		delayInNanos = this.acceleratedClock.nanoDelayUntilInstant(decreaseMode2);
+
+		delayInNanos = this.acceleratedClock.nanoDelayUntilInstant(decreaseToLow);
 		this.logMessage(
 				"Lamp#silTestScenario waits for " + delayInNanos
 				+ " " + TimeUnit.NANOSECONDS + " i.e., "
 				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
 												+ " " + TimeUnit.MILLISECONDS
-				+ " to reach " + decreaseMode2);
+				+ " to reach " + decreaseToLow);
 		this.scheduleTask(
 				o -> ((LampUser)o).decreaseMode(),
 				delayInNanos, TimeUnit.NANOSECONDS);

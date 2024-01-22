@@ -1,47 +1,15 @@
 package equipments.Lamp.mil;
 
-// Copyright Jacques Malenfant, Sorbonne Universite.
-// Jacques.Malenfant@lip6.fr
-//
-// This software is a computer program whose purpose is to implement a mock-up
-// of household energy management system.
-//
-// This software is governed by the CeCILL-C license under French law and
-// abiding by the rules of distribution of free software.  You can use,
-// modify and/ or redistribute the software under the terms of the
-// CeCILL-C license as circulated by CEA, CNRS and INRIA at the following
-// URL "http://www.cecill.info".
-//
-// As a counterpart to the access to the source code and  rights to copy,
-// modify and redistribute granted by the license, users are provided only
-// with a limited warranty  and the software's author,  the holder of the
-// economic rights,  and the successive licensors  have only  limited
-// liability. 
-//
-// In this respect, the user's attention is drawn to the risks associated
-// with loading,  using,  modifying and/or developing or reproducing the
-// software by the user in light of its specific status of free software,
-// that may mean  that it is complicated to manipulate,  and  that  also
-// therefore means  that it is reserved for developers  and  experienced
-// professionals having in-depth computer knowledge. Users are therefore
-// encouraged to load and test the software's suitability as regards their
-// requirements in conditions enabling the security of their systems and/or 
-// data to be ensured and,  more generally, to use and operate it in the 
-// same conditions as regards security. 
-//
-// The fact that you are presently reading this means that you have had
-// knowledge of the CeCILL-C license and that you accept its terms.
-
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
-import java.io.Serializable;
 
 import equipments.Lamp.mil.events.DecreaseLamp;
 import equipments.Lamp.mil.events.IncreaseLamp;
 import equipments.Lamp.mil.events.SwitchOffLamp;
 import equipments.Lamp.mil.events.SwitchOnLamp;
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.es.events.ES_EventI;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
@@ -142,7 +110,8 @@ extends		AtomicES_Model
 	/**	the random number generator from common math library.				*/
 	protected final RandomDataGenerator	rg ;
 	/** Times left to increase/decrease */
-	protected static int timesLeft = 0;
+	protected static int timesLeftIncrease = 1;
+	protected static int timesLeftDecrease = 1;
 	/** Try to increase boolean */
 	protected static boolean increase = true;
 
@@ -209,20 +178,24 @@ extends		AtomicES_Model
 			Time t = this.computeTimeOfNextEvent(current.getTimeOfOccurrence());
 			if (current instanceof SwitchOnLamp) {
 				nextEvent = new IncreaseLamp(t);
-			} else if ((current instanceof IncreaseLamp) && (increase)){
-				nextEvent = new IncreaseLamp(t);
-				timesLeft++;
-				increase = timesLeft == 2 ? false : true;
-			} else if ((current instanceof IncreaseLamp) && (!increase)) {
-				nextEvent = new DecreaseLamp(t);
-			} else if ((current instanceof DecreaseLamp) && (!increase)) {
-				nextEvent = new DecreaseLamp(t);
-				timesLeft--;
-				increase = timesLeft == 0 ? true : false;
-			} else if ((current instanceof DecreaseLamp) && (increase)) {
-				nextEvent = new SwitchOffLamp(t);
+			} else if (current instanceof IncreaseLamp) {
+				if(timesLeftIncrease > 0) {
+					nextEvent = new IncreaseLamp(t);
+					timesLeftIncrease--;
+				} else {
+					nextEvent = new DecreaseLamp(t);
+				}
+			} else if (current instanceof DecreaseLamp) {
+				if(timesLeftDecrease > 0) {
+					nextEvent = new DecreaseLamp(t);
+					timesLeftDecrease--;
+				} else {
+					nextEvent = new SwitchOffLamp(t);
+				}
 			}
 		}
+		this.logMessage("LampUserModel emits "
+								+ nextEvent.getClass().getSimpleName() + ".\n");
 		// schedule the event to be executed by this model
 		this.scheduleEvent(nextEvent);
 	}
@@ -353,6 +326,18 @@ extends		AtomicES_Model
 		) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);
+
+		// this gets the reference on the owner component which is required
+		// to have simulation models able to make the component perform some
+		// operations or tasks or to get the value of variables held by the
+		// component when necessary.
+		if (simParams.containsKey(
+						AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+			// by the following, all of the logging will appear in the owner
+			// component logger
+			this.getSimulationEngine().setLogger(
+						AtomicSimulatorPlugin.createComponentLogger(simParams));
+		}
 
 		String stepName =
 				ModelI.createRunParameterName(getURI(), MEAN_STEP_RPNAME);

@@ -6,12 +6,19 @@ import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.components.cyphy.plugins.devs.RTAtomicSimulatorPlugin;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.HairDryerStateModel;
+import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.events.SetLowHairDryer;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 
 import java.util.HashMap;
 
 import equipments.Lamp.Lamp;
+import equipments.Lamp.mil.LampStateModel;
 import equipments.Lamp.mil.MILSimulationArchitectures;
+import equipments.Lamp.mil.events.DecreaseLamp;
+import equipments.Lamp.mil.events.IncreaseLamp;
+import equipments.Lamp.mil.events.SwitchOffLamp;
+import equipments.Lamp.mil.events.SwitchOnLamp;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import utils.ExecutionType;
 
@@ -26,7 +33,7 @@ import utils.ExecutionType;
  * </p>
  * 
  * <p>
- * The cooking plate is an uncontrollable appliance, hence it does not connect
+ * The lamp is an uncontrollable appliance, hence it does not connect
  * with the household energy manager. However, it will connect later to the
  * electric panel to take its (simulated) electricity consumption into account.
  * </p>
@@ -78,7 +85,7 @@ implements LampImplementationI
 	/** when true, methods trace their actions. */
 	public static boolean VERBOSE = true;
 	public static final LampState INITIAL_STATE = LampState.OFF;
-	public static final LampMode INITIAL_MODE = LampMode.MODE_1;
+	public static final LampMode INITIAL_MODE = LampMode.LOW;
 
 	/** current state (on, off) of the cooking plate. */
 	protected LampState currentState;
@@ -254,9 +261,9 @@ implements LampImplementationI
 		this.lip.publishPort();
 		
 		this.findMode = new HashMap<>();
-		this.findMode.put(LampMode.MODE_1, 10);
-		this.findMode.put(LampMode.MODE_2, 50);
-		this.findMode.put(LampMode.MODE_3, 100);
+		this.findMode.put(LampMode.LOW, 10);
+		this.findMode.put(LampMode.MEDIUM, 50);
+		this.findMode.put(LampMode.HIGH, 100);
 		
 		switch (this.currentExecutionType) {
 		case MIL_SIMULATION:
@@ -361,7 +368,7 @@ implements LampImplementationI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2023e1.equipments.Lamp.LampImplementationI#getState()
+	 * @see equipments.Lamp.LampImplementationI#getState()
 	 */
 	@Override
 	public LampState	getState() throws Exception
@@ -375,7 +382,7 @@ implements LampImplementationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2023e1.equipments.Lamp.LampImplementationI#getMode()
+	 * @see equipments.Lamp.LampImplementationI#getMode()
 	 */
 	@Override
 	public LampMode	getMode() throws Exception
@@ -389,7 +396,7 @@ implements LampImplementationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2023e1.equipments.Lamp.LampImplementationI#turnOn()
+	 * @see equipments.Lamp.LampImplementationI#turnOn()
 	 */
 	@Override
 	public void			turnOn() throws Exception
@@ -402,11 +409,21 @@ implements LampImplementationI
 				new PreconditionException("this.currentState == LampState.OFF");
 
 		this.currentState = LampState.ON;
-		this.currentMode = LampMode.MODE_1;
+		this.currentMode = LampMode.LOW;
+
+		if (this.currentExecutionType.isSIL()) {
+			// For SIL simulation, an operation done in the component code
+			// must be reflected in the simulation; to do so, the component
+			// code triggers an external event sent to the HairDryerStateModel
+			// to make it change its mode to low.
+			((RTAtomicSimulatorPlugin)this.asp).triggerExternalEvent(
+												LampStateModel.SIL_URI,
+												t -> new SwitchOnLamp(t));
+		}
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2023e1.equipments.Lamp.LampImplementationI#turnOff()
+	 * @see equipments.Lamp.LampImplementationI#turnOff()
 	 */
 	@Override
 	public void			turnOff() throws Exception
@@ -419,38 +436,64 @@ implements LampImplementationI
 				new PreconditionException("this.currentStat == LampState.ON");
 
 		this.currentState = LampState.OFF;
+
+		if (this.currentExecutionType.isSIL()) {
+			// For SIL simulation, an operation done in the component code
+			// must be reflected in the simulation; to do so, the component
+			// code triggers an external event sent to the HairDryerStateModel
+			// to make it change its mode to low.
+			((RTAtomicSimulatorPlugin)this.asp).triggerExternalEvent(
+												LampStateModel.SIL_URI,
+												t -> new SwitchOffLamp(t));
+		}
 	}
 
+	/**
+	 * @see equipments.Lamp.LampImplementationI#increaseMode()
+	 */
 	@Override
 	public void increaseMode() throws Exception 
 	{
-		assert	this.currentMode != LampMode.MODE_3 : new PreconditionException("this.currentMode != LampMode.MODE_3");
+		assert	this.currentMode != LampMode.HIGH : new PreconditionException("this.currentMode != LampMode.MODE_3");
 		
 		if (Lamp.VERBOSE) {
 			this.traceMessage("Lamp mode is increasing mode.\n");
 		}
 		
 		switch (this.currentMode) {
-		case MODE_1:
-			assert	this.currentMode == LampMode.MODE_1 :
-				new PreconditionException("this.currentMode== LampMode.MODE_1");
-			this.currentMode = LampMode.MODE_2;
+		case LOW:
+			assert	this.currentMode == LampMode.LOW :
+				new PreconditionException("this.currentMode== LampMode.LOW");
+			this.currentMode = LampMode.MEDIUM;
 			break;
-		case MODE_2:
-			assert	this.currentMode == LampMode.MODE_2 :
-				new PreconditionException("this.currentMode == LampMode.MODE_2");
-			this.currentMode = LampMode.MODE_3;
+		case MEDIUM:
+			assert	this.currentMode == LampMode.MEDIUM :
+				new PreconditionException("this.currentMode == LampMode.MEDIUM");
+			this.currentMode = LampMode.HIGH;
 			break;
 		default:
 			break;
 		}
+
+		if (this.currentExecutionType.isSIL()) {
+			// For SIL simulation, an operation done in the component code
+			// must be reflected in the simulation; to do so, the component
+			// code triggers an external event sent to the HairDryerStateModel
+			// to make it change its mode to low.
+			((RTAtomicSimulatorPlugin)this.asp).triggerExternalEvent(
+												LampStateModel.SIL_URI,
+												t -> new IncreaseLamp(t));
+		}
 	}
 
+	/**
+	 * @see equipments.Lamp.LampImplementationI#decreaseMode()
+	 */
 	@Override
 	public void decreaseMode() throws Exception 
 	{
-		assert	this.currentMode != LampMode.MODE_1 :
-			new PreconditionException("getMode() != LampMode.MODE_1");
+		assert	this.currentMode != LampMode.LOW :
+			new PreconditionException("getMode() != LampMode.LOW");
 		
 		if (Lamp.VERBOSE) {
 			this.traceMessage("Lamp mode is decrease.\n");
@@ -460,18 +503,28 @@ implements LampImplementationI
 			new PreconditionException("getState() == LampState.ON");
 		
 		switch (this.currentMode) {
-		case MODE_2:
-			assert	this.currentMode == LampMode.MODE_2 :
-				new PreconditionException("getMode() == LampMode.MODE_2");
-			this.currentMode = LampMode.MODE_1;
+		case MEDIUM:
+			assert	this.currentMode == LampMode.MEDIUM :
+				new PreconditionException("getMode() == LampMode.MDEIUM");
+			this.currentMode = LampMode.LOW;
 			break;
-		case MODE_3:
-			assert	this.currentMode == LampMode.MODE_3 :
-				new PreconditionException("getMode() == LampMode.MODE_3");
-			this.currentMode = LampMode.MODE_2;
+		case HIGH:
+			assert	this.currentMode == LampMode.HIGH :
+				new PreconditionException("getMode() == LampMode.HIGH");
+			this.currentMode = LampMode.MEDIUM;
 			break;
 		default:
 			break;
+		}
+
+		if (this.currentExecutionType.isSIL()) {
+			// For SIL simulation, an operation done in the component code
+			// must be reflected in the simulation; to do so, the component
+			// code triggers an external event sent to the HairDryerStateModel
+			// to make it change its mode to low.
+			((RTAtomicSimulatorPlugin)this.asp).triggerExternalEvent(
+												LampStateModel.SIL_URI,
+												t -> new DecreaseLamp(t));
 		}
 	}
 	

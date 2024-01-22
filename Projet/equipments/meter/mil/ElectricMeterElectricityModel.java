@@ -42,8 +42,9 @@ import utils.Electricity;
  * <ul>
  * <li>Imported events: none</li>
  * <li>Exported events: none</li>
-// * <li>Imported variables:
-// *   name = {@code currentHeaterIntensity}, type = {@code Double}</li>
+ * <li>Imported variables:
+ *   name = {@code currentAirConditioningIntensity}, type = {@code Double}</li>
+ *   name = {@code currentLampIntensity}, type = {@code Double}</li>
  *   name = {@code currentCookingPlateIntensity}, type = {@code Double}</li>
  * 
  * <p><strong>White-box Invariant</strong></p>
@@ -58,14 +59,9 @@ import utils.Electricity;
  * invariant	{@code true}	// TODO	// no more invariant
  * </pre>
  * 
- * <p>Created on : 2023-11-08</p>
- * 
- * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
 //@ModelImportedVariable(name = "currentCookingPlateIntensity", type = Double.class)
-@ModelImportedVariable(name = "currentLampIntensity", 
-						type = Double.class)
 @ModelImportedVariable(name = "currentAirConditioningIntensity", 
 						type = Double.class)
 ////@ModelImportedVariable(name = "currentFridgeIntensity", type = Double.class) 
@@ -75,6 +71,8 @@ import utils.Electricity;
 //
 //@ModelExportedVariable(name = "currentTotalPowerProduced", type = Double.class)
 @ModelExportedVariable(name = "currentTotalPowerConsumed", 
+						type = Double.class)
+@ModelImportedVariable(name = "currentLampIntensity", 
 						type = Double.class)
 public class ElectricMeterElectricityModel 
 extends AtomicHIOA {
@@ -115,7 +113,7 @@ extends AtomicHIOA {
 	
 	/** current intensity of the Lamp in amperes.							*/
 	@ImportedVariable(type = Double.class)
-	protected Value<Double> currentLampIntensity;
+	protected Value<Double> 		currentLampIntensity;
 
 	/** current intensity of the Air Conditioning amperes.					*/
 	@ImportedVariable(type = Double.class)
@@ -135,7 +133,8 @@ extends AtomicHIOA {
 	
 	/** current total intensity of the house in amperes.					*/
 	@InternalVariable(type = Double.class)
-	protected final Value<Double> currentIntensity = new Value<Double>(this);
+	protected final Value<Double> currentIntensity = 
+											new Value<Double>(this);
 
 	/** the current total power produced by the producers					*/
 //	@ExportedVariable(type = Double.class)
@@ -143,7 +142,7 @@ extends AtomicHIOA {
 	
 	/** the current total power produced by the producers					*/
 	@ExportedVariable(type = Double.class)
-	protected final Value<Double> currentTotalPowerConsumed = 
+	protected final Value<Double> currentCumulativeConsumption = 
 											new Value<Double>(this);
 	
 	// -------------------------------------------------------------------------
@@ -192,11 +191,11 @@ extends AtomicHIOA {
 	 */
 	protected void updateConsumption(Duration d) 
 	{
-		double c = this.currentTotalPowerConsumed.getValue();
+		double c = this.currentCumulativeConsumption.getValue();
 		c += Electricity.computeConsumption(
 				d, TENSION*this.currentIntensity.getValue()*1000.0);
-		Time t = this.currentTotalPowerConsumed.getTime().add(d);
-		this.currentTotalPowerConsumed.setNewValue(c, t);
+		Time t = this.currentCumulativeConsumption.getTime().add(d);
+		this.currentCumulativeConsumption.setNewValue(c, t);
 	}
 	
 	/***********************************************************************************/
@@ -245,8 +244,8 @@ extends AtomicHIOA {
 	 */
 	protected double computeTotalIntensity() {
 		// simple sum of all incoming intensities
-		double i = 	this.currentLampIntensity.getValue() +
-					this.currentAirConditioningIntensity.getValue();
+		double i = 	this.currentLampIntensity.getValue() 
+					+ this.currentAirConditioningIntensity.getValue();
 					/*this.currentCookingPlateIntensity.getValue() +*/
 				
 		// Tracing
@@ -293,7 +292,7 @@ extends AtomicHIOA {
 				) {
 			double i = this.computeTotalIntensity();
 			this.currentIntensity.initialise(i);
-			this.currentTotalPowerConsumed.initialise(0.0);
+			this.currentCumulativeConsumption.initialise(0.0);
 //			this.currentTotalPowerProduced.initialise(0.0);
 			justInitialised += 2;
 		} else if (!this.currentIntensity.isInitialised()) {
@@ -355,7 +354,7 @@ extends AtomicHIOA {
 		// reinitialise the internal model variable.
 		this.finalReport = new ElectricMeterElectricityReport(
 				this.getURI(),
-				this.currentTotalPowerConsumed.getValue()/1000.0,
+				this.currentCumulativeConsumption.getValue()/1000.0,
 				0.0
 //				this.currentTotalPowerProduced.getValue()/1000.0  // TODO AV
 				);
@@ -407,9 +406,6 @@ extends AtomicHIOA {
 	 * invariant	{@code true}	// no invariant
 	 * </pre>
 	 * 
-	 * <p>Created on : 2021-10-01</p>
-	 * 
-	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
 	 */
 	public static class ElectricMeterElectricityReport
 	implements SimulationReportI, HEM_ReportI {
