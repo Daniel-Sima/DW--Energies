@@ -82,12 +82,15 @@ extends	AtomicHIOA {
 	// -------------------------------------------------------------------------
 
 	private static final long	serialVersionUID = 1L;
-	/** URI for a model; works when only one instance is created.			*/
-	public static final String	URI = SolarPanelElectricityModel.class.getSimpleName();
+	/** URI for a model; works when MIL instance is created.			*/
+	public static final String MIL_URI = SolarPanelElectricityModel.class.getSimpleName()
+				+ "-MIL";
     /** URI for a model; works when MIL RT simulation instance is created.	*/
-	public static final String MIL_RT_URI = URI + "-MIL-RT";
+	public static final String MIL_RT_URI = SolarPanelElectricityModel.class.getSimpleName()
+				+ "-MIL-RT";
 	/** URI for a model; works when SIL simulation instance is created.		*/
-	public static final String SIL_URI = URI + "-SIL";
+	public static final String SIL_URI = SolarPanelElectricityModel.class.getSimpleName() 
+				+ "-SIL";
 
 	/** minimum power produced in watts.									*/
 	public static double NOT_PRODUCING_POWER = 0.0;
@@ -280,7 +283,7 @@ extends	AtomicHIOA {
 //						TENSION*this.currentPowerProducedSolarPanel.getValue());
 
 		this.logMessage("simulation ends.\n");
-		this.logMessage(new SolarPanelElectricityReport(URI, Math.round(this.totalProduction * 100.0) / 100.0).printout("-"));
+		this.logMessage(new SolarPanelElectricityReport(getURI(), Math.round(this.totalProduction * 100.0) / 100.0).printout("-"));
 		super.endSimulation(endTime);
 	}
 
@@ -398,7 +401,7 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public SimulationReportI getFinalReport() {
-		return new SolarPanelElectricityReport(URI, this.totalProduction);
+		return new SolarPanelElectricityReport(getURI(), this.totalProduction);
 	}
 }
 /***********************************************************************************/

@@ -2,25 +2,20 @@ package production.aleatory.SolarPanel;
 
 import java.util.concurrent.CompletableFuture;
 
-import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
-import fr.sorbonne_u.components.hem2023e3.equipments.heater.mil.MILSimulationArchitectures;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import production.aleatory.SolarPanel.connections.SolarPanelExternalControlInboundPort;
 import production.aleatory.SolarPanel.connections.SolarPanelMeteoControlInboundPort;
+import production.aleatory.SolarPanel.mil.MILSimulationArchitectures;
 import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
-import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
-import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 import utils.ExecutionType;
-import utils.Measure;
-import utils.MeasurementUnit;
 
 /***********************************************************************************/
 /**
@@ -250,7 +245,7 @@ implements 	SolarPanelExternalControlI,
 		// switch (this.currentExecutionType) {
 		// case MIL_SIMULATION:
 		// 	Architecture architecture =
-		// 			MILSimulationArchitectures.createHeaterMILArchitecture();
+		// 			MILSimulationArchitectures.createSolarPanelMILArchitecture();
 		// 	assert	architecture.getRootModelURI().equals(this.localSimulatorURI) :
 		// 			new AssertionError(
 		// 					"local simulator " + this.localSimulatorURI

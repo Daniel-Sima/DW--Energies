@@ -81,26 +81,26 @@ public class RunSolarPanelUnitarySimulation {
 			//	and the external weather are atomic HIOA models
 			// hence we use an AtomicHIOA_Descriptor(s)
 			atomicModelDescriptors.put(
-					SolarPanelElectricityModel.URI,
+					SolarPanelElectricityModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							SolarPanelElectricityModel.class,
-							SolarPanelElectricityModel.URI,
+							SolarPanelElectricityModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					ExternalWeatherModel.URI,
+					ExternalWeatherModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							ExternalWeatherModel.class,
-							ExternalWeatherModel.URI,
+							ExternalWeatherModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			// the solar panel unit tester model only exchanges event, an
 			// atomic model hence we use an AtomicModelDescriptor
 			atomicModelDescriptors.put(
-					SolarPanelUnitTesterModel.URI,
+					SolarPanelUnitTesterModel.MIL_URI,
 					AtomicModelDescriptor.create(
 							SolarPanelUnitTesterModel.class,
-							SolarPanelUnitTesterModel.URI,
+							SolarPanelUnitTesterModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 
@@ -109,11 +109,11 @@ public class RunSolarPanelUnitarySimulation {
 			Map<String,CoupledModelDescriptor> coupledModelDescriptors =
 					new HashMap<>();
 
-			// the set of submodels of the coupled model, given by their URIs
+			// the set of submodels of the coupled model, given by their MIL_URIs
 			Set<String> submodels = new HashSet<String>();
-			submodels.add(SolarPanelElectricityModel.URI);
-			submodels.add(ExternalWeatherModel.URI);
-			submodels.add(SolarPanelUnitTesterModel.URI);
+			submodels.add(SolarPanelElectricityModel.MIL_URI);
+			submodels.add(ExternalWeatherModel.MIL_URI);
+			submodels.add(SolarPanelUnitTesterModel.MIL_URI);
 
 			// variable bindings between exporting and importing models
 			Map<VariableSource,VariableSink[]> bindings =
@@ -121,19 +121,19 @@ public class RunSolarPanelUnitarySimulation {
 
 			bindings.put(new VariableSource("externalSolarIrradiance",
 					Double.class,
-					ExternalWeatherModel.URI),
+					ExternalWeatherModel.MIL_URI),
 					new VariableSink[] {
 							new VariableSink("externalSolarIrradiance",
 									Double.class,
-									SolarPanelElectricityModel.URI)
+									SolarPanelElectricityModel.MIL_URI)
 			});
 
 			// coupled model descriptor
 			coupledModelDescriptors.put(
-					SolarPanelCoupledModel.URI,
+					SolarPanelCoupledModel.MIL_URI,
 					new CoupledHIOA_Descriptor(
 							SolarPanelCoupledModel.class,
-							SolarPanelCoupledModel.URI,
+							SolarPanelCoupledModel.MIL_URI,
 							submodels,
 							null,
 							null,
@@ -146,7 +146,7 @@ public class RunSolarPanelUnitarySimulation {
 			// simulation architecture
 			ArchitectureI architecture =
 					new Architecture(
-							SolarPanelCoupledModel.URI,
+							SolarPanelCoupledModel.MIL_URI,
 							atomicModelDescriptors,
 							coupledModelDescriptors,
 							TimeUnit.HOURS);
