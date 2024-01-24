@@ -3,6 +3,7 @@ package equipments.CookingPlate.mil;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.HairDryerCoupledModel;
 import fr.sorbonne_u.devs_simulation.models.CoupledModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventSink;
@@ -42,10 +43,18 @@ extends CoupledModel {
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
-	/** URI for an instance model; works as long as only one instance is
-	 *  created.															*/
-	public static final String	URI = CookingPlateCoupledModel.class.getSimpleName();
-
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created.															*/
+	public static final String	MIL_URI = HairDryerCoupledModel.class.
+													getSimpleName() + "-MIL";
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created.															*/
+	public static final String	MIL_RT_URI = HairDryerCoupledModel.class.
+													getSimpleName() + "-MIL_RT";
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created.															*/
+	public static final String	SIL_URI = HairDryerCoupledModel.class.
+													getSimpleName() + "-SIL";
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------

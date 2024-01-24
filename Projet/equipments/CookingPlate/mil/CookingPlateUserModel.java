@@ -10,6 +10,7 @@ import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
 import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
 import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
 import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.es.events.ES_EventI;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
@@ -89,21 +90,30 @@ extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 
 	private static final long	serialVersionUID = 1L;
-	/** URI for an instance model; works as long as only one instance is
-	 *  created.															*/
-	public static final String	URI = CookingPlateUserModel.class.getSimpleName();
+
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created.										*/
+	public static final String	MIL_URI = CookingPlateUserModel.class.
+			getSimpleName() + "-MIL";
+	/** URI for an instance model in MIL real time simulations; works as
+	 *  long as only one instance is created.								*/
+	public static final String	MIL_RT_URI = CookingPlateUserModel.class.
+			getSimpleName() + "-MIL_RT";
+	/** URI for an instance model in SIL simulations; works as long as
+	 *  only one instance is created.										*/
+	public static final String	SIL_URI = CookingPlateUserModel.class.
+			getSimpleName() + "-SIL";
 
 	/** time interval between event outputs in hours.						*/
 	protected static double STEP_MEAN_DURATION = 60.0/3600.0;
 	/** time interval between Cooking Plate usages in hours.				*/
 	protected static double	DELAY_MEAN_DURATION = 4.0;
-	
+
 	/** Times left to increase/decrease */
 	protected static int timesLeft = 0;
 	/** Try to increase boolean */
 	protected static boolean increase = true;
-	
-	
+
 	/**	the random number generator from common math library.				*/
 	protected final RandomDataGenerator	rg ;
 
@@ -182,6 +192,10 @@ extends AtomicES_Model {
 				nextEvent = new SwitchOffCookingPlate(t);
 			}
 		}
+
+		this.logMessage("CookingPlateUserModel emits "
+				+ nextEvent.getClass().getSimpleName() + ".\n");
+
 		// schedule the event to be executed by this model
 		this.scheduleEvent(nextEvent);
 	}
@@ -310,6 +324,18 @@ extends AtomicES_Model {
 			) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);
+
+		// this gets the reference on the owner component which is required
+		// to have simulation models able to make the component perform some
+		// operations or tasks or to get the value of variables held by the
+		// component when necessary.
+		if (simParams.containsKey(
+				AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+			// by the following, all of the logging will appear in the owner
+			// component logger
+			this.getSimulationEngine().setLogger(
+					AtomicSimulatorPlugin.createComponentLogger(simParams));
+		}
 
 		String stepName =
 				ModelI.createRunParameterName(getURI(), MEAN_STEP_RPNAME);

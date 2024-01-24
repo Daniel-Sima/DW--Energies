@@ -6,6 +6,12 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.components.hem2023e3.CVMGlobalTest;
+import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
+import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
+import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
+import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -33,7 +39,7 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-@RequiredInterfaces(required={ElectricMeterCI.class})
+@RequiredInterfaces(required={ElectricMeterCI.class, ClocksServerCI.class})
 public class ElectricMeterUnitTester 
 extends	AbstractComponent {
 	// -------------------------------------------------------------------------
@@ -41,6 +47,9 @@ extends	AbstractComponent {
 	// -------------------------------------------------------------------------
 
 	protected ElectricMeterOutboundPort electricMeterOutboundPort;
+	
+	/** port to connect to the clocks server.								*/
+	protected ClocksServerOutboundPort	clocksServerOutboundPort;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -121,7 +130,25 @@ extends	AbstractComponent {
 	@Override
 	public synchronized void	execute() throws Exception
 	{
+		this.clocksServerOutboundPort = new ClocksServerOutboundPort(this);
+		this.clocksServerOutboundPort.publishPort();
+		this.doPortConnection(
+				this.clocksServerOutboundPort.getPortURI(),
+				ClocksServer.STANDARD_INBOUNDPORT_URI,
+				ClocksServerConnector.class.getCanonicalName());
+		this.logMessage("ElectricMeterUnitTester gets the clock.");
+		AcceleratedClock ac =
+			this.clocksServerOutboundPort.getClock(CVMGlobalTest.CLOCK_URI);
+
+		this.logMessage("ElectricMeterUnitTester waits until start time.");
+		ac.waitUntilStart();
+		this.logMessage("ElectricMeterUnitTester starts.");
+		this.doPortDisconnection(
+					this.clocksServerOutboundPort.getPortURI());
+		this.clocksServerOutboundPort.unpublishPort();
+		this.logMessage("ElectricMeterUnitTester begins to perform tests.");
 		this.runAllTests();
+		this.logMessage("ElectricMeterUnitTester tests end.");
 	}
 
 	/***********************************************************************************/

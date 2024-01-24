@@ -2,6 +2,8 @@ package equipments.meter;
 
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
+import utils.Measure;
+import utils.SensorData;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -56,7 +58,7 @@ implements ElectricMeterCI {
 	 * @see
 	 */
 	@Override
-	public double getCurrentConsumption() throws Exception {
+	public SensorData<Measure<Double>> getCurrentConsumption() throws Exception {
 		return this.getOwner().handleRequest(
 				o -> ((ElectricMeterImplementationI)o).getCurrentConsumption());
 	}
@@ -66,7 +68,7 @@ implements ElectricMeterCI {
 	 * @see
 	 */
 	@Override
-	public double getCurrentProduction() throws Exception {
+	public SensorData<Measure<Double>> getCurrentProduction() throws Exception {
 		return this.getOwner().handleRequest(
 				o -> ((ElectricMeterImplementationI)o).getCurrentProduction());
 	}

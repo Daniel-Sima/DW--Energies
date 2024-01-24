@@ -178,26 +178,26 @@ public class RunBatteryUnitarySimulation {
 
 			// Electric Meter Model
 			atomicModelDescriptors.put(
-					ElectricMeterElectricityModel.URI,
+					ElectricMeterElectricityModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							ElectricMeterElectricityModel.class,
-							ElectricMeterElectricityModel.URI,
+							ElectricMeterElectricityModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 
 			// Cooking Plate
 			atomicModelDescriptors.put(
-					CookingPlateElectricityModel.URI,
+					CookingPlateElectricityModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							CookingPlateElectricityModel.class,
-							CookingPlateElectricityModel.URI,
+							CookingPlateElectricityModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					CookingPlateUserModel.URI,
+					CookingPlateUserModel.MIL_URI,
 					AtomicModelDescriptor.create(
 							CookingPlateUserModel.class,
-							CookingPlateUserModel.URI,
+							CookingPlateUserModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			
@@ -306,10 +306,10 @@ public class RunBatteryUnitarySimulation {
 			submodels.add(PetrolGeneratorElectricityModel.URI);
 			submodels.add(PetrolGeneratorUnitTesterModel.URI);
 			// Electric Meter
-			submodels.add(ElectricMeterElectricityModel.URI);
+			submodels.add(ElectricMeterElectricityModel.MIL_URI);
 			// Cooking Plate
-			submodels.add(CookingPlateElectricityModel.URI);
-			submodels.add(CookingPlateUserModel.URI);
+			submodels.add(CookingPlateElectricityModel.MIL_URI);
+			submodels.add(CookingPlateUserModel.MIL_URI);
 			// Lamp
 			submodels.add(LampElectricityModel.URI);
 			submodels.add(LampUserModel.URI);
@@ -367,27 +367,27 @@ public class RunBatteryUnitarySimulation {
 
 					// Cooking plate
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, SwitchOnCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, SwitchOnCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
 											SwitchOnCookingPlate.class)
 							});
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, SwitchOffCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, SwitchOffCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
 											SwitchOffCookingPlate.class)
 							});
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, IncreaseCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, IncreaseCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
 											IncreaseCookingPlate.class)
 							});
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, DecreaseCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, DecreaseCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
 											DecreaseCookingPlate.class)
 							});
 					
@@ -559,7 +559,7 @@ public class RunBatteryUnitarySimulation {
 									new VariableSink[] {
 											new VariableSink("currentPowerProducedSolarPanel",
 													Double.class,
-													ElectricMeterElectricityModel.URI)
+													ElectricMeterElectricityModel.MIL_URI)
 									});
 							bindings.put(
 									new VariableSource("currentPowerProducedPetrolGenerator",
@@ -568,12 +568,12 @@ public class RunBatteryUnitarySimulation {
 									new VariableSink[] {
 											new VariableSink("currentPowerProducedPetrolGenerator",
 													Double.class,
-													ElectricMeterElectricityModel.URI)
+													ElectricMeterElectricityModel.MIL_URI)
 									});
 							bindings.put(
 									new VariableSource("currentTotalPowerProduced",
 											Double.class,
-											ElectricMeterElectricityModel.URI),
+											ElectricMeterElectricityModel.MIL_URI),
 									new VariableSink[] {
 											new VariableSink("currentTotalPowerProduced",
 													Double.class,
@@ -582,7 +582,7 @@ public class RunBatteryUnitarySimulation {
 							bindings.put(
 									new VariableSource("currentTotalPowerConsumed",
 											Double.class,
-											ElectricMeterElectricityModel.URI),
+											ElectricMeterElectricityModel.MIL_URI),
 									new VariableSink[] {
 											new VariableSink("currentTotalPowerConsumed",
 													Double.class,
@@ -591,11 +591,11 @@ public class RunBatteryUnitarySimulation {
 							bindings.put(
 									new VariableSource("currentIntensity",
 											Double.class,
-											CookingPlateElectricityModel.URI),
+											CookingPlateElectricityModel.MIL_URI),
 									new VariableSink[] {
 											new VariableSink("currentCookingPlateIntensity",
 													Double.class,
-													ElectricMeterElectricityModel.URI)
+													ElectricMeterElectricityModel.MIL_URI)
 									});
 							bindings.put(
 									new VariableSource("currentIntensity",
@@ -604,7 +604,7 @@ public class RunBatteryUnitarySimulation {
 									new VariableSink[] {
 											new VariableSink("currentLampIntensity",
 													Double.class,
-													ElectricMeterElectricityModel.URI)
+													ElectricMeterElectricityModel.MIL_URI)
 									});
 							bindings.put(
 									new VariableSource("currentIntensity",
@@ -613,7 +613,7 @@ public class RunBatteryUnitarySimulation {
 									new VariableSink[] {
 											new VariableSink("currentAirConditioningIntensity",
 													Double.class,
-													ElectricMeterElectricityModel.URI)
+													ElectricMeterElectricityModel.MIL_URI)
 									});
 							bindings.put(
 									new VariableSource("currentIntensity",
@@ -622,7 +622,7 @@ public class RunBatteryUnitarySimulation {
 									new VariableSink[] {
 											new VariableSink("currentFridgeIntensity",
 													Double.class,
-													ElectricMeterElectricityModel.URI)
+													ElectricMeterElectricityModel.MIL_URI)
 									});
 
 							// coupled model descriptor

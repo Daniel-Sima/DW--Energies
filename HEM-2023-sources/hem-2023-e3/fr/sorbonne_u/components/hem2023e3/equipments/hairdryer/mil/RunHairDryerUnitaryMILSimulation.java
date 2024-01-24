@@ -241,7 +241,8 @@ public class			RunHairDryerUnitaryMILSimulation
 			// standard simulations (useful when debugging)
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 			// run a simulation with the simulation beginning at 0.0 and
-			// ending at 24.0
+			// ending at 24.0import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.HairDryerStateModel;
+			
 			se.doStandAloneSimulation(0.0, 24.0);
 			SimulationReportI sr = se.getSimulatedModel().getFinalReport();
 			System.out.println(sr);

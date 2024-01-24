@@ -2,6 +2,8 @@ package equipments.meter;
 
 import fr.sorbonne_u.components.interfaces.OfferedCI;
 import fr.sorbonne_u.components.interfaces.RequiredCI;
+import utils.Measure;
+import utils.SensorData;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -29,13 +31,13 @@ extends	ElectricMeterImplementationI, RequiredCI, OfferedCI {
 	/**
 	 * @see
 	 */
-	public double getCurrentConsumption() throws Exception;
+	public SensorData<Measure<Double>> getCurrentConsumption() throws Exception;
 	
 	/***********************************************************************************/
 	/**
 	 * @see
 	 */
-	public double getCurrentProduction() throws Exception;
+	public SensorData<Measure<Double>> getCurrentProduction() throws Exception;
 }
 /***********************************************************************************/
 /***********************************************************************************/

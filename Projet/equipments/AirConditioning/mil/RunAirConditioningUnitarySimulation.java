@@ -225,7 +225,7 @@ public class RunAirConditioningUnitarySimulation {
 							SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 							// run a simulation with the simulation beginning at 0.0 and
 							// ending at 24.0
-							se.doStandAloneSimulation(0.0, 6.0);
+							se.doStandAloneSimulation(0.0, 1.0);
 							System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;

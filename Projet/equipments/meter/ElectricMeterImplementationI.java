@@ -1,5 +1,8 @@
 package equipments.meter;
 
+import utils.Measure;
+import utils.SensorData;
+
 /***********************************************************************************/
 /***********************************************************************************/
 /***********************************************************************************/
@@ -35,7 +38,7 @@ public interface ElectricMeterImplementationI {
 	 * @return				the current total electric consumption in W.
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public double getCurrentConsumption() throws Exception;
+	public SensorData<Measure<Double>> getCurrentConsumption() throws Exception;
 	
 	/***********************************************************************************/
 	/**
@@ -51,7 +54,7 @@ public interface ElectricMeterImplementationI {
 	 * @return				the current total electric power production in W.
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public double getCurrentProduction() throws Exception;
+	public SensorData<Measure<Double>> getCurrentProduction() throws Exception;
 
 }
 /***********************************************************************************/

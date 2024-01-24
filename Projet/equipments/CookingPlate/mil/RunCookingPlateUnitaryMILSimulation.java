@@ -86,19 +86,26 @@ public class RunCookingPlateUnitaryMILSimulation {
 			// the Cooking Plate model simulating its electricity consumption, an
 			// atomic HIOA model hence we use an AtomicHIOA_Descriptor
 			atomicModelDescriptors.put(
-					CookingPlateElectricityModel.URI,
+					CookingPlateElectricityModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							CookingPlateElectricityModel.class,
-							CookingPlateElectricityModel.URI,
+							CookingPlateElectricityModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			
 			// for atomic model, we use an AtomicModelDescriptor
 			atomicModelDescriptors.put(
-					CookingPlateUserModel.URI,
+					CookingPlateUserModel.MIL_URI,
 					AtomicModelDescriptor.create(
 							CookingPlateUserModel.class,
-							CookingPlateUserModel.URI,
+							CookingPlateUserModel.MIL_URI,
+							TimeUnit.HOURS,
+							null));
+			atomicModelDescriptors.put(
+					CookingPlateStateModel.MIL_URI,
+					AtomicModelDescriptor.create(
+							CookingPlateStateModel.class,
+							CookingPlateStateModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 
@@ -109,44 +116,71 @@ public class RunCookingPlateUnitaryMILSimulation {
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
-			submodels.add(CookingPlateElectricityModel.URI);
-			submodels.add(CookingPlateUserModel.URI);
+			submodels.add(CookingPlateElectricityModel.MIL_URI);
+			submodels.add(CookingPlateStateModel.MIL_URI);
+			submodels.add(CookingPlateUserModel.MIL_URI);
 
 			// event exchanging connections between exporting and importing models
 			Map<EventSource,EventSink[]> connections =
 					new HashMap<EventSource,EventSink[]>();
-
+					
+					// Cooking Plate
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, SwitchOnCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, SwitchOnCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateStateModel.MIL_URI,
 											SwitchOnCookingPlate.class)
 							});
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, SwitchOffCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, SwitchOffCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateStateModel.MIL_URI,
 											SwitchOffCookingPlate.class)
 							});
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, IncreaseCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, IncreaseCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateStateModel.MIL_URI,
 											IncreaseCookingPlate.class)
 							});
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, DecreaseCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, DecreaseCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateStateModel.MIL_URI,
+											DecreaseCookingPlate.class)
+							});
+
+					connections.put(
+							new EventSource(CookingPlateStateModel.MIL_URI, SwitchOnCookingPlate.class),
+							new EventSink[] {
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
+											SwitchOnCookingPlate.class)
+							});
+					connections.put(
+							new EventSource(CookingPlateStateModel.MIL_URI, SwitchOffCookingPlate.class),
+							new EventSink[] {
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
+											SwitchOffCookingPlate.class)
+							});
+					connections.put(
+							new EventSource(CookingPlateStateModel.MIL_URI, IncreaseCookingPlate.class),
+							new EventSink[] {
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
+											IncreaseCookingPlate.class)
+							});
+					connections.put(
+							new EventSource(CookingPlateStateModel.MIL_URI, DecreaseCookingPlate.class),
+							new EventSink[] {
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
 											DecreaseCookingPlate.class)
 							});
 
 					// coupled model descriptor
 					coupledModelDescriptors.put(
-							CookingPlateCoupledModel.URI,
+							CookingPlateCoupledModel.MIL_URI,
 							new CoupledModelDescriptor(
 									CookingPlateCoupledModel.class,
-									CookingPlateCoupledModel.URI,
+									CookingPlateCoupledModel.MIL_URI,
 									submodels,
 									null,
 									null,
@@ -156,7 +190,7 @@ public class RunCookingPlateUnitaryMILSimulation {
 					// simulation architecture
 					ArchitectureI architecture =
 							new Architecture(
-									CookingPlateCoupledModel.URI,
+									CookingPlateCoupledModel.MIL_URI,
 									atomicModelDescriptors,
 									coupledModelDescriptors,
 									TimeUnit.HOURS);
@@ -168,7 +202,7 @@ public class RunCookingPlateUnitaryMILSimulation {
 					SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 					// run a simulation with the simulation beginning at 0.0 and
 					// ending at 24.0
-					se.doStandAloneSimulation(0.0, 10.0);
+					se.doStandAloneSimulation(0.0, 24.0);
 					System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;

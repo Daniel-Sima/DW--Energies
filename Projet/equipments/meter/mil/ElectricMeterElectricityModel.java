@@ -1,9 +1,13 @@
 package equipments.meter.mil;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import equipments.HEM.simulation.HEM_ReportI;
+import equipments.meter.ElectricMeter;
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
+import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.InternalVariable;
@@ -18,6 +22,7 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.Pair;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
+import fr.sorbonne_u.exceptions.PreconditionException;
 import utils.Electricity;
 
 /***********************************************************************************/
@@ -59,14 +64,14 @@ import utils.Electricity;
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
 @ModelImportedVariable(name = "currentCookingPlateIntensity", type = Double.class)
-@ModelImportedVariable(name = "currentLampIntensity", type = Double.class)
-@ModelImportedVariable(name = "currentAirConditioningIntensity", type = Double.class)
-@ModelImportedVariable(name = "currentFridgeIntensity", type = Double.class)
+//@ModelImportedVariable(name = "currentLampIntensity", type = Double.class)
+//@ModelImportedVariable(name = "currentAirConditioningIntensity", type = Double.class)
+//@ModelImportedVariable(name = "currentFridgeIntensity", type = Double.class)
 
-@ModelImportedVariable(name = "currentPowerProducedSolarPanel", type = Double.class)
-@ModelImportedVariable(name = "currentPowerProducedPetrolGenerator", type = Double.class)
+//@ModelImportedVariable(name = "currentPowerProducedSolarPanel", type = Double.class)
+//@ModelImportedVariable(name = "currentPowerProducedPetrolGenerator", type = Double.class)
 
-@ModelExportedVariable(name = "currentTotalPowerProduced", type = Double.class)
+//@ModelExportedVariable(name = "currentTotalPowerProduced", type = Double.class)
 @ModelExportedVariable(name = "currentTotalPowerConsumed", type = Double.class)
 public class ElectricMeterElectricityModel 
 extends AtomicHIOA {
@@ -74,8 +79,15 @@ extends AtomicHIOA {
 	// Constants and variables
 	// -------------------------------------------------------------------------
 	private static final long serialVersionUID = 1L;
-	/** URI for a model; works when only one instance is created.			*/
-	public static final String URI = ElectricMeterElectricityModel.class.getSimpleName();
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created.										*/
+	public static final String	MIL_URI = ElectricMeterElectricityModel.class.
+			getSimpleName() + "-MIL";
+	/** URI for an instance model in MIL real time simulations; works as
+	 *  long as only one instance is created.										*/
+	public static final String	MIL_RT_URI = ElectricMeterElectricityModel.class.
+			getSimpleName() + "-MIL_RT";
+
 	/** tension of electric circuit for appliances in volts.			 	*/
 	public static final double TENSION = 220.0;
 
@@ -84,49 +96,51 @@ extends AtomicHIOA {
 	/** evaluation step as a duration, including the time unit.				*/
 	protected final Duration evaluationStep;
 
+	protected ElectricMeter						ownerComponent;
+
 	/** final report of the simulation run.									*/
 	protected ElectricMeterElectricityReport finalReport;
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
 	// -------------------------------------------------------------------------
-	
+
 	/** current intensity of the Cooking Plate in amperes.					*/
 	@ImportedVariable(type = Double.class)
 	protected Value<Double> currentCookingPlateIntensity;
-	
+
 	/** current intensity of the Lamp in amperes.							*/
-	@ImportedVariable(type = Double.class)
-	protected Value<Double> currentLampIntensity;
+//	@ImportedVariable(type = Double.class)
+//	protected Value<Double> currentLampIntensity;
 
 	/** current intensity of the Air Conditioning amperes.					*/
-	@ImportedVariable(type = Double.class)
-	protected Value<Double> currentAirConditioningIntensity;
-	
+//	@ImportedVariable(type = Double.class)
+//	protected Value<Double> currentAirConditioningIntensity;
+
 	/** current intensity of the Fridge amperes.							*/
-	@ImportedVariable(type = Double.class)
-	protected Value<Double> currentFridgeIntensity;
-	
+//	@ImportedVariable(type = Double.class)
+//	protected Value<Double> currentFridgeIntensity;
+
 	/** current power produce by the Solar Panel in Wh.						*/
-	@ImportedVariable(type = Double.class)
-	protected Value<Double> currentPowerProducedSolarPanel;
-	
+//	@ImportedVariable(type = Double.class)
+//	protected Value<Double> currentPowerProducedSolarPanel;
+
 	/** current power produce by the Petrol Generator in Wh.				*/
-	@ImportedVariable(type = Double.class)
-	protected Value<Double> currentPowerProducedPetrolGenerator;
-	
+//	@ImportedVariable(type = Double.class)
+//	protected Value<Double> currentPowerProducedPetrolGenerator;
+
 	/** current total intensity of the house in amperes.					*/
 	@InternalVariable(type = Double.class)
 	protected final Value<Double> currentIntensity = new Value<Double>(this);
 
 	/** the current total power produced by the producers					*/
-	@ExportedVariable(type = Double.class)
-	protected final Value<Double> currentTotalPowerProduced = new Value<Double>(this);
-	
+//	@ExportedVariable(type = Double.class)
+//	protected final Value<Double> currentTotalPowerProduced = new Value<Double>(this);
+
 	/** the current total power produced by the producers					*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double> currentTotalPowerConsumed = new Value<Double>(this);
-	
+
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -157,7 +171,7 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 	// Methods
 	// -------------------------------------------------------------------------
-	
+
 	/**
 	 * update the total electricity consumption in kwh given the current
 	 * intensity has been constant for the duration {@code d}.
@@ -178,7 +192,7 @@ extends AtomicHIOA {
 		Time t = this.currentTotalPowerConsumed.getTime().add(d);
 		this.currentTotalPowerConsumed.setNewValue(c, t);
 	}
-	
+
 	/***********************************************************************************/
 	/**
 	 * compute the current total production.
@@ -192,23 +206,23 @@ extends AtomicHIOA {
 	 *
 	 * @return the current total electric production in Wh.
 	 */
-	protected double computeTotalProduction() {
-		// simple sum of all incoming power produced Wh
-		double i = this.currentPowerProducedSolarPanel.getValue() + 
-				this.currentPowerProducedPetrolGenerator.getValue();
-
-		// Tracing
-		if (this.currentTotalPowerProduced.isInitialised()) {
-			StringBuffer message = new StringBuffer("Current total production: ");
-			message.append(this.currentTotalPowerProduced.getValue()); // TODO AV pq = 0 tjr
-			message.append(" kWh at ");
-			message.append(this.getCurrentStateTime());
-			message.append('\n');
-			this.logMessage(message.toString());
-		}
-
-		return i; 
-	}
+//	protected double computeTotalProduction() {
+//		// simple sum of all incoming power produced Wh
+//		double i = this.currentPowerProducedSolarPanel.getValue() + 
+//				this.currentPowerProducedPetrolGenerator.getValue();
+//
+//		// Tracing
+//		if (this.currentTotalPowerProduced.isInitialised()) {
+//			StringBuffer message = new StringBuffer("Current total production: ");
+//			message.append(this.currentTotalPowerProduced.getValue()); // TODO AV pq = 0 tjr
+//			message.append(" kWh at ");
+//			message.append(this.getCurrentStateTime());
+//			message.append('\n');
+//			this.logMessage(message.toString());
+//		}
+//
+//		return i; 
+//	}
 
 	/***********************************************************************************/
 	/**
@@ -225,15 +239,16 @@ extends AtomicHIOA {
 	 */
 	protected double computeTotalIntensity() {
 		// simple sum of all incoming intensities
-		double i = this.currentCookingPlateIntensity.getValue() + 
-				this.currentLampIntensity.getValue() +
-				this.currentAirConditioningIntensity.getValue() +
-				this.currentFridgeIntensity.getValue();
-				
+		double i = this.currentCookingPlateIntensity.getValue();
+//				+ 
+//				this.currentLampIntensity.getValue() +
+//				this.currentAirConditioningIntensity.getValue() +
+//				this.currentFridgeIntensity.getValue();
+
 		// Tracing
 		if (this.currentIntensity.isInitialised()) {
-			StringBuffer message = new StringBuffer("Current total consumption: ");
-			message.append(this.currentIntensity.getValue());
+			StringBuffer message = new StringBuffer("Current intensity consumption: ");
+			message.append((Math.round(this.currentIntensity.getValue() * 100.0)/100.0) + " Amperes");
 			message.append(" at ");
 			message.append(this.getCurrentStateTime());
 			message.append('\n');
@@ -264,16 +279,18 @@ extends AtomicHIOA {
 		int notInitialisedYet = 0;
 
 		if (!this.currentIntensity.isInitialised() &&
-				this.currentCookingPlateIntensity.isInitialised() &&
-				this.currentLampIntensity.isInitialised() && 
-				this.currentAirConditioningIntensity.isInitialised() && 
-				this.currentFridgeIntensity.isInitialised() && 
-				this.currentPowerProducedSolarPanel.isInitialised() && 
-				this.currentPowerProducedPetrolGenerator.isInitialised()) {
+				this.currentCookingPlateIntensity.isInitialised()
+//				&&
+//				this.currentLampIntensity.isInitialised() && 
+//				this.currentAirConditioningIntensity.isInitialised() && 
+//				this.currentFridgeIntensity.isInitialised() && 
+//				this.currentPowerProducedSolarPanel.isInitialised() && 
+//				this.currentPowerProducedPetrolGenerator.isInitialised()
+				) {
 			double i = this.computeTotalIntensity();
 			this.currentIntensity.initialise(i);
 			this.currentTotalPowerConsumed.initialise(0.0);
-			this.currentTotalPowerProduced.initialise(0.0);
+//			this.currentTotalPowerProduced.initialise(0.0);
 			justInitialised += 2;
 		} else if (!this.currentIntensity.isInitialised()) {
 			notInitialisedYet += 2;
@@ -317,9 +334,9 @@ extends AtomicHIOA {
 		double i = this.computeTotalIntensity();
 		this.currentIntensity.setNewValue(i, this.getCurrentStateTime());
 		// update 
-		double p = this.computeTotalProduction();
+//		double p = this.computeTotalProduction();
 		// recompute the current total production
-		this.currentTotalPowerProduced.setNewValue(p+this.currentTotalPowerProduced.getValue(), this.getCurrentStateTime());	
+//		this.currentTotalPowerProduced.setNewValue(p+this.currentTotalPowerProduced.getValue(), this.getCurrentStateTime());	
 	}
 
 	/***********************************************************************************/
@@ -328,18 +345,47 @@ extends AtomicHIOA {
 	 */
 	@Override
 	public void endSimulation(Time endTime) {
-//		this.updateConsumption(endTime.subtract(this.currentTotalPowerConsumed.getTime()));
+		//		this.updateConsumption(endTime.subtract(this.currentTotalPowerConsumed.getTime()));
 
 		// must capture the current consumption before the finalisation
 		// reinitialise the internal model variable.
 		this.finalReport = new ElectricMeterElectricityReport(
-				URI,
+				MIL_URI,
 				this.currentTotalPowerConsumed.getValue()/1000.0, // TODO AV
-				this.currentTotalPowerProduced.getValue()/1000.0  // TODO AV
+				0
+//				this.currentTotalPowerProduced.getValue()/1000.0  // TODO AV
 				);
 
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
+	}
+
+	// -------------------------------------------------------------------------
+	// Optional DEVS simulation protocol: simulation run parameters
+	// -------------------------------------------------------------------------
+
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.Model#setSimulationRunParameters(java.util.Map)
+	 */
+	@Override
+	public void setSimulationRunParameters(
+			Map<String, Object> simParams
+			) throws MissingRunParameterException
+	{
+		super.setSimulationRunParameters(simParams);
+
+		assert	simParams != null && !simParams.isEmpty() :
+			new PreconditionException(
+					"simParams != null && !simParams.isEmpty()");
+
+		if (simParams.containsKey(
+				AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+			this.ownerComponent = 
+					(ElectricMeter) simParams.get(
+							AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME);
+			this.getSimulationEngine().setLogger(
+					AtomicSimulatorPlugin.createComponentLogger(simParams));
+		}
 	}
 
 	// -------------------------------------------------------------------------

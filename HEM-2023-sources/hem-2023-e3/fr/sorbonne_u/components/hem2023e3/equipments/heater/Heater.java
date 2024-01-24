@@ -937,7 +937,7 @@ implements	HeaterUserImplI,
 	// -------------------------------------------------------------------------
 
 	/**
-	 * return				the heating status of the heater as a sensor data.
+	 * return the heating status of the heater as a sensor data.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
