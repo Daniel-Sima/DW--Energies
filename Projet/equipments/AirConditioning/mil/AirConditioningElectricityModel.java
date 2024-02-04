@@ -93,7 +93,7 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 								Cool.class,
 								DoNotCool.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
-public class 		AirConditioningElectricityModel 
+public class 		 	AirConditioningElectricityModel 
 extends 		AtomicHIOA 
 implements		AirConditioningOperationI
 {

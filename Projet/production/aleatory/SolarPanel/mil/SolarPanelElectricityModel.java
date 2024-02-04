@@ -21,6 +21,7 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.Pair;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
+import utils.Electricity;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -276,11 +277,11 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public void	endSimulation(Time endTime) {
-//		Duration d = endTime.subtract(this.getCurrentStateTime());
-//		this.totalProduction +=
-//				Electricity.computeConsumption(
-//						d,
-//						TENSION*this.currentPowerProducedSolarPanel.getValue());
+		Duration d = endTime.subtract(this.getCurrentStateTime());
+		this.totalProduction +=
+				Electricity.computeProduction(
+						d,
+						TENSION*this.currentPowerProducedSolarPanel.getValue());
 
 		this.logMessage("simulation ends.\n");
 		this.logMessage(new SolarPanelElectricityReport(getURI(), Math.round(this.totalProduction * 100.0) / 100.0).printout("-"));

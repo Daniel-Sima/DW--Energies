@@ -83,10 +83,10 @@ extends AbstractComponent
     private static final double SUSPEND_TEMP = 16.0;
 	/** Température maximale pour laquelle le HEM doit
 	 * 	resume AirConditioning.												*/
-	private static final double RESUME_TEMP = 21.0;
+	private static final double RESUME_TEMP = 20.0;
 	/** Consommation maximale pour laquelle le HEM doit 
 	 *	suspendre AirConditioning.											*/
-	private static final double CONSUMPTION_THRESHOLD = 600.0;
+	private static final double CONSUMPTION_THRESHOLD = 10.0;
 
 	/** Restart flag														*/
 	private boolean restart = true;
@@ -180,9 +180,6 @@ extends AbstractComponent
 								electricMeterOutboundPort.getCurrentConsumption()
 														 .getMeasure()
 														 .getData() + "\n");
-						o.traceMessage(
-								"Electric meter total consumption: " +
-								totalConsumption + "\n");
 
 						// Appeler la méthode de décision pour la température
 						evaluateTemperatureAndTakeAction();
@@ -215,7 +212,7 @@ extends AbstractComponent
 			}
 			else if (currentTemp > RESUME_TEMP) {
 				adjustableOutboundPortAirConditioning.resume();
-				restart = false;
+				adjustableOutboundPortAirConditioning.setMode(3);		// max 6
 			}
 
 		} catch (Exception e) {
@@ -226,8 +223,8 @@ extends AbstractComponent
 	public void evaluateConsumptionAndTakeAction() {
         try {
             SensorData<Measure<Double>> currentConsumption = electricMeterOutboundPort.getCurrentConsumption();
-            totalConsumption += currentConsumption.getMeasure().getData();
-            if (totalConsumption > CONSUMPTION_THRESHOLD && restart) {
+
+            if (currentConsumption.getMeasure().getData() > CONSUMPTION_THRESHOLD) {
                 // Le taux de consommation est trop élevé, suspendre le climatiseur
                 adjustableOutboundPortAirConditioning.suspend();
                 // Vous pouvez également notifier d'autres composants ou prendre d'autres actions nécessaires.

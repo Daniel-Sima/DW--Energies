@@ -447,7 +447,6 @@ implements 	ElectricMeterImplementationI {
 	@Override
 	public void			execute() throws Exception
 	{
-		System.out.println("Electric execute");
 		// In the electric meter, the accelerated clock is only used to get
 		// properly time stamped sensor data in simulated time instants.
 		this.clock = null;
@@ -466,6 +465,7 @@ implements 	ElectricMeterImplementationI {
 			this.clocksServerOutboundPort.unpublishPort();
 			this.logMessage("ElectricMeter got the clock " + this.clock);
 		}
+		System.out.println("Electric execute");
 	}
 
 	/**

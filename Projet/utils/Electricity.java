@@ -75,6 +75,29 @@ public class Electricity {
 		return h*i/1000.0;
 	}
 
+	/***********************************************************************************/
+	/**
+	 * compute the total production in kwh for the power level {@code i}
+	 * in watts produced during the duration {@code d}.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code d != null}
+	 * pre	{@code i >= 0.0}
+	 * post	{@code ret >= 0.0}
+	 * </pre>
+	 *
+	 * @param d		duration of the consumption to be computed.
+	 * @param p		constant intensity in watts during the duration {@code d}.
+	 * @return		the total production in kwh.
+	 */
+	public static double computeProduction(Duration d, double p)
+	{
+		double h = toHours(d);
+		return h*p/1000.0;
+	}
+
 }
 /***********************************************************************************/
 /***********************************************************************************/

@@ -3,16 +3,16 @@ package global;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
-import equipments.AirConditioning.AirConditioning;
-import equipments.AirConditioning.AirConditioningController;
-import equipments.AirConditioning.AirConditioningController.ControlMode;
-import equipments.AirConditioning.AirConditioningUser;
-import equipments.AirConditioning.mil.AirConditioningCoupledModel;
-import equipments.HEM.HEM;
-import equipments.Lamp.Lamp;
-import equipments.Lamp.LampUser;
-import equipments.Lamp.mil.LampStateModel;
-import equipments.Lamp.mil.LampUserModel;
+// import equipments.AirConditioning.AirConditioning;
+// import equipments.AirConditioning.AirConditioningController;
+// import equipments.AirConditioning.AirConditioningController.ControlMode;
+// import equipments.AirConditioning.AirConditioningUser;
+// import equipments.AirConditioning.mil.AirConditioningCoupledModel;
+// import equipments.HEM.HEM;
+// import equipments.Lamp.Lamp;
+// import equipments.Lamp.LampUser;
+// import equipments.Lamp.mil.LampStateModel;
+// import equipments.Lamp.mil.LampUserModel;
 import equipments.meter.ElectricMeter;
 import equipments.meter.ElectricMeterUnitTester;
 import equipments.meter.mil.ElectricMeterCoupledModel;
@@ -20,6 +20,10 @@ import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import production.aleatory.SolarPanel.SolarPanel;
+import production.aleatory.SolarPanel.SolarPanelController;
+import production.aleatory.SolarPanel.SolarPanelController.ControlMode;
+import production.aleatory.SolarPanel.mil.SolarPanelCoupledModel;
 import utils.ExecutionType;
 
 // -----------------------------------------------------------------------------
@@ -78,8 +82,11 @@ extends		AbstractCVM
 											// ExecutionType.MIL_SIMULATION;
 											// ExecutionType.MIL_RT_SIMULATION;
 											ExecutionType.SIL_SIMULATION;
+
 	/** the control mode of the air conditioning controller for the next run.			*/
-	public static final ControlMode		CONTROL_MODE = ControlMode.PULL;
+	// public static final AirConditioningController.ControlMode		CONTROL_MODE_AC = AirConditioningController.ControlMode.PULL;
+	/** the control mode of the solar panel for the next run.			*/
+	public static final ControlMode		CONTROL_MODE_SP = ControlMode.PULL;
 
 	/** for unit tests and SIL simulation tests, a {@code Clock} is
 	 *  used to get a time-triggered synchronisation of the actions of
@@ -127,9 +134,10 @@ extends		AbstractCVM
 		// execution that is required.
 		// URI of the simulation architecture for the current run, if relevant.
 		String architectureURI = "";
-		String lampLocalSimulatorURI = "";
-		String lampUserLocalSimulatorURI = "";
-		String airConditioningLocalSimulatorURI = "";
+		// String lampLocalSimulatorURI = "";
+		// String lampUserLocalSimulatorURI = "";
+		// String airConditioningLocalSimulatorURI = "";
+		String solarPanelLocalSimulatorURI = "";
 		String meterLocalSimulatorURI = "";
 		// acceleration factor for the current run, if relevant.
 		double accelerationFactor = 0.0;
@@ -146,9 +154,10 @@ extends		AbstractCVM
 		switch (CURRENT_EXECUTION_TYPE) {
 		case MIL_SIMULATION:
 			architectureURI = GlobalSupervisor.MIL_SIM_ARCHITECTURE_URI;
-			lampLocalSimulatorURI = LampStateModel.MIL_URI;
-			lampUserLocalSimulatorURI = LampUserModel.MIL_URI;
-			airConditioningLocalSimulatorURI = AirConditioningCoupledModel.MIL_URI;
+			// lampLocalSimulatorURI = LampStateModel.MIL_URI;
+			// lampUserLocalSimulatorURI = LampUserModel.MIL_URI;
+			// airConditioningLocalSimulatorURI = AirConditioningCoupledModel.MIL_URI;
+			solarPanelLocalSimulatorURI = SolarPanelCoupledModel.MIL_URI;
 			meterLocalSimulatorURI = ElectricMeterCoupledModel.MIL_URI;
 			accelerationFactor = ACCELERATION_FACTOR;
 			unixEpochStartTimeInMillis =
@@ -158,9 +167,10 @@ extends		AbstractCVM
 			break;
 		case MIL_RT_SIMULATION:
 			architectureURI = GlobalSupervisor.MIL_SIM_ARCHITECTURE_URI;
-			lampLocalSimulatorURI = LampStateModel.MIL_RT_URI;
-			lampUserLocalSimulatorURI = LampUserModel.MIL_RT_URI;
-			airConditioningLocalSimulatorURI = AirConditioningCoupledModel.MIL_RT_URI;
+			// lampLocalSimulatorURI = LampStateModel.MIL_RT_URI;
+			// lampUserLocalSimulatorURI = LampUserModel.MIL_RT_URI;
+			// airConditioningLocalSimulatorURI = AirConditioningCoupledModel.MIL_RT_URI;
+			solarPanelLocalSimulatorURI = SolarPanelCoupledModel.MIL_RT_URI;
 			meterLocalSimulatorURI = ElectricMeterCoupledModel.MIL_RT_URI;
 			accelerationFactor = ACCELERATION_FACTOR;
 			unixEpochStartTimeInMillis =
@@ -170,9 +180,10 @@ extends		AbstractCVM
 			break;
 		case SIL_SIMULATION:
 			architectureURI = GlobalSupervisor.SIL_SIM_ARCHITECTURE_URI;
-			lampLocalSimulatorURI = LampStateModel.SIL_URI;
-			lampUserLocalSimulatorURI = "not-used";
-			airConditioningLocalSimulatorURI = AirConditioningCoupledModel.SIL_URI;
+			// lampLocalSimulatorURI = LampStateModel.SIL_URI;
+			// lampUserLocalSimulatorURI = "not-used";
+			// airConditioningLocalSimulatorURI = AirConditioningCoupledModel.SIL_URI;
+			solarPanelLocalSimulatorURI = SolarPanelCoupledModel.SIL_URI;
 			meterLocalSimulatorURI = ElectricMeterCoupledModel.SIL_URI;
 			accelerationFactor = ACCELERATION_FACTOR;
 			unixEpochStartTimeInMillis =
@@ -190,54 +201,73 @@ extends		AbstractCVM
 		default:
 		}
 
-		AbstractComponent.createComponent(
-				Lamp.class.getCanonicalName(),
-				new Object[]{Lamp.REFLECTION_INBOUND_PORT_URI,
-							 Lamp.INBOUND_PORT_URI,
-							 CURRENT_EXECUTION_TYPE,
-							 architectureURI,
-							 lampLocalSimulatorURI,
-							 accelerationFactor});
-		AbstractComponent.createComponent(
-				LampUser.class.getCanonicalName(),
-				new Object[]{LampUser.REFLECTION_INBOUND_PORT_URI,
-							 Lamp.INBOUND_PORT_URI,
-							 CURRENT_EXECUTION_TYPE,
-							 architectureURI,
-							 lampUserLocalSimulatorURI,
-							 accelerationFactor});
+		// AbstractComponent.createComponent(
+		// 		Lamp.class.getCanonicalName(),
+		// 		new Object[]{Lamp.REFLECTION_INBOUND_PORT_URI,
+		// 					 Lamp.INBOUND_PORT_URI,
+		// 					 CURRENT_EXECUTION_TYPE,
+		// 					 architectureURI,
+		// 					 lampLocalSimulatorURI,
+		// 					 accelerationFactor});
+		// AbstractComponent.createComponent(
+		// 		LampUser.class.getCanonicalName(),
+		// 		new Object[]{LampUser.REFLECTION_INBOUND_PORT_URI,
+		// 					 Lamp.INBOUND_PORT_URI,
+		// 					 CURRENT_EXECUTION_TYPE,
+		// 					 architectureURI,
+		// 					 lampUserLocalSimulatorURI,
+		// 					 accelerationFactor});
+
+		// AbstractComponent.createComponent(
+		// 		AirConditioning.class.getCanonicalName(),
+		// 		new Object[]{AirConditioning.REFLECTION_INBOUND_PORT_URI,
+		// 					 AirConditioning.USER_INBOUND_PORT_URI,
+		// 					 AirConditioning.INTERNAL_CONTROL_INBOUND_PORT_URI,
+		// 					 AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+		// 					 AirConditioning.SENSOR_INBOUND_PORT_URI_USER,
+		// 					 AirConditioning.ACTUATOR_INBOUND_PORT_URI,
+		// 					 CURRENT_EXECUTION_TYPE,
+		// 					 architectureURI,
+		// 					 airConditioningLocalSimulatorURI,
+		// 					 accelerationFactor,
+		// 					 CLOCK_URI});
+		// AbstractComponent.createComponent(
+		// 		AirConditioningController.class.getCanonicalName(),
+		// 		new Object[]{AirConditioning.SENSOR_INBOUND_PORT_URI_USER,
+		// 					 AirConditioning.ACTUATOR_INBOUND_PORT_URI,
+		// 					 AirConditioningController.STANDARD_HYSTERESIS,
+		// 					 AirConditioningController.STANDARD_CONTROL_PERIOD,
+		// 					 CONTROL_MODE_AC,
+		// 					 CURRENT_EXECUTION_TYPE,
+		// 					 CLOCK_URI});
+		// AbstractComponent.createComponent(
+		// 		AirConditioningUser.class.getCanonicalName(),
+		// 		new Object[]{AirConditioning.USER_INBOUND_PORT_URI,
+		// 					 AirConditioning.INTERNAL_CONTROL_INBOUND_PORT_URI,
+		// 					 AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+		// 					 AirConditioning.SENSOR_INBOUND_PORT_URI_USER,
+		// 					 AirConditioning.ACTUATOR_INBOUND_PORT_URI,
+		// 					 CURRENT_EXECUTION_TYPE,
+		// 					 CLOCK_URI});
 
 		AbstractComponent.createComponent(
-				AirConditioning.class.getCanonicalName(),
-				new Object[]{AirConditioning.REFLECTION_INBOUND_PORT_URI,
-							 AirConditioning.USER_INBOUND_PORT_URI,
-							 AirConditioning.INTERNAL_CONTROL_INBOUND_PORT_URI,
-							 AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI,
-							 AirConditioning.SENSOR_INBOUND_PORT_URI_USER,
-							 AirConditioning.ACTUATOR_INBOUND_PORT_URI,
+				SolarPanel.class.getCanonicalName(),
+				new Object[]{SolarPanel.REFLECTION_INBOUND_PORT_URI,
+							 SolarPanel.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+							 SolarPanel.METEO_CONTROL_INBOUND_PORT_URI,
 							 CURRENT_EXECUTION_TYPE,
 							 architectureURI,
-							 airConditioningLocalSimulatorURI,
+							 solarPanelLocalSimulatorURI,
 							 accelerationFactor,
 							 CLOCK_URI});
-		AbstractComponent.createComponent(
-				AirConditioningController.class.getCanonicalName(),
-				new Object[]{AirConditioning.SENSOR_INBOUND_PORT_URI_USER,
-							 AirConditioning.ACTUATOR_INBOUND_PORT_URI,
-							 AirConditioningController.STANDARD_HYSTERESIS,
-							 AirConditioningController.STANDARD_CONTROL_PERIOD,
-							 CONTROL_MODE,
-							 CURRENT_EXECUTION_TYPE,
-							 CLOCK_URI});
-		AbstractComponent.createComponent(
-				AirConditioningUser.class.getCanonicalName(),
-				new Object[]{AirConditioning.USER_INBOUND_PORT_URI,
-							 AirConditioning.INTERNAL_CONTROL_INBOUND_PORT_URI,
-							 AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI,
-							 AirConditioning.SENSOR_INBOUND_PORT_URI_USER,
-							 AirConditioning.ACTUATOR_INBOUND_PORT_URI,
-							 CURRENT_EXECUTION_TYPE,
-							 CLOCK_URI});
+	    AbstractComponent.createComponent(
+	    		SolarPanelController.class.getCanonicalName(),
+	    		new Object[]{SolarPanelController.STANDARD_HYSTERESIS,
+	    					 SolarPanelController.STANDARD_CONTROL_PERIOD,
+							 CONTROL_MODE_SP,
+	    					 CURRENT_EXECUTION_TYPE,
+	    					 CLOCK_URI});
+
 		AbstractComponent.createComponent(
 				ElectricMeter.class.getCanonicalName(),
 				new Object[]{ElectricMeter.REFLECTION_INBOUND_PORT_URI,
@@ -246,9 +276,9 @@ extends		AbstractCVM
 							 architectureURI,
 							 meterLocalSimulatorURI,
 							 accelerationFactor});
-		AbstractComponent.createComponent(
-				HEM.class.getCanonicalName(),
-				new Object[]{CURRENT_EXECUTION_TYPE});
+		// AbstractComponent.createComponent(
+		// 		HEM.class.getCanonicalName(),
+		// 		new Object[]{CURRENT_EXECUTION_TYPE});
 
 		if (CURRENT_EXECUTION_TYPE.isIntegrationTest()) {
 			AbstractComponent.createComponent(
@@ -318,14 +348,14 @@ extends		AbstractCVM
 				executionDuration = ((long)
 						(((double)SIMULATION_TIME_UNIT.toMillis(1))*
 								(SIMULATION_DURATION/ACCELERATION_FACTOR)))
-					+ DELAY_TO_START_SIMULATION + 2000L;
+					+ DELAY_TO_START_SIMULATION + 4000L;
 				break;
 			case INTEGRATION_TEST:
 				executionDuration =
 						DELAY_TO_START +
 							((long)(TimeUnit.SECONDS.toMillis(1)
 											* (660.0/ACCELERATION_FACTOR)))
-																	+ 2000L;
+																	+ 4000L;
 				break;
 			case STANDARD:
 			default:

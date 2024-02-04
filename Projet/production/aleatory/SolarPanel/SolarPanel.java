@@ -6,14 +6,19 @@ import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
+import fr.sorbonne_u.components.cyphy.plugins.devs.RTAtomicSimulatorPlugin;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
+import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import production.aleatory.SolarPanel.connections.SolarPanelExternalControlInboundPort;
 import production.aleatory.SolarPanel.connections.SolarPanelMeteoControlInboundPort;
+import production.aleatory.SolarPanel.mil.ExternalWeatherModel;
 import production.aleatory.SolarPanel.mil.MILSimulationArchitectures;
 import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
+import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
+import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 import utils.ExecutionType;
 
@@ -41,8 +46,8 @@ import utils.ExecutionType;
  */
 @OfferedInterfaces(offered={SolarPanelExternalControlCI.class, SolarPanelMeteoControlCI.class})
 @RequiredInterfaces(required={ClocksServerCI.class})
-public class SolarPanel 
-extends	AbstractCyPhyComponent  
+public class	 SolarPanel 
+extends		AbstractCyPhyComponent  
 implements 	SolarPanelExternalControlI, 
 			SolarPanelMeteoControlI {
 	// -------------------------------------------------------------------------
@@ -59,7 +64,10 @@ implements 	SolarPanelExternalControlI,
 	/** URI of the solar panel port for external control.				    */
 	public static final String EXTERNAL_CONTROL_INBOUND_PORT_URI =
 			"SOLAR-PANEL-EXTERNAL-CONTROL-INBOUND-PORT-URI";
-	/** URI of the solar panel port for meteo control.				    */
+	/** URI of the AirConditioning port for internal control.				*/
+	public static final String INTERNAL_CONTROL_INBOUND_PORT_URI =
+			"SOLAR-PANEL-INTERNAL-CONTROL-INBOUND-PORT-URI";
+	/** URI of the solar panel port for meteo control.				    	*/
 	public static final String METEO_CONTROL_INBOUND_PORT_URI =
 			"SOLAR-PANEL-METEO-CONTROL-INBOUND-PORT-URI";
 
@@ -70,7 +78,7 @@ implements 	SolarPanelExternalControlI,
 	protected double currentPowerLevelProduction;
 	/** inbound port offering the <code>SolarPanelExternalControlCI</code>
 	 *  interface.															*/
-	protected SolarPanelExternalControlInboundPort solarPanelExternalControlInbound;
+	protected SolarPanelExternalControlInboundPort solarPanelExternalControlInboundPort;
 	/** inbound port offerinr the <code>SolarPanelMeteoControlCI</code> inteface */
 	protected SolarPanelMeteoControlInboundPort solarPanelMeteoControlInboundPort;
 	
@@ -132,6 +140,7 @@ implements 	SolarPanelExternalControlI,
 	 * </pre>
 	 * 
 	 * @param solarPanelExternalControlInboundPortURI	URI of the inbound port to call the solar panel component for external control.
+	 * @param solarPanelMeteoControlInboundPort			URI of the inbound port to call the solar panel component for meteo control.
 	 * @throws Exception							<i>to do</i>.
 	 */
 	protected SolarPanel(
@@ -160,6 +169,7 @@ implements 	SolarPanelExternalControlI,
 	 * 
 	 * @param reflectionInboundPortURI				URI of the reflection inbound port of the component.
 	 * @param solarPanelExternalControlInboundPortURI	URI of the inbound port to call the solar panel component for external control.
+	 * @param solarPanelMeteoControlInboundPort
 	 * @param currentExecutionType					current execution type for the next run.
 	 * @param simArchitectureURI					URI of the simulation architecture to be created or the empty string if the component does not execute as a simulation.
 	 * @param localSimulatorURI						URI of the local simulator to be used in the simulation architecture.
@@ -177,28 +187,8 @@ implements 	SolarPanelExternalControlI,
 		double accFactor,
 		String clockURI
 		) throws Exception
-	{
-		super(reflectionInboundPortURI, 1, 0);
-		
-		assert	currentExecutionType != null :
-				new PreconditionException("currentExecutionType != null");
-		assert	!currentExecutionType.isSimulated() ||
-							(simArchitectureURI != null &&
-										!simArchitectureURI.isEmpty()) :
-				new PreconditionException(
-						"currentExecutionType.isSimulated() ||  "
-						+ "(simArchitectureURI != null && "
-						+ "!simArchitectureURI.isEmpty())");
-		assert	!currentExecutionType.isSimulated() ||
-							(localSimulatorURI != null &&
-											!localSimulatorURI.isEmpty()) :
-				new PreconditionException(
-						"currentExecutionType.isSimulated() ||  "
-						+ "(localSimulatorURI != null && "
-						+ "!localSimulatorURI.isEmpty())");
-		assert	!currentExecutionType.isSIL() || accFactor > 0.0 :
-				new PreconditionException(
-						"!currentExecutionType.isSIL() || accFactor > 0.0");
+	{		
+		super(reflectionInboundPortURI, 1, 1);
 
 		this.currentExecutionType = currentExecutionType;
 		this.simArchitectureURI = simArchitectureURI;
@@ -207,6 +197,8 @@ implements 	SolarPanelExternalControlI,
 		this.clockURI = clockURI;
 		this.clock = new CompletableFuture<AcceleratedClock>();
 				
+		System.out.println("Solar panel creation");
+
 		this.initialise(solarPanelExternalControlInboundPortURI, 
 						solarPanelMeteoControlInboundPort);
 	}
@@ -235,44 +227,44 @@ implements 	SolarPanelExternalControlI,
 
 		this.currentPowerLevelProduction = 0;
 
-		this.solarPanelExternalControlInbound = new SolarPanelExternalControlInboundPort(
+		this.solarPanelExternalControlInboundPort = new SolarPanelExternalControlInboundPort(
 				solarPanelExternalControlInboundPortURI, this);
-		this.solarPanelExternalControlInbound.publishPort();
+		this.solarPanelExternalControlInboundPort.publishPort();
 		
 		this.solarPanelMeteoControlInboundPort = new SolarPanelMeteoControlInboundPort(solarPanelMeteoControlInboundPort, this);
 		this.solarPanelMeteoControlInboundPort.publishPort();
 
-		// switch (this.currentExecutionType) {
-		// case MIL_SIMULATION:
-		// 	Architecture architecture =
-		// 			MILSimulationArchitectures.createSolarPanelMILArchitecture();
-		// 	assert	architecture.getRootModelURI().equals(this.localSimulatorURI) :
-		// 			new AssertionError(
-		// 					"local simulator " + this.localSimulatorURI
-		// 					+ " does not exist!");
-		// 	this.addLocalSimulatorArchitecture(architecture);
-		// 	this.architecturesURIs2localSimulatorURIS.
-		// 				put(this.simArchitectureURI, this.localSimulatorURI);
-		// 	break;
-		// case MIL_RT_SIMULATION:
-		// case SIL_SIMULATION:
-		// 	architecture =
-		// 			MILSimulationArchitectures.
-		// 				createSolarPanelRTArchitecture(
-		// 						this.currentExecutionType,
-		// 						this.accFactor);
-		// assert	architecture.getRootModelURI().equals(this.localSimulatorURI) :
-		// 		new AssertionError(
-		// 				"local simulator " + this.localSimulatorURI
-		// 				+ " does not exist!");
-		// this.addLocalSimulatorArchitecture(architecture);
-		// this.architecturesURIs2localSimulatorURIS.
-		// 		put(this.simArchitectureURI, this.localSimulatorURI);
-		// break;
-		// case STANDARD:
-		// case INTEGRATION_TEST:
-		// default:
-		// }
+		switch (this.currentExecutionType) {
+		case MIL_SIMULATION:
+			Architecture architecture =
+					MILSimulationArchitectures.createSolarPanelMILArchitecture();
+			assert	architecture.getRootModelURI().equals(this.localSimulatorURI) :
+					new AssertionError(
+							"local simulator " + this.localSimulatorURI
+							+ " does not exist!");
+			this.addLocalSimulatorArchitecture(architecture);
+			this.architecturesURIs2localSimulatorURIS.
+						put(this.simArchitectureURI, this.localSimulatorURI);
+			break;
+		case MIL_RT_SIMULATION:
+		case SIL_SIMULATION:
+			architecture =
+					MILSimulationArchitectures.
+						createSolarPanelRTArchitecture(
+								this.currentExecutionType,
+								this.accFactor);
+		assert	architecture.getRootModelURI().equals(this.localSimulatorURI) :
+				new AssertionError(
+						"local simulator " + this.localSimulatorURI
+						+ " does not exist!");
+		this.addLocalSimulatorArchitecture(architecture);
+		this.architecturesURIs2localSimulatorURIS.
+				put(this.simArchitectureURI, this.localSimulatorURI);
+		break;
+		case STANDARD:
+		case INTEGRATION_TEST:
+		default:
+		}
 
 		if (VERBOSE) {
 			this.tracer.get().setTitle("Solar panel component");
@@ -284,7 +276,83 @@ implements 	SolarPanelExternalControlI,
 	// -------------------------------------------------------------------------
 	// Component life-cycle
 	// -------------------------------------------------------------------------
-	/***********************************************************************************/
+	
+	/**
+	 * @see fr.sorbonne_u.components.AbstractComponent#start()
+	 */
+	@Override
+	public synchronized void	start() throws ComponentStartException
+	{
+		super.start();
+
+		try {
+			switch (this.currentExecutionType) {
+			case MIL_SIMULATION:
+				this.asp = new AtomicSimulatorPlugin();
+				String uri = this.architecturesURIs2localSimulatorURIS.
+												get(this.simArchitectureURI);
+				Architecture architecture =
+					(Architecture) this.localSimulatorsArchitectures.get(uri);
+				this.asp.setPluginURI(uri);
+				this.asp.setSimulationArchitecture(architecture);
+				this.installPlugin(this.asp);
+				break;
+			case MIL_RT_SIMULATION:
+				this.asp = new RTAtomicSimulatorPlugin();
+				uri = this.architecturesURIs2localSimulatorURIS.
+												get(this.simArchitectureURI);
+				architecture =
+						(Architecture) this.localSimulatorsArchitectures.get(uri);
+				((RTAtomicSimulatorPlugin)this.asp).setPluginURI(uri);
+				((RTAtomicSimulatorPlugin)this.asp).
+										setSimulationArchitecture(architecture);
+				this.installPlugin(this.asp);
+				break;
+			case SIL_SIMULATION:
+				// For SIL simulations, we use the ModelStateAccessI protocol
+				// to provide the access to the current temperature computed
+				// by the HeaterTemperatureModel.
+				this.asp = new RTAtomicSimulatorPlugin();
+				uri = this.architecturesURIs2localSimulatorURIS.
+												get(this.simArchitectureURI);
+				architecture =
+						(Architecture) this.localSimulatorsArchitectures.get(uri);
+				((RTAtomicSimulatorPlugin)this.asp).setPluginURI(uri);
+				((RTAtomicSimulatorPlugin)this.asp).
+										setSimulationArchitecture(architecture);
+				this.installPlugin(this.asp);
+				break;
+			case STANDARD:
+			case INTEGRATION_TEST:
+			default:
+			}		
+		} catch (Exception e) {
+			throw new ComponentStartException(e) ;
+		}		
+	}
+
+	/**
+	 * @see fr.sorbonne_u.components.AbstractComponent#execute()
+	 */
+	@Override
+	public void			execute() throws Exception
+	{
+		if (!this.currentExecutionType.isStandard()) {
+			this.clockServerOBP = new ClocksServerOutboundPort(this);
+			this.clockServerOBP.publishPort();
+			this.doPortConnection(
+					this.clockServerOBP.getPortURI(),
+					ClocksServer.STANDARD_INBOUNDPORT_URI,
+					ClocksServerConnector.class.getCanonicalName());
+			AcceleratedClock clock =
+					this.clockServerOBP.getClock(this.clockURI);
+			this.doPortDisconnection(this.clockServerOBP.getPortURI());
+			this.clockServerOBP.unpublishPort();
+			this.clock.complete(clock);
+		}
+		System.out.println("Solar panel execute");
+	}
+	
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
 	 */
@@ -292,7 +360,7 @@ implements 	SolarPanelExternalControlI,
 	public synchronized void shutdown() throws ComponentShutdownException
 	{
 		try {
-			this.solarPanelExternalControlInbound.unpublishPort();
+			this.solarPanelExternalControlInboundPort.unpublishPort();
 			this.solarPanelMeteoControlInboundPort.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
@@ -342,7 +410,8 @@ implements 	SolarPanelExternalControlI,
 			this.traceMessage("Solar panel power production level changed to "+ this.currentPowerLevelProduction + ".\n");
 		}
 		
-		assert	this.currentPowerLevelProduction >= 0 && this.currentPowerLevelProduction <= MAX_POWER_LEVEL_PRODUCTION : new PreconditionException("this.currentPowerLevelProduction >= 0 && this.currentPowerLevelProduction <= MAX_POWER_LEVEL_PRODUCTION ");
+		assert	this.currentPowerLevelProduction >= 0 && this.currentPowerLevelProduction <= MAX_POWER_LEVEL_PRODUCTION :
+			 new PreconditionException("this.currentPowerLevelProduction >= 0 && this.currentPowerLevelProduction <= MAX_POWER_LEVEL_PRODUCTION ");
 	}
 }
 /***********************************************************************************/

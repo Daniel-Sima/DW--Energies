@@ -226,24 +226,24 @@ public class RunHEM_Simulation {
 
 			// Solar Panel models
 			atomicModelDescriptors.put(
-					SolarPanelElectricityModel.URI,
+					SolarPanelElectricityModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							SolarPanelElectricityModel.class,
-							SolarPanelElectricityModel.URI,
+							SolarPanelElectricityModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					ExternalWeatherModel.URI,
+					ExternalWeatherModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							ExternalWeatherModel.class,
-							ExternalWeatherModel.URI,
+							ExternalWeatherModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					SolarPanelUnitTesterModel.URI,
+					SolarPanelUnitTesterModel.MIL_URI,
 					AtomicModelDescriptor.create(
 							SolarPanelUnitTesterModel.class,
-							SolarPanelUnitTesterModel.URI,
+							SolarPanelUnitTesterModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 
@@ -292,9 +292,9 @@ public class RunHEM_Simulation {
 			submodels.add(FridgeTemperatureModel.URI);
 			submodels.add(InternalTemperatureModel.URI);
 			submodels.add(FridgeUnitTesterModel.URI);
-			submodels.add(SolarPanelElectricityModel.URI);
-			submodels.add(ExternalWeatherModel.URI);
-			submodels.add(SolarPanelUnitTesterModel.URI);
+			submodels.add(SolarPanelElectricityModel.MIL_URI);
+			submodels.add(ExternalWeatherModel.MIL_URI);
+			submodels.add(SolarPanelUnitTesterModel.MIL_URI);
 			submodels.add(PetrolGeneratorElectricityModel.URI);
 			submodels.add(PetrolGeneratorUnitTesterModel.URI);
 
@@ -519,11 +519,11 @@ public class RunHEM_Simulation {
 							// Solar Panel bindings
 							bindings.put(new VariableSource("externalSolarIrradiance",
 									Double.class,
-									ExternalWeatherModel.URI),
+									ExternalWeatherModel.MIL_URI),
 									new VariableSink[] {
 											new VariableSink("externalSolarIrradiance",
 													Double.class,
-													SolarPanelElectricityModel.URI)
+													SolarPanelElectricityModel.MIL_URI)
 							});
 
 							// bindings between models and the electric meter model
@@ -567,7 +567,7 @@ public class RunHEM_Simulation {
 							bindings.put(
 									new VariableSource("currentPowerProducedSolarPanel",
 											Double.class,
-											SolarPanelElectricityModel.URI),
+											SolarPanelElectricityModel.MIL_URI),
 									new VariableSink[] {
 											new VariableSink("currentPowerProducedSolarPanel",
 													Double.class,

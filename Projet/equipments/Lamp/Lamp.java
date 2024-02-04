@@ -6,8 +6,6 @@ import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.components.cyphy.plugins.devs.RTAtomicSimulatorPlugin;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
-import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.HairDryerStateModel;
-import fr.sorbonne_u.components.hem2023e3.equipments.hairdryer.mil.events.SetLowHairDryer;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 
 import java.util.HashMap;
