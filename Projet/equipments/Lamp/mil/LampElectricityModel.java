@@ -111,7 +111,7 @@ implements LampOperationI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * The enumeration <code>State</code> describes the discrete states or
+	 * The enumeration <code>LampState</code> describes the discrete states or
 	 * modes of the lamp.
 	 *
 	 * <p><strong>Description</strong></p>
@@ -125,7 +125,7 @@ implements LampOperationI
 	 * 
 	 * @author	<a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
 	 */
-	public static enum State {
+	public static enum LampState {
 		OFF,
 		/** low mode is less light and less consuming.							*/
 		LOW,			
@@ -155,18 +155,18 @@ implements LampOperationI
 													getSimpleName() + "-SIL";
 
 	/** energy consumption (in Watts) of the Lamp depending the mode.		*/
-	public static HashMap<State, Double> LampEnergyConsumption = new HashMap<State, Double>() {{
-		put(State.LOW,65.0); 
-		put(State.MEDIUM,110.0);
-		put(State.HIGH,230.0);}
+	public static HashMap<LampState, Double> LampEnergyConsumption = new HashMap<LampState, Double>() {{
+		put(LampState.LOW,65.0); 
+		put(LampState.MEDIUM,110.0);
+		put(LampState.HIGH,230.0);}
 	};
 
 
 	/** nominal tension (in Volts) of the lamp.						*/
 	public static double TENSION = 220; // Volts
 
-	/** current state (OFF, LOW, HIGH) of the lamp.					*/
-	protected State					currentState = State.OFF;
+	/** current LampState (OFF, LOW, HIGH) of the lamp.					*/
+	protected LampState					currentState = LampState.OFF;
 	/** true when the electricity consumption of the lamp has changed
 	 *  after executing an external event; the external event changes the
 	 *  value of <code>currentState</code> and then an internal transition
@@ -224,9 +224,9 @@ implements LampOperationI
 	@Override
 	public void			turnOn()
 	{
-		if (this.currentState == LampElectricityModel.State.OFF) {
+		if (this.currentState == LampElectricityModel.LampState.OFF) {
 			// then put it in the state LOW
-			this.currentState = LampElectricityModel.State.LOW;
+			this.currentState = LampElectricityModel.LampState.LOW;
 			// trigger an internal transition by toggling the electricity
 			// consumption changed boolean to true
 			this.toggleConsumptionHasChanged();
@@ -241,9 +241,9 @@ implements LampOperationI
 	{
 		// a SwitchOff event can be executed when the state of the hair
 		// dryer model is *not* in the state OFF
-		if (this.currentState != LampElectricityModel.State.OFF) {
+		if (this.currentState != LampElectricityModel.LampState.OFF) {
 			// then put it in the state OFF
-			this.currentState = LampElectricityModel.State.OFF;
+			this.currentState = LampElectricityModel.LampState.OFF;
 			// trigger an internal transition by toggling the electricity
 			// consumption changed boolean to true
 			this.toggleConsumptionHasChanged();
@@ -258,12 +258,12 @@ implements LampOperationI
 	{
 		// a IncreaseLamp event can be executed when the state of the lamp
 		// model is *not* in the state OFF
-		if (this.currentState != LampElectricityModel.State.OFF) {
+		if (this.currentState != LampElectricityModel.LampState.OFF) {
 			// then put it in the next state
 			switch (this.currentState) {
-				case LOW : this.currentState = LampElectricityModel.State.MEDIUM;
+				case LOW : this.currentState = LampElectricityModel.LampState.MEDIUM;
 							break;
-				case MEDIUM : this.currentState = LampElectricityModel.State.HIGH;
+				case MEDIUM : this.currentState = LampElectricityModel.LampState.HIGH;
 							break;
 				default : break;
 			}
@@ -280,13 +280,13 @@ implements LampOperationI
 	public void			decreaseMode()
 	{
 		// a DecreaseLamp event can be executed when the state of the lamp
-		// model is *not* in the state OFF
-		if (this.currentState != LampElectricityModel.State.OFF) {
+		// model is *not* in the LampState OFF
+		if (this.currentState != LampElectricityModel.LampState.OFF) {
 			// then put it in the next state
 			switch (this.currentState) {
-				case MEDIUM : this.currentState = LampElectricityModel.State.LOW;
+				case MEDIUM : this.currentState = LampElectricityModel.LampState.LOW;
 							break;
-				case HIGH : this.currentState = LampElectricityModel.State.MEDIUM;
+				case HIGH : this.currentState = LampElectricityModel.LampState.MEDIUM;
 							break;
 				default : break;
 			}
@@ -333,7 +333,7 @@ implements LampOperationI
 
 		// initially the lamp is off and its electricity consumption is
 		// not about to change.
-		this.currentState = State.OFF;
+		this.currentState = LampState.OFF;
 		this.consumptionHasChanged = false;
 		this.totalConsumption = 0.0;
 
@@ -397,13 +397,13 @@ implements LampOperationI
 		{
 			case OFF : 	this.currentIntensity.setNewValue(0.0, t); break;
 			case LOW : 	this.currentIntensity.
-							setNewValue(LampEnergyConsumption.get(State.LOW)/TENSION, t);
+							setNewValue(LampEnergyConsumption.get(LampState.LOW)/TENSION, t);
 						break;
 			case MEDIUM : this.currentIntensity.
-							setNewValue(LampEnergyConsumption.get(State.MEDIUM)/TENSION, t);
+							setNewValue(LampEnergyConsumption.get(LampState.MEDIUM)/TENSION, t);
 						break;
 			case HIGH : this.currentIntensity.
-							setNewValue(LampEnergyConsumption.get(State.HIGH)/TENSION, t);
+							setNewValue(LampEnergyConsumption.get(LampState.HIGH)/TENSION, t);
 		}
 
 		// Tracing
@@ -439,9 +439,6 @@ implements LampOperationI
 				Electricity.computeConsumption(
 									elapsedTime,
 									TENSION*this.currentIntensity.getValue());
-		
-//		this.totalConsumption += TENSION * this.currentIntensity.getValue();
-
 
 		// Tracing
 		StringBuffer message =
@@ -514,19 +511,19 @@ implements LampOperationI
 			ModelI.createRunParameterName(getURI(),
 										  LOW_MODE_CONSUMPTION_RPNAME);
 		if (simParams.containsKey(lowName)) {
-			LampEnergyConsumption.put(State.LOW,(double) simParams.get(lowName));
+			LampEnergyConsumption.put(LampState.LOW,(double) simParams.get(lowName));
 		}
 		String mediumName =
 			ModelI.createRunParameterName(getURI(),
 										  MEDIUM_MODE_CONSUMPTION_RPNAME);
 		if (simParams.containsKey(mediumName)) {
-			LampEnergyConsumption.put(State.MEDIUM,(double) simParams.get(mediumName));
+			LampEnergyConsumption.put(LampState.MEDIUM,(double) simParams.get(mediumName));
 		}
 		String highName =
 			ModelI.createRunParameterName(getURI(),
 										  HIGH_MODE_CONSUMPTION_RPNAME);
 		if (simParams.containsKey(highName)) {
-			LampEnergyConsumption.put(State.HIGH,(double) simParams.get(highName));
+			LampEnergyConsumption.put(LampState.HIGH,(double) simParams.get(highName));
 		}
 		String tensionName =
 				ModelI.createRunParameterName(getURI(), TENSION_RPNAME);

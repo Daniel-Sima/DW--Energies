@@ -1,6 +1,5 @@
 package equipments.CookingPlate.mil;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -90,9 +89,16 @@ extends AtomicES_Model {
 	// -------------------------------------------------------------------------
 
 	private static final long	serialVersionUID = 1L;
-	/** URI for an instance model; works as long as only one instance is
+	/** URI for an MIL model; works as long as only one instance is
 	 *  created.															*/
-	public static final String	URI = CookingPlateUserModel.class.getSimpleName();
+	public static final String	MIL_URI = CookingPlateUserModel.class.getSimpleName()
+											                + "MIL-URI";
+	/** URI for MIL_RT model; works as long as only one instance is created. */
+	public static final String MIL_RT_URI = CookingPlateUserModel.class.getSimpleName() 
+															+ "MIL-RT-URI";
+	/** URI for  SIL model; works as long as only one instance is created. */
+	public static final String SIL_URI = CookingPlateUserModel.class.getSimpleName()
+															+ "SIL-URI";
 
 	/** time interval between event outputs in hours.						*/
 	protected static double STEP_MEAN_DURATION = 60.0/3600.0;

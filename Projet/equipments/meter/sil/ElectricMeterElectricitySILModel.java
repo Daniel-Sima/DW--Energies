@@ -93,41 +93,41 @@ extends		ElectricMeterElectricityModel
 		// must be done before recomputing the instantaneous intensity.
 		this.updateConsumption(elapsedTime);
 		// recompute the current total intensity
-		// double old = this.currentIntensity.getValue();
-		// double i = this.computeTotalIntensity();
-		// this.currentIntensity.setNewValue(i, this.getCurrentStateTime());
-		// this.ownerComponent.setCurrentPowerConsumption(
-		// 					new Measure<Double>(i, MeasurementUnit.AMPERES));
-		//
-		// if (Math.abs(old - i) > 0.000001) {
-		// 	// Tracing
-		// 	StringBuffer message =
-		// 				new StringBuffer("current power consumption: ");
-		// 	message.append(this.currentIntensity.getValue());
-		// 	message.append(" at ");
-		// 	message.append(this.getCurrentStateTime());
-		// 	message.append('\n');
-		// 	this.logMessage(message.toString());
-		// }
+		 double old = this.currentIntensity.getValue();
+		 double i = this.computeTotalIntensity();
+		 this.currentIntensity.setNewValue(i, this.getCurrentStateTime());
+		 this.ownerComponent.setCurrentPowerConsumption(
+		 					new Measure<Double>(i, MeasurementUnit.AMPERES));
+		
+		 if (Math.abs(old - i) > 0.000001) {
+		 	// Tracing
+		 	StringBuffer message =
+		 				new StringBuffer("current power consumption: ");
+		 	message.append(this.currentIntensity.getValue());
+		 	message.append(" at ");
+		 	message.append(this.getCurrentStateTime());
+		 	message.append('\n');
+		 	this.logMessage(message.toString());
+		 }
 
 		// here, the difference with the MIL model; the new value is set
 		// directly in the component to be retrieved by its sensor methods.
-		double oldP = this.currentTotalPowerProduced.getValue();
-		double p = this.computeTotalProduction();
-		this.currentTotalPowerProduced.setNewValue(p, this.getCurrentStateTime());
-		this.ownerComponent.setCurrentPowerProduction(
-						new Measure<Double>(p, MeasurementUnit.WATTS));
-		
-		if (Math.abs(oldP - p) > 0.000001) {
-			// Tracing
-			StringBuffer message =
-						new StringBuffer("current power consumption: ");
-			message.append(this.currentTotalPowerProduced.getValue());
-			message.append(" at ");
-			message.append(this.getCurrentStateTime());
-			message.append('\n');
-			this.logMessage(message.toString());
-		}
+//		double oldP = this.currentTotalPowerProduced.getValue();
+//		double p = this.computeTotalProduction();
+//		this.currentTotalPowerProduced.setNewValue(p, this.getCurrentStateTime());
+//		this.ownerComponent.setCurrentPowerProduction(
+//						new Measure<Double>(p, MeasurementUnit.WATTS));
+//		
+//		if (Math.abs(oldP - p) > 0.000001) {
+//			// Tracing
+//			StringBuffer message =
+//						new StringBuffer("current power consumption: ");
+//			message.append(this.currentTotalPowerProduced.getValue());
+//			message.append(" at ");
+//			message.append(this.getCurrentStateTime());
+//			message.append('\n');
+//			this.logMessage(message.toString());
+//		}
 	}
 }
 // -----------------------------------------------------------------------------

@@ -12,6 +12,11 @@ import equipments.AirConditioning.mil.events.DoNotCool;
 import equipments.AirConditioning.mil.events.SetPowerAirConditioning;
 import equipments.AirConditioning.mil.events.SwitchOffAirConditioning;
 import equipments.AirConditioning.mil.events.SwitchOnAirConditioning;
+import equipments.CookingPlate.mil.CookingPlateElectricityModel;
+import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
+import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
+import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
+import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
 import equipments.Lamp.mil.LampElectricityModel;
 import equipments.Lamp.mil.events.DecreaseLamp;
 import equipments.Lamp.mil.events.IncreaseLamp;
@@ -102,6 +107,14 @@ public abstract class	SILSimulationArchitectures
 						null,
 						accelerationFactor));
 		atomicModelDescriptors.put(
+				CookingPlateElectricityModel.SIL_URI,
+				RTAtomicHIOA_Descriptor.create(
+						CookingPlateElectricityModel.class,
+						CookingPlateElectricityModel.SIL_URI,
+						TimeUnit.HOURS,
+						null,
+						accelerationFactor));
+		atomicModelDescriptors.put(
 				AirConditioningElectricityModel.SIL_URI,
 				RTAtomicHIOA_Descriptor.create(
 						AirConditioningElectricityModel.class,
@@ -119,6 +132,7 @@ public abstract class	SILSimulationArchitectures
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(ElectricMeterElectricitySILModel.SIL_URI);
 		submodels.add(LampElectricityModel.SIL_URI);
+		submodels.add(CookingPlateElectricityModel.SIL_URI);
 		submodels.add(AirConditioningElectricityModel.SIL_URI);
 
 		Map<Class<? extends EventI>,EventSink[]> imported = new HashMap<>();
@@ -146,6 +160,33 @@ public abstract class	SILSimulationArchitectures
 				new EventSink(LampElectricityModel.SIL_URI,
 								IncreaseLamp.class)
 			});
+		
+		// variable bindings between exporting and importing models for the cooking plate
+		imported.put(
+			SwitchOnCookingPlate.class,
+			new EventSink[] {
+				new EventSink(CookingPlateElectricityModel.SIL_URI,
+							  SwitchOnLamp.class)
+			});
+		imported.put(
+			SwitchOffCookingPlate.class,
+			new EventSink[] {
+				new EventSink(CookingPlateElectricityModel.SIL_URI,
+								SwitchOffLamp.class)
+			});
+		imported.put(
+			DecreaseCookingPlate.class,
+			new EventSink[] {
+				new EventSink(CookingPlateElectricityModel.SIL_URI,
+								DecreaseLamp.class)
+			});
+		imported.put(
+			IncreaseCookingPlate.class,
+			new EventSink[] {
+				new EventSink(CookingPlateElectricityModel.SIL_URI,
+								IncreaseLamp.class)
+			});
+		
 
 		imported.put(
 				SetPowerAirConditioning.class,
@@ -189,6 +230,16 @@ public abstract class	SILSimulationArchitectures
 					new VariableSink("currentLampIntensity",
 									 Double.class,
 									 ElectricMeterElectricitySILModel.SIL_URI)
+				});
+		
+		bindings.put(
+				new VariableSource("currentIntensity", 
+									Double.class, 
+									CookingPlateElectricityModel.SIL_URI),
+				new VariableSink[] { 
+						new VariableSink("currentCookingPlateIntensity", 
+										Double.class,
+										ElectricMeterElectricitySILModel.SIL_URI) 
 				});
 
 		bindings.put(

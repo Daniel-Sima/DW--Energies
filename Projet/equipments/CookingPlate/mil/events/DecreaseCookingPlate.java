@@ -1,5 +1,6 @@
 package equipments.CookingPlate.mil.events;
 
+import equipments.CookingPlate.CookingPlateOperationI;
 import equipments.CookingPlate.mil.CookingPlateElectricityModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
@@ -77,18 +78,9 @@ extends AbstractCookingPlateEvent {
 	 */
 	@Override
 	public void executeOn(AtomicModelI model) {
-		assert	model instanceof CookingPlateElectricityModel;
+		assert	model instanceof CookingPlateOperationI;
 
-		CookingPlateElectricityModel m = (CookingPlateElectricityModel)model;
-		// a Decrease event can only be executed when the state of the 
-		// Cooking Plate model is in the state ON
-		if (m.getState() == CookingPlateElectricityModel.CookingPlateState.ON) {
-			// then put it in the state LOW
-			m.setMode(m.getMode() - 1); // max 8 modes // TODO AV
-			// trigger an internal transition by toggling the electricity
-			// consumption changed boolean to true
-			m.toggleConsumptionHasChanged();
-		}
+		((CookingPlateOperationI)model).decreaseMode();
 	}
 
 }

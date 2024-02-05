@@ -61,12 +61,13 @@ import utils.Electricity;
  * 
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
-//@ModelImportedVariable(name = "currentCookingPlateIntensity", type = Double.class)
-// @ModelImportedVariable(name = "currentAirConditioningIntensity", 
-// 						type = Double.class)
+@ModelImportedVariable(name = "currentCookingPlateIntensity", 
+						type = Double.class)
+ @ModelImportedVariable(name = "currentAirConditioningIntensity", 
+ 						type = Double.class)
 ////@ModelImportedVariable(name = "currentFridgeIntensity", type = Double.class) 
 //
-@ModelImportedVariable(name = "currentPowerProducedSolarPanel", type = Double.class)
+//@ModelImportedVariable(name = "currentPowerProducedSolarPanel", type = Double.class)
 //@ModelImportedVariable(name = "currentPowerProducedPetrolGenerator", type = Double.class)
 //
 //@ModelExportedVariable(name = "currentTotalPowerProduced", type = Double.class)
@@ -108,42 +109,42 @@ extends AtomicHIOA {
 	// -------------------------------------------------------------------------
 	
 	/** current intensity of the Cooking Plate in amperes.					*/
-//	@ImportedVariable(type = Double.class)
-//	protected Value<Double> currentCookingPlateIntensity;
+	@ImportedVariable(type = Double.class)
+	protected Value<Double> currentCookingPlateIntensity;
 	
 	/** current intensity of the Lamp in amperes.							*/
-	// @ImportedVariable(type = Double.class)
-	// protected Value<Double> 		currentLampIntensity;
+	 @ImportedVariable(type = Double.class)
+	 protected Value<Double> 		currentLampIntensity;
 
 	// /** current intensity of the Air Conditioning amperes.					*/
-	// @ImportedVariable(type = Double.class)
-	// protected Value<Double> currentAirConditioningIntensity;
+	 @ImportedVariable(type = Double.class)
+	 protected Value<Double> currentAirConditioningIntensity;
 	
 	/** current intensity of the Fridge amperes.							*/
 //	@ImportedVariable(type = Double.class)
 //	protected Value<Double> currentFridgeIntensity;
 	
 	/** current power produce by the Solar Panel in Wh.						*/
-	@ImportedVariable(type = Double.class)
-	protected Value<Double> currentPowerProducedSolarPanel;
+//	@ImportedVariable(type = Double.class)
+//	protected Value<Double> currentPowerProducedSolarPanel;
 	
 	/** current power produce by the Petrol Generator in Wh.				*/
 //	@ImportedVariable(type = Double.class)
 //	protected Value<Double> currentPowerProducedPetrolGenerator;
 	
 	/** current total intensity of the house in amperes.					*/
-	// @InternalVariable(type = Double.class)
-	// protected final Value<Double> currentIntensity = 
-	// 										new Value<Double>(this);
+	 @InternalVariable(type = Double.class)
+	 protected final Value<Double> currentIntensity = 
+	 										new Value<Double>(this);
 
 	/** the current total power produced by the producers					*/
-	@ExportedVariable(type = Double.class)
-	protected final Value<Double> currentTotalPowerProduced = new Value<Double>(this);
+//	@ExportedVariable(type = Double.class)
+//	protected final Value<Double> currentTotalPowerProduced = new Value<Double>(this);
 	
 	/** the current total power consumed by the consumers					*/
-	// @ExportedVariable(type = Double.class)
-	// protected final Value<Double> currentCumulativeConsumption = 
-	// 										new Value<Double>(this);
+	 @ExportedVariable(type = Double.class)
+	 protected final Value<Double> currentCumulativeConsumption = 
+	 										new Value<Double>(this);
 	
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -191,11 +192,11 @@ extends AtomicHIOA {
 	 */
 	protected void updateConsumption(Duration d) 
 	{
-		// double c = this.currentCumulativeConsumption.getValue();
-		// c += Electricity.computeConsumption(
-		// 		d, TENSION*this.currentIntensity.getValue()*1000.0);
-		// Time t = this.currentCumulativeConsumption.getTime().add(d);
-		// this.currentCumulativeConsumption.setNewValue(c, t);
+		 double c = this.currentCumulativeConsumption.getValue();
+		 c += Electricity.computeConsumption(
+		 		d, TENSION*this.currentIntensity.getValue()*1000.0);
+		 Time t = this.currentCumulativeConsumption.getTime().add(d);
+		 this.currentCumulativeConsumption.setNewValue(c, t);
 	}
 
 	/**
@@ -213,11 +214,11 @@ extends AtomicHIOA {
 	 */
 	protected void updateProduction(Duration d) 
 	{
-		double c = this.currentTotalPowerProduced.getValue();
-		c += Electricity.computeProduction(
-				d, TENSION*this.currentTotalPowerProduced.getValue()*1000.0);
-		Time t = this.currentTotalPowerProduced.getTime().add(d);
-		this.currentTotalPowerProduced.setNewValue(c, t);
+//		double c = this.currentTotalPowerProduced.getValue();
+//		c += Electricity.computeProduction(
+//				d, TENSION*this.currentTotalPowerProduced.getValue()*1000.0);
+//		Time t = this.currentTotalPowerProduced.getTime().add(d);
+//		this.currentTotalPowerProduced.setNewValue(c, t);
 	}
 	
 	/***********************************************************************************/
@@ -233,23 +234,23 @@ extends AtomicHIOA {
 	 *
 	 * @return the current total electric production in Wh.
 	 */
-	protected double computeTotalProduction() {
-		// simple sum of all incoming power produced Wh
-		double i = this.currentPowerProducedSolarPanel.getValue();
-				// this.currentPowerProducedPetrolGenerator.getValue();
-
-		// Tracing
-		if (this.currentTotalPowerProduced.isInitialised()) {
-			StringBuffer message = new StringBuffer("Current total production: ");
-			message.append(this.currentTotalPowerProduced.getValue()); // TODO AV pq = 0 tjr
-			message.append(" kWh at ");
-			message.append(this.getCurrentStateTime());
-			message.append('\n');
-			this.logMessage(message.toString());
-		}
-
-		return i; 
-	}
+//	protected double computeTotalProduction() {
+//		// simple sum of all incoming power produced Wh
+//		double i = this.currentPowerProducedSolarPanel.getValue();
+//				// this.currentPowerProducedPetrolGenerator.getValue();
+//
+//		// Tracing
+//		if (this.currentTotalPowerProduced.isInitialised()) {
+//			StringBuffer message = new StringBuffer("Current total production: ");
+//			message.append(this.currentTotalPowerProduced.getValue()); // TODO AV pq = 0 tjr
+//			message.append(" kWh at ");
+//			message.append(this.getCurrentStateTime());
+//			message.append('\n');
+//			this.logMessage(message.toString());
+//		}
+//
+//		return i; 
+//	}
 
 	/***********************************************************************************/
 	/**
@@ -264,24 +265,24 @@ extends AtomicHIOA {
 	 *
 	 * @return the current total intensity of electric consumption.
 	 */
-	// protected double computeTotalIntensity() {
-	// 	// simple sum of all incoming intensities
-	// 	double i = 	this.currentLampIntensity.getValue() 
-	// 				+ this.currentAirConditioningIntensity.getValue();
-	// 				/*this.currentCookingPlateIntensity.getValue() +*/
+	 protected double computeTotalIntensity() {
+	 	// simple sum of all incoming intensities
+	 	double i = 	this.currentLampIntensity.getValue() 
+	 				+ this.currentAirConditioningIntensity.getValue()
+	 				+ this.currentCookingPlateIntensity.getValue();
 				
-	// 	// Tracing
-	// 	if (this.currentIntensity.isInitialised()) {
-	// 		StringBuffer message = new StringBuffer("Current total consumption: ");
-	// 		message.append(this.currentIntensity.getValue());
-	// 		message.append(" at ");
-	// 		message.append(this.getCurrentStateTime());
-	// 		message.append('\n');
-	// 		this.logMessage(message.toString());
-	// 	}
+	 	// Tracing
+	 	if (this.currentIntensity.isInitialised()) {
+	 		StringBuffer message = new StringBuffer("Current total consumption: ");
+	 		message.append(this.currentIntensity.getValue());
+	 		message.append(" at ");
+	 		message.append(this.getCurrentStateTime());
+	 		message.append('\n');
+	 		this.logMessage(message.toString());
+	 	}
 
-	// 	return i;
-	// }
+	 	return i;
+	 }
 
 	// -------------------------------------------------------------------------
 	// DEVS simulation protocol
@@ -304,30 +305,30 @@ extends AtomicHIOA {
 		int justInitialised = 0;
 		int notInitialisedYet = 0;
 
-// 		if (!this.currentIntensity.isInitialised()
-// //				&& this.currentCookingPlateIntensity.isInitialised() 
-// 				&& this.currentLampIntensity.isInitialised() 
-// 				&& this.currentAirConditioningIntensity.isInitialised()
-// //				&& this.currentFridgeIntensity.isInitialised()
-// //				&& this.currentPowerProducedSolarPanel.isInitialised()
-// //				&& this.currentPowerProducedPetrolGenerator.isInitialised()
-// 				) {
-// 			double i = this.computeTotalIntensity();
-// 			this.currentIntensity.initialise(i);
-// 			this.currentCumulativeConsumption.initialise(0.0);
-// 			justInitialised += 1;
-// 		} else if (!this.currentIntensity.isInitialised()) {
-// 			notInitialisedYet += 1;
-// 		}
+ 		if (!this.currentIntensity.isInitialised()
+ 				&& this.currentCookingPlateIntensity.isInitialised() 
+ 				&& this.currentLampIntensity.isInitialised() 
+ 				&& this.currentAirConditioningIntensity.isInitialised()
+ //				&& this.currentFridgeIntensity.isInitialised()
+ //				&& this.currentPowerProducedSolarPanel.isInitialised()
+ //				&& this.currentPowerProducedPetrolGenerator.isInitialised()
+ 				) {
+ 			double i = this.computeTotalIntensity();
+ 			this.currentIntensity.initialise(i);
+ 			this.currentCumulativeConsumption.initialise(0.0);
+ 			justInitialised += 1;
+ 		} else if (!this.currentIntensity.isInitialised()) {
+ 			notInitialisedYet += 1;
+ 		}
 
-		if (!this.currentTotalPowerProduced.isInitialised()
-				&& this.currentPowerProducedSolarPanel.isInitialised()) {
-			double p = this.computeTotalProduction();
-			this.currentTotalPowerProduced.initialise(p);
-			justInitialised++;
-		} else if (!this.currentTotalPowerProduced.isInitialised()) {
-			notInitialisedYet++;
-		}
+//		if (!this.currentTotalPowerProduced.isInitialised()
+//				&& this.currentPowerProducedSolarPanel.isInitialised()) {
+//			double p = this.computeTotalProduction();
+//			this.currentTotalPowerProduced.initialise(p);
+//			justInitialised++;
+//		} else if (!this.currentTotalPowerProduced.isInitialised()) {
+//			notInitialisedYet++;
+//		}
 
 		return new Pair<>(justInitialised, notInitialisedYet);
 	}
@@ -363,16 +364,16 @@ extends AtomicHIOA {
 
 		// update the current consumption since the last consumption update.
 		// must be done before recomputing the instantaneous intensity.
-		// this.updateConsumption(elapsedTime);
+		 this.updateConsumption(elapsedTime);
 		// recompute the current total intensity
-		// double i = this.computeTotalIntensity();
-		// this.currentIntensity.setNewValue(i, this.getCurrentStateTime());
+		 double i = this.computeTotalIntensity();
+		 this.currentIntensity.setNewValue(i, this.getCurrentStateTime());
 		// update 
-		double p = this.computeTotalProduction();
-		// recompute the current total production
-		this.currentTotalPowerProduced.setNewValue(p+this.currentTotalPowerProduced.getValue(), this.getCurrentStateTime());	
+//		double p = this.computeTotalProduction();
+//		// recompute the current total production
+//		this.currentTotalPowerProduced.setNewValue(p+this.currentTotalPowerProduced.getValue(), this.getCurrentStateTime());	
 		
-		System.out.println("ElectricMeterElectricityModel: userDefinedInternalTransition: currentTotalPowerProduced = " + this.currentTotalPowerProduced.getValue());
+//		System.out.println("ElectricMeterElectricityModel: userDefinedInternalTransition: currentTotalPowerProduced = " + this.currentTotalPowerProduced.getValue());
 	}
 
 	/***********************************************************************************/
@@ -387,9 +388,9 @@ extends AtomicHIOA {
 		// reinitialise the internal model variable.
 		this.finalReport = new ElectricMeterElectricityReport(
 				this.getURI(),
-				// this.currentCumulativeConsumption.getValue()/1000.0,
-				0.0,
-				this.currentTotalPowerProduced.getValue()/1000.0  // TODO AV
+				 this.currentCumulativeConsumption.getValue()/1000.0,
+				0.0
+//				this.currentTotalPowerProduced.getValue()/1000.0  // TODO AV
 				);
 
 		this.logMessage("simulation ends.\n");
@@ -476,10 +477,10 @@ extends AtomicHIOA {
 			ret.append(" report\n");
 			ret.append(indent);
 			ret.append('|');
-			// ret.append("total consumption in kwh = ");
-			// ret.append(this.totalConsumption);
-			ret.append("\n  |total production in kwh = ");
-			ret.append(this.totalProduction);
+			 ret.append("total consumption in kwh = ");
+			 ret.append(this.totalConsumption);
+//			ret.append("\n  |total production in kwh = ");
+//			ret.append(this.totalProduction);
 			ret.append(".\n");
 			ret.append(indent);
 			ret.append("---\n");

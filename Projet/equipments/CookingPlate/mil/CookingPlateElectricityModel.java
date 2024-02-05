@@ -8,6 +8,9 @@ import java.util.concurrent.TimeUnit;
 import equipments.CookingPlate.mil.events.AbstractCookingPlateEvent;
 import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
 import equipments.HEM.simulation.HEM_ReportI;
+import equipments.CookingPlate.CookingPlate;
+import equipments.CookingPlate.CookingPlateOperationI;
+import equipments.CookingPlate.mil.CookingPlateElectricityModel;
 import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
 import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
 import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
@@ -82,14 +85,14 @@ import utils.Electricity;
  * @author <a href="mailto:simadaniel@hotmail.com">Daniel SIMA</a>
  */
 @ModelExternalEvents(imported = {SwitchOnCookingPlate.class,
-		SwitchOffCookingPlate.class,
-		IncreaseCookingPlate.class,
-		DecreaseCookingPlate.class
-})
-@ModelExportedVariable(name = "currentIntensity", type = Double.class)
-@ModelExportedVariable(name = "currentPowerConsumed", type = Double.class)
+								SwitchOffCookingPlate.class,
+								IncreaseCookingPlate.class,
+								DecreaseCookingPlate.class})
+@ModelExportedVariable(name = "currentLampIntensity", type = Double.class)
 public class CookingPlateElectricityModel 
-extends	AtomicHIOA {
+extends	AtomicHIOA
+implements CookingPlateOperationI
+{
 	// -------------------------------------------------------------------------
 	// Color for prints
 	// -------------------------------------------------------------------------
@@ -158,12 +161,28 @@ extends	AtomicHIOA {
 
 	private static final long serialVersionUID = 1L;
 
-	/** URI for an instance model; works as long as only one instance is
-	 *  created.																	*/
-	public static final String URI = CookingPlateElectricityModel.class.getSimpleName();
+	/** URI for an MIL model; works as long as only one instance is
+	 *  created.															*/
+	public static final String	MIL_URI = CookingPlateUserModel.class.getSimpleName()
+											                + "MIL-URI";
+	/** URI for MIL_RT model; works as long as only one instance is created. */
+	public static final String MIL_RT_URI = CookingPlateUserModel.class.getSimpleName() 
+															+ "MIL-RT-URI";
+	/** URI for  SIL model; works as long as only one instance is created. */
+	public static final String SIL_URI = CookingPlateUserModel.class.getSimpleName()
+															+ "SIL-URI";
 
 	/** energy consumption (in Watts) of the Cooking Plate depending the mode.		*/
-	public static double[] CookingPlateEnergyConsumption = new double[] {4.0, 250.0, 400.0, 500.0, 600.0, 750.0, 900.0, 1000.0};
+	public static double[] CookingPlateEnergyConsumption = new double[] {
+			4.0, 
+			250.0, 
+			400.0, 
+			500.0, 
+			600.0, 
+			750.0, 
+			900.0, 
+			1000.0
+	};
 
 	/** nominal tension (in Volts) in Europe										*/
 	public static double TENSION = 220.0; // Volts
@@ -190,10 +209,6 @@ extends	AtomicHIOA {
 	/** current intensity in amperes; intensity is power/tension.					*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double> currentIntensity = new Value<Double>(this);
-	
-	/** current power consumed in kWh.					*/
-	@ExportedVariable(type = Double.class)
-	protected final Value<Double> currentPowerConsumed = new Value<Double>(this);
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -225,72 +240,65 @@ extends	AtomicHIOA {
 	// -------------------------------------------------------------------------
 	// Methods
 	// -------------------------------------------------------------------------
+
 	/**
-	 * set the state of the Cooking Plate.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code s != null}
-	 * post	{@code getState() == s}
-	 * </pre>
-	 *
-	 * @param s		the new state.
+	 * @see equipments.CookingPlate.mil.CookingPlateOperationI#turnOn()
 	 */
-	public void setState(CookingPlateState s) {
-		this.currentState = s;
+	@Override
+	public void			turnOn()
+	{
+		if (this.currentState == CookingPlateElectricityModel.CookingPlateState.OFF) {
+			// then put it in the state LOW
+			this.currentState = CookingPlateElectricityModel.CookingPlateState.ON;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
 	}
 
-	/***********************************************************************************/
 	/**
-	 * set the mode of the Cooking Plate.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code s != null}
-	 * post	{@code getState() == s}
-	 * </pre>
-	 *
-	 * @param m		the new mode.
+	 * @see equipments.CookingPlate.mil.CookingPlateOperationI#turnOff()
 	 */
-	public void setMode(int m) {
-		this.currentMode = m;
+	@Override
+	public void			turnOff()
+	{
+		// a SwitchOff event can be executed when the state of the hair
+		// dryer model is *not* in the state OFF
+		if (this.currentState != CookingPlateElectricityModel.CookingPlateState.OFF) {
+			// then put it in the state OFF
+			this.currentState = CookingPlateElectricityModel.CookingPlateState.OFF;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
 	}
 
-	/***********************************************************************************/
 	/**
-	 * return the state of the Cooking Plate.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code true}	// no precondition.
-	 * post	{@code ret != null}
-	 * </pre>
-	 *
-	 * @return	the state of the Cooking Plate.
+	 * @see equipments.CookingPlate.mil.CookingPlateOperationI#increaseMode()
 	 */
-	public CookingPlateState getState() {
-		return this.currentState;
+	@Override
+	public void 	increaseMode() {
+		if (this.currentState == CookingPlateElectricityModel.CookingPlateState.ON) {
+			if (this.currentMode < CookingPlate.MAX_MODES) {
+				this.currentMode++;
+			}
+		}
+		this.toggleConsumptionHasChanged();
+	}
+	
+	/**
+	 * @see equipments.CookingPlate.mil.CookingPlateOperationI#decreaseMode()
+	 */
+	@Override
+	public void decreaseMode() {
+		if (this.currentState == CookingPlateElectricityModel.CookingPlateState.ON) {
+			if (this.currentMode > 0) {
+				this.currentMode--;
+			}
+		}
+		this.toggleConsumptionHasChanged();
 	}
 
-	/***********************************************************************************/
-	/**
-	 * return the mode of the Cooking Plate.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code true}	// no precondition.
-	 * post	{@code ret != null}
-	 * </pre>
-	 *
-	 * @return	the mode of the Cooking Plate.
-	 */
-	public int getMode() {
-		return this.currentMode;
-	}
 
 	/***********************************************************************************/
 	/**
@@ -328,6 +336,7 @@ extends	AtomicHIOA {
 		// initially the Cooking Plate is off and its electricity consumption is
 		// not about to change.
 		this.currentState = CookingPlateState.OFF;
+		this.currentMode = 0;
 		this.consumptionHasChanged = false;
 		this.totalConsumption = 0.0;
 
@@ -345,7 +354,6 @@ extends	AtomicHIOA {
 
 		// initially, the Cooking Plate is off, so its consumption is zero.
 		this.currentIntensity.initialise(0.0);
-		this.currentPowerConsumed.initialise(0.0);
 	}
 
 	/***********************************************************************************/
@@ -391,14 +399,14 @@ extends	AtomicHIOA {
 		switch (this.currentState) {
 		case OFF : this.currentIntensity.setNewValue(0.0, t); break;
 		case ON : switch (this.currentMode) {
-		case 0 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[0]/TENSION, t); break;			
-		case 1 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[1]/TENSION, t); break;
-		case 2 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[2]/TENSION, t); break;
-		case 3 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[3]/TENSION, t); break;
-		case 4 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[4]/TENSION, t); break;
-		case 5 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[5]/TENSION, t); break;
-		case 6 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[6]/TENSION, t); break;
-		case 7 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[7]/TENSION, t); break;
+			case 0 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[0]/TENSION, t); break;			
+			case 1 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[1]/TENSION, t); break;
+			case 2 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[2]/TENSION, t); break;
+			case 3 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[3]/TENSION, t); break;
+			case 4 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[4]/TENSION, t); break;
+			case 5 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[5]/TENSION, t); break;
+			case 6 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[6]/TENSION, t); break;
+			case 7 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[7]/TENSION, t); break;
 		}
 		}
 	}
@@ -408,7 +416,8 @@ extends	AtomicHIOA {
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedExternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
 	 */ // TODO AR
 	@Override
-	public void	userDefinedExternalTransition(Duration elapsedTime) {
+	public void	userDefinedExternalTransition(Duration elapsedTime) 
+	{
 		super.userDefinedExternalTransition(elapsedTime);
 
 		// get the vector of currently received external events
@@ -420,15 +429,15 @@ extends	AtomicHIOA {
 
 		Event ce = (Event) currentEvents.get(0);
 
-		// compute the total consumption (in kwh) for the simulation report.
-		double currentIntensityInPower = Electricity.computeConsumption(elapsedTime,
-				TENSION*this.currentIntensity.getValue());
-		this.totalConsumption += currentIntensityInPower;
+		
+		this.totalConsumption += Electricity.computeConsumption(
+											elapsedTime,
+											TENSION*this.currentIntensity.getValue());
 
-		this.currentPowerConsumed.setNewValue(currentIntensityInPower, currentStateTime);
 
 		// Tracing
-		StringBuffer message = new StringBuffer(ANSI_GREY_BACKGROUND + "Current consumption ");
+		StringBuffer message = 
+				new StringBuffer(ANSI_GREY_BACKGROUND + "Current consumption ");
 		message.append(Math.round(this.currentIntensity.getValue() * 100.0) / 100.0);
 		message.append(" Amperes (total: " +  (Math.round(this.totalConsumption * 100.0) / 100.0) + " kWh) at " + this.currentIntensity.getTime() + ".\n" + ANSI_RESET);
 		this.logMessage(message.toString());
@@ -449,8 +458,15 @@ extends	AtomicHIOA {
 	 * @see fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA#endSimulation(fr.sorbonne_u.devs_simulation.models.time.Time)
 	 */
 	@Override
-	public void endSimulation(Time endTime) {
-		this.logMessage("\n" + (new CookingPlateElectricityReport(URI, (Math.round(this.totalConsumption * 100.0)/100.0) * 1000.00)).printout("-"));
+	public void endSimulation(Time endTime) 
+	{
+		Duration d = endTime.subtract(this.getCurrentStateTime());
+		this.totalConsumption +=
+				Electricity.computeConsumption(
+									d,
+									TENSION*this.currentIntensity.getValue());
+
+		this.logMessage("\n" + (new CookingPlateElectricityReport(this.getURI(), (Math.round(this.totalConsumption * 100.0)/100.0) * 1000.00)).printout("-"));
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
 	}
@@ -459,9 +475,9 @@ extends	AtomicHIOA {
 	// Optional DEVS simulation protocol: simulation run parameters
 	// -------------------------------------------------------------------------
 	/** run parameter name for {@code MODE_CONSUMPTION}.				*/
-	public static final String MODE_CONSUMPTION_RPNAME = URI + ":MODE_CONSUMPTION";
+	public static final String MODE_CONSUMPTION_RPNAME = MIL_URI + ":MODE_CONSUMPTION";
 	/** run parameter name for {@code TENSION}.								*/
-	public static final String TENSION_RPNAME = URI + ":TENSION";
+	public static final String TENSION_RPNAME = MIL_URI + ":TENSION";
 
 	/***********************************************************************************/
 	/**
@@ -564,7 +580,7 @@ extends	AtomicHIOA {
 	 */
 	@Override
 	public SimulationReportI getFinalReport() {
-		return new CookingPlateElectricityReport(URI, this.totalConsumption);
+		return new CookingPlateElectricityReport(this.getURI(), this.totalConsumption);
 	}
 
 }

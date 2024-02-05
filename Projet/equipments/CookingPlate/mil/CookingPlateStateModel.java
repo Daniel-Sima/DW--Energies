@@ -1,12 +1,17 @@
-package equipments.Lamp.mil;
+package equipments.CookingPlate.mil;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import equipments.Lamp.LampOperationI;
-import equipments.Lamp.mil.LampElectricityModel.LampState;
-import equipments.Lamp.mil.events.*;
+import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
+import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
+import equipments.CookingPlate.CookingPlate;
+import equipments.CookingPlate.CookingPlateOperationI;
+import equipments.CookingPlate.mil.CookingPlateElectricityModel.CookingPlateState;
+import equipments.CookingPlate.mil.events.AbstractCookingPlateEvent;
+import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
+import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
@@ -19,38 +24,38 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>LampStateModel</code> defines a simulation model
- * tracking the state changes on a lamp.
+ * The class <code>CookingPlateStateModel</code> defines a simulation model
+ * tracking the state changes on a CookingPlate.
  *
  * <p><strong>Description</strong></p>
  * 
  * <p>
- * The model receives event from the lamp component (corresponding to
- * calls to operations on the lamp in this component), keeps track of
- * the current state of the lamp in the simulation and then emits the
+ * The model receives event from the CookingPlate component (corresponding to
+ * calls to operations on the CookingPlate in this component), keeps track of
+ * the current state of the CookingPlate in the simulation and then emits the
  * received events again towards another model simulating the electricity
- * consumption of the lamp given its current operating state (switched
+ * consumption of the CookingPlate given its current operating state (switched
  * on/off, high/low power mode).
  * </p>
  * <p>
  * This model becomes necessary in a SIL simulation of the household energy
  * management system because the electricity model must be put in the electric
  * meter component to share variables with other electricity models so this
- * state model will serve as a bridge between the models put in the lamp
+ * state model will serve as a bridge between the models put in the CookingPlate
  * component and its electricity model put in the electric meter component.
  * </p>
  * 
  * <ul>
  * <li>Imported events:
- *   {@code SwitchOnLamp},
- *   {@code SwitchOffLamp},
- *   {@code SetLowLamp},
- *   {@code SetHighLamp}</li>
+ *   {@code SwitchOnCookingPlate},
+ *   {@code SwitchOffCookingPlate},
+ *   {@code SetLowCookingPlate},
+ *   {@code SetHighCookingPlate}</li>
  * <li>Exported events:
- *   {@code SwitchOnLamp},
- *   {@code SwitchOffLamp},
- *   {@code SetLowLamp},
- *   {@code SetHighLamp}</li>
+ *   {@code SwitchOnCookingPlate},
+ *   {@code SwitchOffCookingPlate},
+ *   {@code SetLowCookingPlate},
+ *   {@code SetHighCookingPlate}</li>
  * <li>Imported variables: none</li>
  * <li>Exported variables: none</li>
  * </ul>
@@ -73,15 +78,15 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
  */
 // -----------------------------------------------------------------------------
 @ModelExternalEvents(
-	imported = {SwitchOnLamp.class,SwitchOffLamp.class,
-				DecreaseLamp.class,IncreaseLamp.class},
-	exported = {SwitchOnLamp.class,SwitchOffLamp.class,
-				DecreaseLamp.class,IncreaseLamp.class}
+	imported = {SwitchOnCookingPlate.class,SwitchOffCookingPlate.class,
+				DecreaseCookingPlate.class,IncreaseCookingPlate.class},
+	exported = {SwitchOnCookingPlate.class,SwitchOffCookingPlate.class,
+				DecreaseCookingPlate.class,IncreaseCookingPlate.class}
 	)
 // -----------------------------------------------------------------------------
-public class			LampStateModel
+public class			CookingPlateStateModel
 extends		AtomicModel
-implements	LampOperationI
+implements	CookingPlateOperationI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -90,28 +95,30 @@ implements	LampOperationI
 	private static final long serialVersionUID = 1L;
 	/** URI for an instance model in MIL simulations; works as long as
 	 *  only one instance is created.										*/
-	public static final String	MIL_URI = LampStateModel.class.
+	public static final String	MIL_URI = CookingPlateStateModel.class.
 													getSimpleName() + "-MIL";
 	/** URI for an instance model in MIL real time simulations; works as
 	 *  long as only one instance is created.								*/
-	public static final String	MIL_RT_URI = LampStateModel.class.
+	public static final String	MIL_RT_URI = CookingPlateStateModel.class.
 													getSimpleName() + "-MIL_RT";
 	/** URI for an instance model in SIL simulations; works as long as
 	 *  only one instance is created.										*/
-	public static final String	SIL_URI = LampStateModel.class.
+	public static final String	SIL_URI = CookingPlateStateModel.class.
 													getSimpleName() + "-SIL";
 
-	/** current state of the lamp.									*/
-	protected LampState						currentState;
+	/** current state of the CookingPlate.									*/
+	protected CookingPlateState						currentState;
+	/** current mode of the CookingPlate.									*/
+	protected int									currentMode;
 	/** last received event or null if none.								*/
-	protected AbstractLampEvent			lastReceived;
+	protected AbstractCookingPlateEvent			lastReceived;
 
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a lamp state model instance.
+	 * create a CookingPlate state model instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -125,7 +132,7 @@ implements	LampOperationI
 	 * @param simulationEngine	simulation engine to which the model is attached.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public				LampStateModel(
+	public				CookingPlateStateModel(
 		String uri,
 		TimeUnit simulatedTimeUnit,
 		AtomicSimulatorI simulationEngine
@@ -141,64 +148,58 @@ implements	LampOperationI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2023e3.equipments.Lamp.mil.LampOperationI#turnOn()
+	 * @see fr.sorbonne_u.components.hem2023e3.equipments.CookingPlate.mil.CookingPlateOperationI#turnOn()
 	 */
 	@Override
 	public void			turnOn()
 	{
-		if (this.currentState == LampElectricityModel.LampState.OFF) {
+		if (this.currentState == CookingPlateElectricityModel.CookingPlateState.OFF) {
 			// then put it in the state LOW
-			this.currentState = LampElectricityModel.LampState.LOW;
+			this.currentState = CookingPlateElectricityModel.CookingPlateState.ON;
+			this.currentMode = 0;
 		}
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2023e3.equipments.Lamp.mil.LampOperationI#turnOff()
+	 * @see fr.sorbonne_u.components.hem2023e3.equipments.CookingPlate.mil.CookingPlateOperationI#turnOff()
 	 */
 	@Override
 	public void			turnOff()
 	{
 		// a SwitchOff event can be executed when the state of the hair
 		// dryer model is *not* in the state OFF
-		if (this.currentState != LampElectricityModel.LampState.OFF) {
+		if (this.currentState != CookingPlateElectricityModel.CookingPlateState.OFF) {
 			// then put it in the state OFF
-			this.currentState = LampElectricityModel.LampState.OFF;
+			this.currentState = CookingPlateElectricityModel.CookingPlateState.OFF;
+			this.currentMode = 0;
 		}
 	}
 
 	/**
-	 * @see equipments.Lamp.mil.LampOperationI#increaseMode()
+	 * @see equipments.CookingPlate.mil.CookingPlateOperationI#increaseMode()
 	 */
 	@Override
 	public void			increaseMode()
 	{
-		// a SetHigh event can only be executed when the state of the 
-		// lamp model is in the state LOW
-		if (this.currentState == LampElectricityModel.LampState.LOW) {
-			// then put it in the state HIGH
-			this.currentState = LampElectricityModel.LampState.MEDIUM;
-		}
-		else if (this.currentState == LampElectricityModel.LampState.MEDIUM) {
-			// then put it in the state HIGH
-			this.currentState = LampElectricityModel.LampState.HIGH;
+		if (this.currentState == CookingPlateElectricityModel.CookingPlateState.ON) {
+			if (this.currentMode < CookingPlate.MAX_MODES) {
+				this.currentMode++;
+			}
 		}
 	}
 
 	/**
-	 * @see equipments.Lamp.mil.LampOperationI#decreaseMode()
+	 * @see equipments.CookingPlate.mil.CookingPlateOperationI#decreaseMode()
 	 */
 	@Override
 	public void			decreaseMode()
 	{
 		// a SetLow event can only be executed when the state of the hair
 		// dryer model is in the state HIGH
-		if (this.currentState == LampElectricityModel.LampState.HIGH) {
-			// then put it in the state LOW
-			this.currentState = LampElectricityModel.LampState.MEDIUM;
-		}
-		else if (this.currentState == LampElectricityModel.LampState.MEDIUM) {
-			// then put it in the state LOW
-			this.currentState = LampElectricityModel.LampState.LOW;
+		if (this.currentState == CookingPlateElectricityModel.CookingPlateState.ON) {
+			if (this.currentMode > 0) {
+				this.currentMode--;
+			}
 		}
 	}
 
@@ -215,7 +216,7 @@ implements	LampOperationI
 		super.initialiseState(initialTime);
 
 		this.lastReceived = null;
-		this.currentState = LampState.OFF;
+		this.currentState = CookingPlateState.OFF;
 
 		this.getSimulationEngine() .toggleDebugMode();
 		this.logMessage("simulation begins.\n");
@@ -257,7 +258,7 @@ implements	LampOperationI
 		// get the vector of current external events
 		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 		// when this method is called, there is at least one external event,
-		// and for the lamp model, there will be exactly one by
+		// and for the CookingPlate model, there will be exactly one by
 		// construction.
 		assert	currentEvents != null && currentEvents.size() == 1;
 
@@ -266,7 +267,7 @@ implements	LampOperationI
 		// on the model state except to put lastReceived to null again, but
 		// this will also trigger output and the sending of the event to
 		// the electricity model to also change its state
-		this.lastReceived = (AbstractLampEvent) currentEvents.get(0);
+		this.lastReceived = (AbstractCookingPlateEvent) currentEvents.get(0);
 
 		// tracing
 		StringBuffer message = new StringBuffer(this.uri);

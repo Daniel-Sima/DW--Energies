@@ -1,5 +1,6 @@
 package equipments.CookingPlate.mil.events;
 
+import equipments.CookingPlate.CookingPlateOperationI;
 import equipments.CookingPlate.mil.CookingPlateElectricityModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
@@ -76,20 +77,9 @@ extends AbstractCookingPlateEvent {
 	 */
 	@Override
 	public void executeOn(AtomicModelI model) {
-		assert	model instanceof CookingPlateElectricityModel;
+		assert	model instanceof CookingPlateOperationI;
 
-		CookingPlateElectricityModel m = ((CookingPlateElectricityModel)model);
-		// a SwitchOff event can be executed when the state of the Cooking Plate
-		// model is *not* in the state OFF
-		if (m.getState() != CookingPlateElectricityModel.CookingPlateState.OFF) {
-			// then put it in the state OFF
-			m.setState(CookingPlateElectricityModel.CookingPlateState.OFF);
-			// then put it in the mode 0
-			m.setMode(0);
-			// trigger an internal transition by toggling the electricity
-			// consumption changed boolean to true
-			m.toggleConsumptionHasChanged();
-		}
+		((CookingPlateOperationI) model).turnOff();
 	}
 
 

@@ -42,9 +42,16 @@ extends CoupledModel {
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
-	/** URI for an instance model; works as long as only one instance is
+	/** URI for an MIL model; works as long as only one instance is
 	 *  created.															*/
-	public static final String	URI = CookingPlateCoupledModel.class.getSimpleName();
+	public static final String	MIL_URI = CookingPlateUserModel.class.getSimpleName()
+											                + "MIL-URI";
+	/** URI for MIL_RT model; works as long as only one instance is created. */
+	public static final String MIL_RT_URI = CookingPlateUserModel.class.getSimpleName() 
+															+ "MIL-RT-URI";
+	/** URI for  SIL model; works as long as only one instance is created. */
+	public static final String SIL_URI = CookingPlateUserModel.class.getSimpleName()
+															+ "SIL-URI";
 
 	// -------------------------------------------------------------------------
 	// Constructors

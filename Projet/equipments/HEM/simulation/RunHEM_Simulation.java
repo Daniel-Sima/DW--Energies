@@ -134,17 +134,17 @@ public class RunHEM_Simulation {
 
 			// Cooking Plate models
 			atomicModelDescriptors.put(
-					CookingPlateElectricityModel.URI,
+					CookingPlateElectricityModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							CookingPlateElectricityModel.class,
-							CookingPlateElectricityModel.URI,
+							CookingPlateElectricityModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					CookingPlateUserModel.URI,
+					CookingPlateUserModel.MIL_URI,
 					AtomicModelDescriptor.create(
 							CookingPlateUserModel.class,
-							CookingPlateUserModel.URI,
+							CookingPlateUserModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 
@@ -280,8 +280,8 @@ public class RunHEM_Simulation {
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
-			submodels.add(CookingPlateElectricityModel.URI);
-			submodels.add(CookingPlateUserModel.URI);
+			submodels.add(CookingPlateElectricityModel.MIL_URI);
+			submodels.add(CookingPlateUserModel.MIL_URI);
 			submodels.add(LampElectricityModel.MIL_URI);
 			submodels.add(LampUserModel.MIL_URI);
 			submodels.add(AirConditioningElectricityModel.MIL_URI);
@@ -307,27 +307,27 @@ public class RunHEM_Simulation {
 
 					// Cooking plate connections
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, SwitchOnCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, SwitchOnCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
 											SwitchOnCookingPlate.class)
 							});
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, SwitchOffCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, SwitchOffCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
 											SwitchOffCookingPlate.class)
 							});
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, IncreaseCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, IncreaseCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
 											IncreaseCookingPlate.class)
 							});
 					connections.put(
-							new EventSource(CookingPlateUserModel.URI, DecreaseCookingPlate.class),
+							new EventSource(CookingPlateUserModel.MIL_URI, DecreaseCookingPlate.class),
 							new EventSink[] {
-									new EventSink(CookingPlateElectricityModel.URI,
+									new EventSink(CookingPlateElectricityModel.MIL_URI,
 											DecreaseCookingPlate.class)
 							});
 
@@ -530,7 +530,7 @@ public class RunHEM_Simulation {
 							bindings.put(
 									new VariableSource("currentIntensity",
 											Double.class,
-											CookingPlateElectricityModel.URI),
+											CookingPlateElectricityModel.MIL_URI),
 									new VariableSink[] {
 											new VariableSink("currentCookingPlateIntensity",
 													Double.class,

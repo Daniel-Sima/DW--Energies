@@ -61,7 +61,7 @@ implements	LampOperationI
 	public static boolean				VERBOSE = true ;
 
 	/** outbound port to connect to the {@code Lamp} component.		*/
-	protected LampOutboundPort		lop;
+protected LampOutboundPort				lop;
 	/** service inbound port URI of the {@code Lamp} component.		*/
 	protected String					lampInboundPortURI;
 
@@ -454,6 +454,10 @@ implements	LampOperationI
 		super.start();
 
 		try {
+			System.out.println("LampUser starts.");
+			System.out.println("LampUser connects to the CookingPlate component.");
+			System.out.println(this.lop.getPortURI());
+			System.out.println(lampInboundPortURI);
 			this.doPortConnection(
 					this.lop.getPortURI(),
 					this.lampInboundPortURI,

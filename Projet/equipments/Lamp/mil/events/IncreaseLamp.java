@@ -1,8 +1,6 @@
 package equipments.Lamp.mil.events;
 
 import equipments.Lamp.LampOperationI;
-import equipments.Lamp.mil.LampElectricityModel;
-import equipments.Lamp.mil.LampElectricityModel.State;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;

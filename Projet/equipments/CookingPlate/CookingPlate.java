@@ -1,9 +1,20 @@
 package equipments.CookingPlate;
 
-import fr.sorbonne_u.components.AbstractComponent;
+import equipments.CookingPlate.mil.CookingPlateStateModel;
+import equipments.CookingPlate.mil.MILSimulationArchitectures;
+import equipments.CookingPlate.mil.events.DecreaseCookingPlate;
+import equipments.CookingPlate.mil.events.IncreaseCookingPlate;
+import equipments.CookingPlate.mil.events.SwitchOffCookingPlate;
+import equipments.CookingPlate.mil.events.SwitchOnCookingPlate;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
+import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
+import fr.sorbonne_u.components.cyphy.plugins.devs.RTAtomicSimulatorPlugin;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
+import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.exceptions.PreconditionException;
+import utils.ExecutionType;
 
 /***********************************************************************************/
 /***********************************************************************************/
@@ -39,16 +50,20 @@ import fr.sorbonne_u.exceptions.PreconditionException;
  */
 @OfferedInterfaces(offered={CookingPlateUserCI.class})
 public class CookingPlate
-extends AbstractComponent
-implements CookingPlateImplementationI{
+extends AbstractCyPhyComponent
+implements CookingPlateImplementationI
+{
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
 	/** URI of the cooking plate inbound port used in tests.					*/
+	public static final String			REFLECTION_INBOUND_PORT_URI =
+														"COOKING-PLATE-RIP-URI";	
+	/** URI of the cooking plate inbound port used in tests.					*/
 	public static final String	INBOUND_PORT_URI = "COOKING-PLATE-INBOUND-PORT-URI";
 
-	/** when true, methods trace their actions.								*/
+	/** when true, methods trace their actions.									*/
 	public static final boolean VERBOSE = true;
 	public static final CookingPlateState INITIAL_STATE = CookingPlateState.OFF;
 	public static final int INITIAL_TEMPERATURE = CookingPlateTemperature[0];
@@ -58,10 +73,26 @@ implements CookingPlateImplementationI{
 	/** current mode of operation (1 (50°) to 7 (300°)) of the cooking plate.			*/
 	protected int currentMode;
 	/** number modes of the Cooking Plate */
-	protected int MAX_MODES;
+	public static int MAX_MODES	= 7;
 
 	/** inbound port offering the <code>CookingPlateUserCI</code> interface.		*/
 	protected CookingPlateInboundPort cookingPlateInboudPort;
+	
+	// Execution/Simulation
+
+	/** plug-in holding the local simulation architecture and simulators.	*/
+	protected AtomicSimulatorPlugin		asp;
+	/** current type of execution.											*/
+	protected final ExecutionType		currentExecutionType;
+	/** URI of the simulation architecture to be created or the empty string
+	 *  if the component does not execute as a SIL simulation.				*/
+	protected final String				simArchitectureURI;
+	/** URI of the local simulator used to compose the global simulation
+	 *  architecture.														*/
+	protected final String				localSimulatorURI;
+	/** acceleration factor to be used when running the real time
+	 *  simulation.															*/
+	protected double					accFactor;
 
 	// -------------------------------------------------------------------------
 	// Constructors
@@ -83,8 +114,7 @@ implements CookingPlateImplementationI{
 	protected CookingPlate()
 			throws Exception
 	{
-		super(1, 0);
-		this.initialise(INBOUND_PORT_URI);
+		this(INBOUND_PORT_URI);
 	}
 
 	/***********************************************************************************/
@@ -106,8 +136,8 @@ implements CookingPlateImplementationI{
 	protected CookingPlate(String cookingPlateInboundPortURI)
 			throws Exception
 	{
-		super(1, 0);
-		this.initialise(cookingPlateInboundPortURI);
+		this(REFLECTION_INBOUND_PORT_URI, cookingPlateInboundPortURI,
+				ExecutionType.STANDARD, null, null, 0.0);
 	}
 
 	/***********************************************************************************/
@@ -129,9 +159,46 @@ implements CookingPlateImplementationI{
 	 * @param reflectionInboundPortURI	URI of the reflection innbound port of the component.
 	 * @throws Exception				<i>to do</i>.
 	 */
-	protected CookingPlate(String cookingPlateInboundPortURI, String reflectionInboundPortURI) 
-			throws Exception {
+	protected CookingPlate(
+		String reflectionInboundPortURI,
+		String cookingPlateInboundPortURI,
+		ExecutionType currentExecutionType,
+		String simArchitectureURI,
+		String localSimulatorURI,
+		double accFactor) throws Exception 
+	{
 		super(reflectionInboundPortURI, 1, 0);
+		
+		assert	cookingPlateInboundPortURI != null &&
+				!cookingPlateInboundPortURI.isEmpty() :
+		new PreconditionException(
+		"lampInboundPortURI != null && "
+		+ "!lampInboundPortURI.isEmpty()");
+		assert	currentExecutionType != null :
+		new PreconditionException("currentExecutionType != null");
+		assert	!currentExecutionType.isSimulated() ||
+			(simArchitectureURI != null &&
+						!simArchitectureURI.isEmpty()) :
+		new PreconditionException(
+		"currentExecutionType.isSimulated() ||  "
+		+ "(simArchitectureURI != null && "
+		+ "!simArchitectureURI.isEmpty())");
+		assert	!currentExecutionType.isSimulated() ||
+			(localSimulatorURI != null &&
+							!localSimulatorURI.isEmpty()) :
+		new PreconditionException(
+		"currentExecutionType.isSimulated() ||  "
+		+ "(localSimulatorURI != null && "
+		+ "!localSimulatorURI.isEmpty())");
+		assert	!currentExecutionType.isSIL() || accFactor > 0.0 :
+		new PreconditionException(
+		"!currentExecutionType.isSIL() || accFactor > 0.0");
+		
+		this.currentExecutionType = currentExecutionType;
+		this.simArchitectureURI = simArchitectureURI;
+		this.localSimulatorURI = localSimulatorURI;
+		this.accFactor = accFactor;	
+		
 		this.initialise(cookingPlateInboundPortURI);
 	}
 
@@ -158,10 +225,41 @@ implements CookingPlateImplementationI{
 
 		this.currentState = INITIAL_STATE;
 		this.currentMode = 0; // 0°
-		this.MAX_MODES = 7;
 		this.cookingPlateInboudPort  = new CookingPlateInboundPort(cookingPlateInboundPortURI, this);
 		this.cookingPlateInboudPort.publishPort();
 
+		switch (this.currentExecutionType) {
+		case MIL_SIMULATION:
+			Architecture architecture =
+				MILSimulationArchitectures.createCookingPlateMILArchitecture();
+			assert	architecture.getRootModelURI().equals(this.localSimulatorURI) :
+					new AssertionError(
+							"local simulator " + this.localSimulatorURI
+							+ " does not exist!");
+			this.addLocalSimulatorArchitecture(architecture);
+			this.architecturesURIs2localSimulatorURIS.
+						put(this.simArchitectureURI, this.localSimulatorURI);
+			break;
+		case MIL_RT_SIMULATION:
+		case SIL_SIMULATION:
+			architecture =
+				MILSimulationArchitectures.
+							createCookingPlateRTArchitecture(
+									this.currentExecutionType,
+									this.accFactor);
+			assert	architecture.getRootModelURI().equals(this.localSimulatorURI) :
+					new AssertionError(
+							"local simulator " + this.localSimulatorURI
+							+ " does not exist!");
+			this.addLocalSimulatorArchitecture(architecture);
+			this.architecturesURIs2localSimulatorURIS.
+					put(this.simArchitectureURI, this.localSimulatorURI);
+			break;
+		case STANDARD:
+		case INTEGRATION_TEST:
+		default:
+		}
+		
 		if (CookingPlate.VERBOSE) {
 			this.tracer.get().setTitle("CookingPlate component");
 			this.tracer.get().setRelativePosition(1, 1);
@@ -172,6 +270,48 @@ implements CookingPlateImplementationI{
 	// -------------------------------------------------------------------------
 	// Component life-cycle
 	// -------------------------------------------------------------------------
+	
+	/**
+	 * @see fr.sorbonne_u.components.AbstractComponent#start()
+	 */
+	@Override
+	public synchronized void	start() throws ComponentStartException
+	{
+		super.start();
+
+		try {
+			switch (this.currentExecutionType) {
+			case MIL_SIMULATION:
+				this.asp = new AtomicSimulatorPlugin();
+				String uri = this.architecturesURIs2localSimulatorURIS.
+												get(this.simArchitectureURI);
+				Architecture architecture =
+					(Architecture) this.localSimulatorsArchitectures.get(uri);
+				this.asp.setPluginURI(uri);
+				this.asp.setSimulationArchitecture(architecture);
+				this.installPlugin(this.asp);
+				break;
+			case MIL_RT_SIMULATION:
+			case SIL_SIMULATION:
+				this.asp = new RTAtomicSimulatorPlugin();
+				uri = this.architecturesURIs2localSimulatorURIS.
+												get(this.simArchitectureURI);
+				architecture =
+						(Architecture) this.localSimulatorsArchitectures.get(uri);
+				((RTAtomicSimulatorPlugin)this.asp).setPluginURI(uri);
+				((RTAtomicSimulatorPlugin)this.asp).
+										setSimulationArchitecture(architecture);
+				this.installPlugin(this.asp);
+				break;
+			case STANDARD:
+			case INTEGRATION_TEST:
+			default:
+			}		
+		} catch (Exception e) {
+			throw new ComponentStartException(e) ;
+		}		
+	}
+	
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
 	 */
@@ -189,6 +329,7 @@ implements CookingPlateImplementationI{
 	// -------------------------------------------------------------------------
 	// Component services implementation
 	// -------------------------------------------------------------------------
+	
 	/**
 	 * @see
 	 */
@@ -228,6 +369,16 @@ implements CookingPlateImplementationI{
 
 		this.currentState = CookingPlateState.ON;
 		this.currentMode = 0;
+		
+		if (this.currentExecutionType.isSIL()) {
+			// For SIL simulation, an operation done in the component code
+			// must be reflected in the simulation; to do so, the component
+			// code triggers an external event sent to the CookerPlateStateModel
+			// to make it change its mode to low.
+			((RTAtomicSimulatorPlugin)this.asp).triggerExternalEvent(
+												CookingPlateStateModel.SIL_URI,
+												t -> new SwitchOnCookingPlate(t));
+		}
 	}
 
 	/***********************************************************************************/
@@ -243,6 +394,16 @@ implements CookingPlateImplementationI{
 		assert this.currentState == CookingPlateState.ON : new PreconditionException("currentState == CookingPlateState.ON");
 
 		this.currentState = CookingPlateState.OFF;
+		
+		if (this.currentExecutionType.isSIL()) {
+			// For SIL simulation, an operation done in the component code
+			// must be reflected in the simulation; to do so, the component
+			// code triggers an external event sent to the CookingPlateStateModel
+			// to make it change its mode to low.
+			((RTAtomicSimulatorPlugin)this.asp).triggerExternalEvent(
+												CookingPlateStateModel.SIL_URI,
+												t -> new SwitchOffCookingPlate(t));
+		}
 	}
 
 	/***********************************************************************************/
@@ -262,6 +423,16 @@ implements CookingPlateImplementationI{
 		}
 
 		this.currentMode = nextMode; 
+		
+		if (this.currentExecutionType.isSIL()) {
+			// For SIL simulation, an operation done in the component code
+			// must be reflected in the simulation; to do so, the component
+			// code triggers an external event sent to the CookingPlateStateModel
+			// to make it change its mode to low.
+			((RTAtomicSimulatorPlugin)this.asp).triggerExternalEvent(
+												CookingPlateStateModel.SIL_URI,
+												t -> new IncreaseCookingPlate(t));
+		}
 	}
 
 	/***********************************************************************************/
@@ -280,6 +451,16 @@ implements CookingPlateImplementationI{
 		}
 
 		this.currentMode = nextMode;
+		
+		if (this.currentExecutionType.isSIL()) {
+			// For SIL simulation, an operation done in the component code
+			// must be reflected in the simulation; to do so, the component
+			// code triggers an external event sent to the CookingPlateStateModel
+			// to make it change its mode to low.
+			((RTAtomicSimulatorPlugin)this.asp).triggerExternalEvent(
+												CookingPlateStateModel.SIL_URI,
+												t -> new DecreaseCookingPlate(t));
+		}
 	}
 	
 	/***********************************************************************************/
