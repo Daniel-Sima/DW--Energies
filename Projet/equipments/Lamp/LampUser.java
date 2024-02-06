@@ -42,7 +42,7 @@ import equipments.Lamp.mil.MILSimulationArchitectures;
  * 
  * <p>Created on : 2023-09-19</p>
  * 
- * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
+ * @author	<a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
 @RequiredInterfaces(required = {LampUserCI.class, ClocksServerCI.class})
 public class			LampUser

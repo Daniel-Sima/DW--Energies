@@ -418,6 +418,10 @@ implements LampOperationI
 	}
 
 	/**
+	 * The method is overridden to take into account the electricity consumption
+	 * of the Lamp when it is switched on and off and when its mode is
+	 * changed.
+	 * @param elapsedTime	time duration of the external event.
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedExternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
 	 */
 	@Override

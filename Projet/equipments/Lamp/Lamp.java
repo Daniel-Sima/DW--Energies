@@ -63,7 +63,7 @@ import utils.ExecutionType;
  * Created on : 2023-10-10
  * </p>
  * 
- * @author <a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
+ * @author <a href="mailto:walterbeles@gmail.com">Walter ABELES</a>
  */
 @OfferedInterfaces(offered = { LampUserCI.class })
 public class Lamp 

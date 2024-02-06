@@ -270,6 +270,33 @@ extends AtomicHIOA {
 	 	double i = 	this.currentLampIntensity.getValue() 
 	 				+ this.currentAirConditioningIntensity.getValue()
 	 				+ this.currentCookingPlateIntensity.getValue();
+	 	
+//	 	if (this.currentLampIntensity.isInitialised()) {
+//	 		StringBuffer message = new StringBuffer("Current Lamp consumption: ");
+//	 		message.append(this.currentLampIntensity.getValue());
+//	 		message.append(" at ");
+//	 		message.append(this.getCurrentStateTime());
+//	 		message.append('\n');
+//	 		this.logMessage(message.toString());
+//	 	}
+//	 	
+//		if (this.currentAirConditioningIntensity.isInitialised()) {
+//			StringBuffer message = new StringBuffer("Current Air Conditioning consumption: ");
+//			message.append(this.currentAirConditioningIntensity.getValue());
+//			message.append(" at ");
+//			message.append(this.getCurrentStateTime());
+//			message.append('\n');
+//			this.logMessage(message.toString());
+//		}
+//		
+//		if (this.currentCookingPlateIntensity.isInitialised()) {
+//			StringBuffer message = new StringBuffer("Current Cooking Plate consumption: ");
+//			message.append(this.currentCookingPlateIntensity.getValue());
+//			message.append(" at ");
+//			message.append(this.getCurrentStateTime());
+//			message.append('\n');
+//			this.logMessage(message.toString());
+//		}
 				
 	 	// Tracing
 	 	if (this.currentIntensity.isInitialised()) {

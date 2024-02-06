@@ -28,6 +28,7 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
+import javassist.bytecode.stackmap.Tracer;
 import utils.Electricity;
 
 /***********************************************************************************/
@@ -88,7 +89,7 @@ import utils.Electricity;
 								SwitchOffCookingPlate.class,
 								IncreaseCookingPlate.class,
 								DecreaseCookingPlate.class})
-@ModelExportedVariable(name = "currentLampIntensity", type = Double.class)
+@ModelExportedVariable(name = "currentCookingPlateIntensity", type = Double.class)
 public class CookingPlateElectricityModel 
 extends	AtomicHIOA
 implements CookingPlateOperationI
@@ -262,8 +263,8 @@ implements CookingPlateOperationI
 	@Override
 	public void			turnOff()
 	{
-		// a SwitchOff event can be executed when the state of the hair
-		// dryer model is *not* in the state OFF
+		// a SwitchOff event can be executed when the state of the cooking plate
+		// model is *not* in the state OFF
 		if (this.currentState != CookingPlateElectricityModel.CookingPlateState.OFF) {
 			// then put it in the state OFF
 			this.currentState = CookingPlateElectricityModel.CookingPlateState.OFF;
@@ -409,14 +410,27 @@ implements CookingPlateOperationI
 			case 7 : this.currentIntensity.setNewValue(CookingPlateEnergyConsumption[7]/TENSION, t); break;
 		}
 		}
+		// Tracing
+		StringBuffer message =
+				new StringBuffer(ANSI_RED_BACKGROUND +"Current consumption ");
+		message.append((Math.round(this.currentIntensity.getValue()* 100.0) / 100.0) );
+		message.append(" Amperes (Total: " + 
+		(Math.round(this.totalConsumption * 100.0) / 100.0) + " Wh" + ") at ");
+		message.append(this.currentIntensity.getTime());
+		message.append(".\n" + ANSI_RESET);
+		System.out.println(message.toString());	
 	}
 
 	/***********************************************************************************/
 	/**
+	 * The method is overridden to take into account the electricity consumption
+	 * of the Cooking Plate when it is switched on and off and when its mode is
+	 * changed.
+	 * @param elapsedTime	time duration of the external event.
 	 * @see fr.sorbonne_u.devs_simulation.models.AtomicModel#userDefinedExternalTransition(fr.sorbonne_u.devs_simulation.models.time.Duration)
-	 */ // TODO AR
+	 */
 	@Override
-	public void	userDefinedExternalTransition(Duration elapsedTime) 
+	public void		userDefinedExternalTransition(Duration elapsedTime) 
 	{
 		super.userDefinedExternalTransition(elapsedTime);
 
@@ -433,7 +447,6 @@ implements CookingPlateOperationI
 		this.totalConsumption += Electricity.computeConsumption(
 											elapsedTime,
 											TENSION*this.currentIntensity.getValue());
-
 
 		// Tracing
 		StringBuffer message = 

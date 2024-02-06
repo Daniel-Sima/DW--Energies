@@ -166,8 +166,8 @@ implements	CookingPlateOperationI
 	@Override
 	public void			turnOff()
 	{
-		// a SwitchOff event can be executed when the state of the hair
-		// dryer model is *not* in the state OFF
+		// a SwitchOff event can be executed when the state of the cooking plate 
+		// model is *not* in the state OFF
 		if (this.currentState != CookingPlateElectricityModel.CookingPlateState.OFF) {
 			// then put it in the state OFF
 			this.currentState = CookingPlateElectricityModel.CookingPlateState.OFF;
@@ -194,8 +194,8 @@ implements	CookingPlateOperationI
 	@Override
 	public void			decreaseMode()
 	{
-		// a SetLow event can only be executed when the state of the hair
-		// dryer model is in the state HIGH
+		// a SetLow event can only be executed when the state of the cooking plate
+		// model is in the state HIGH
 		if (this.currentState == CookingPlateElectricityModel.CookingPlateState.ON) {
 			if (this.currentMode > 0) {
 				this.currentMode--;

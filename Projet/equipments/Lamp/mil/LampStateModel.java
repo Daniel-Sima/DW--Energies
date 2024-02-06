@@ -141,7 +141,7 @@ implements	LampOperationI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2023e3.equipments.Lamp.mil.LampOperationI#turnOn()
+	 * @see equipments.Lamp.mil.LampOperationI#turnOn()
 	 */
 	@Override
 	public void			turnOn()
@@ -153,13 +153,13 @@ implements	LampOperationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2023e3.equipments.Lamp.mil.LampOperationI#turnOff()
+	 * @see equipments.Lamp.mil.LampOperationI#turnOff()
 	 */
 	@Override
 	public void			turnOff()
 	{
-		// a SwitchOff event can be executed when the state of the hair
-		// dryer model is *not* in the state OFF
+		// a SwitchOff event can be executed when the state of the lamp
+		// model is *not* in the state OFF
 		if (this.currentState != LampElectricityModel.LampState.OFF) {
 			// then put it in the state OFF
 			this.currentState = LampElectricityModel.LampState.OFF;

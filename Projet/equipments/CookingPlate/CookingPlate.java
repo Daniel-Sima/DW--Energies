@@ -22,7 +22,7 @@ import utils.ExecutionType;
 /**
  * The class <code>CookingPlate</code> implements the cooking plate component.
  *
- * <p><strong>Description TODO </strong></p>
+ * <p><strong>Description Cooking plate state model for the cooking plate </strong></p>
  * 
  * <p> 
  * The cooking plate is an uncontrollable appliance, hence it does not connect
