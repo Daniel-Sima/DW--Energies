@@ -16,7 +16,7 @@
 	<classpathentry kind="lib" path="BCM4Java-28112023.jar"/>
 	<classpathentry kind="lib" path="BCM4Java-CyPhy-06122023.jar"/>
 	<classpathentry kind="lib" path="NeoSim4Java-06122023.jar"/>
-	<classpathentry kind="lib" path="/home/walter/Desktop/MASTER/ALASCA/DW--Energies/jing-20181222/bin/jing.jar"/>
-	<classpathentry kind="lib" path="/home/walter/Desktop/MASTER/ALASCA/DW--Energies/javassist/javassist.jar"/>
+	<classpathentry kind="lib" path="/javassist/javassist.jar"/>
+	<classpathentry kind="lib" path="jing-20181222/bin/jing.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
