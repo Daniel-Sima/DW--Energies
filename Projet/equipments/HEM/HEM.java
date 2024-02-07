@@ -80,13 +80,21 @@ extends AbstractComponent
 
     /** Température minimale pour laquelle le HEM doit 
 	 * 	suspendre AirConditioning.											*/
-    private static final double SUSPEND_TEMP = 16.0;
+    private static final double SUSPEND_TEMP = 18.9;
 	/** Température maximale pour laquelle le HEM doit
 	 * 	resume AirConditioning.												*/
-	private static final double RESUME_TEMP = 20.0;
+	private static final double RESUME_TEMP = 19.4;
 	/** Consommation maximale pour laquelle le HEM doit 
-	 *	suspendre AirConditioning.											*/
-	private static final double CONSUMPTION_THRESHOLD = 10.0;
+	 *	suspendre tous les appareils										*/
+	private static final double MAX_CONSUMPTION_THRESHOLD = 10.0;
+	/**
+	 * Consommation minimale pour laquelle le HEM doit resume tous les appareils
+	 */
+	private static final double MIN_CONSUMPTION_THRESHOLD = 0.0;
+	/**
+	 * Boolean flag to indicate that AirConditioning has been suspended.
+	 */
+	private boolean airConditioningSuspended = false;
 
 	/** Restart flag														*/
 	private boolean restart = true;
@@ -174,15 +182,15 @@ extends AbstractComponent
 				o -> {
 					try	{
 						// Appeler la méthode de décision pour la consommation
-						evaluateConsumptionAndTakeAction();
+						evaluateAirConditioningAndTakeAction();
 						o.traceMessage(
 								"Electric meter current consumption: " +
 								electricMeterOutboundPort.getCurrentConsumption()
 														 .getMeasure()
 														 .getData() + "\n");
-
-						// Appeler la méthode de décision pour la température
-						evaluateTemperatureAndTakeAction();
+						o.traceMessage(
+								"AirConditioning is suspended? " + 
+								adjustableOutboundPortAirConditioning.suspended() + "\n");
 
 //						o.traceMessage(
 //								"Electric meter current production: " +
@@ -195,24 +203,34 @@ extends AbstractComponent
 		}
 	}
 
-	private void evaluateTemperatureAndTakeAction() {
+	private void evaluateAirConditioningAndTakeAction() {
 		try {
 			@SuppressWarnings("unchecked")
 			AirConditioningSensorData<AirConditioningCompoundMeasure> td =
 						(AirConditioningSensorData<AirConditioningCompoundMeasure>)
-										this.sensorOutboundPort.request();
+										this.sensorOutboundPort.request();			
+			SensorData<Measure<Double>> currentConsumption = electricMeterOutboundPort.getCurrentConsumption();
+			
 			if(DEBUG) {
 				this.traceMessage(td + "\n");	
 			}
 
 			double currentTemp = td.getMeasure().getCurrentTemperature();
 
-			if(currentTemp < SUSPEND_TEMP) {
-				adjustableOutboundPortAirConditioning.suspend();
+			if(!airConditioningSuspended) {
+				if(currentConsumption.getMeasure().getData() > MAX_CONSUMPTION_THRESHOLD || currentTemp < SUSPEND_TEMP) {
+					System.out.println("Suspending air conditioning");
+					adjustableOutboundPortAirConditioning.suspend();
+					airConditioningSuspended = true;
+				}
 			}
-			else if (currentTemp > RESUME_TEMP) {
-				adjustableOutboundPortAirConditioning.resume();
-				adjustableOutboundPortAirConditioning.setMode(3);		// max 6
+			else {
+				System.out.println("Suspended");
+					System.out.println("Resuming air conditioning");
+					adjustableOutboundPortAirConditioning.resume();
+					adjustableOutboundPortAirConditioning.setMode(6);		// max 6
+					airConditioningSuspended = false;
+				}
 			}
 
 		} catch (Exception e) {
@@ -220,19 +238,6 @@ extends AbstractComponent
 		}
 	}
 
-	public void evaluateConsumptionAndTakeAction() {
-        try {
-            SensorData<Measure<Double>> currentConsumption = electricMeterOutboundPort.getCurrentConsumption();
-
-            if (currentConsumption.getMeasure().getData() > CONSUMPTION_THRESHOLD) {
-                // Le taux de consommation est trop élevé, suspendre le climatiseur
-                adjustableOutboundPortAirConditioning.suspend();
-                // Vous pouvez également notifier d'autres composants ou prendre d'autres actions nécessaires.
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 	// -------------------------------------------------------------------------
 	// Component life-cycle
@@ -258,6 +263,7 @@ extends AbstractComponent
 					this.adjustableOutboundPortAirConditioning.getPortURI(),
 					AirConditioning.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 					AirConditioningConnector.class.getCanonicalName());
+			this.adjustableOutboundPortAirConditioning.setMode(3);		// max 6
 
 			System.out.println("HEM sensor outbound port uri : " + this.sensorOutboundPort.getPortURI());
 			this.doPortConnection(
